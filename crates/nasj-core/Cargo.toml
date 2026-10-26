@@ -1,0 +1,9 @@
+[package]
+name = "nasj-core"
+description = "Canonical topology model and future Nginx configuration analysis"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+[dependencies]
+serde.workspace = true
