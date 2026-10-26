@@ -8,7 +8,7 @@ fn url_secrets_are_removed_and_repeated_sanitization_is_stable() {
         "https://example.test?secret",
     ] {
         let output = redact::text(input);
-        assert!(!output.contains("password") || output.contains("[redacted]"));
+        assert!(!output.contains("password"));
         assert!(!output.contains("secret"));
         assert!(!output.contains("fragment"));
         assert_eq!(redact::text(&output), output);

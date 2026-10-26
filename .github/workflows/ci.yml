@@ -18,5 +18,12 @@ jobs:
       - run: cargo clippy --locked --workspace --all-targets -- -D warnings
       - run: cargo test --locked --workspace
       - run: cargo build --locked --workspace
+      - run: python3 tools/report-csp.py --check
       - run: cargo fmt --manifest-path tools/parser-spike/Cargo.toml -- --check
       - run: cargo test --locked --manifest-path tools/parser-spike/Cargo.toml
+      - name: Verify offline browser reports
+        run: |
+          python3 -m venv /tmp/nasj-browser-venv
+          /tmp/nasj-browser-venv/bin/pip install -r tools/browser-requirements.txt
+          /tmp/nasj-browser-venv/bin/playwright install chromium
+          /tmp/nasj-browser-venv/bin/python tools/browser-smoke.py

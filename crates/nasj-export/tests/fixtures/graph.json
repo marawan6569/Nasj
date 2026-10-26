@@ -1,0 +1,15 @@
+{
+  "schema_version": "0.1",
+  "analysis": "configuration",
+  "sources": ["fixtures/nginx.conf"],
+  "nodes": [
+    {"id":"domain","kind":"domain","label":"example.test","source":{"path":"fixtures/nginx.conf","line":4},"attributes":{}},
+    {"id":"location","kind":"location","label":"location /api","source":{"path":"fixtures/nginx.conf","line":5},"attributes":{"match":"prefix"}},
+    {"id":"target","kind":"target","label":"127.0.0.1:8000","source":{"path":"fixtures/nginx.conf","line":6},"attributes":{}}
+  ],
+  "edges": [
+    {"from":"domain","to":"location","kind":"routes_to","source":{"path":"fixtures/nginx.conf","line":5},"evidence":"configured"},
+    {"from":"location","to":"target","kind":"proxies_to","source":{"path":"fixtures/nginx.conf","line":6},"evidence":"configured"}
+  ],
+  "warnings": [{"code":"fixture.warning","message":"Configured infrastructure is unverified","source":{"path":"fixtures/nginx.conf","line":6}}]
+}

@@ -1,0 +1,9 @@
+digraph nasj {
+  rankdir=LR;
+  "domain" [label="example.test"];
+  "location" [label="location /api"];
+  "target" [label="127.0.0.1:8000"];
+  "domain" -> "location" [label="routes to (configured)"];
+  "location" -> "target" [label="proxies to (configured)"];
+  graph [label="fixture.warning: Configured infrastructure is unverified", labelloc=b];
+}

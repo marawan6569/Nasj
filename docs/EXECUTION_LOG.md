@@ -42,3 +42,31 @@ configured/synthetic evidence, source metadata, URL redaction, and functional
 Fixtures cover recursive/glob includes, IPv6/TLS, virtual hosts, locations,
 upstreams, redirects, static paths, conditional/variable routes and failures.
 See ANALYSIS.md for conservative exclusions and limits. Discovery remains absent.
+
+Validation for P1b: fmt, Clippy with warnings denied, all 19 workspace tests and
+build passed. Review found and fixed Unix socket URL authority parsing, with a
+regression fixture. PR #9 at `925c24f` passed Actions run 40394983790.
+
+## P2 — portable SVG and offline HTML
+
+Added native deterministic SVG layering and an embedded HTML viewer with zoom,
+pan, mouse/keyboard node selection, search, filters, source/evidence inspector,
+diagnostics navigation, responsive layout and light/dark themes. JSON/DOT/SVG
+goldens and hostile/empty/cyclic graph tests exercise the shared model. Export
+validation rejects duplicate IDs and dangling endpoints. DOT shows configured
+evidence and warnings. HTML escapes inert JSON and XML, uses DOM text creation,
+and allows only the checked-in viewer script hash under a network-denying CSP.
+No runtime renderer dependencies added. See REPORTS.md.
+
+Validation: all four workspace gates pass, 23 tests; CSP hash check passes.
+Chromium 156 / Playwright 1.64.1 passed actual offline file:// browser checks for
+interactions, mobile overflow, sources/evidence, themes, hostile and empty input,
+and zero external requests/browser errors. Desktop/mobile screenshots reviewed.
+Missing Chromium libraries/fonts were extracted into /tmp under user permissions;
+no system package install or privilege escalation. Graphviz 14.1.2 independently
+accepted ordinary and hostile DOT using temporary local libraries/plugins.
+
+Limitations: SVG layout can have crossing edges and requires zoom on larger maps;
+the browser suite currently covers Chromium only. No arbitrary config secret
+detection or runtime verification is promised. Corrected branding remains missing.
+Next: documentation/release checklist and future discovery/server architecture.

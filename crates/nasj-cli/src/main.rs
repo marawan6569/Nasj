@@ -45,12 +45,16 @@ enum Command {
 enum OutputFormat {
     Json,
     Dot,
+    Svg,
+    Html,
 }
 impl From<OutputFormat> for Format {
     fn from(value: OutputFormat) -> Self {
         match value {
             OutputFormat::Json => Format::Json,
             OutputFormat::Dot => Format::Dot,
+            OutputFormat::Svg => Format::Svg,
+            OutputFormat::Html => Format::Html,
         }
     }
 }

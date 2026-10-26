@@ -1,17 +1,61 @@
-//! Portable topology exporters (JSON and DOT bootstrap only).
+//! Portable, self-contained exporters consuming the same normalized model.
 use nasj_core::Topology;
+use std::{collections::BTreeSet, error::Error, fmt};
+
+mod html;
+mod svg;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Format {
     Json,
     Dot,
+    Svg,
+    Html,
 }
 
-pub fn render(topology: &Topology, format: Format) -> Result<String, serde_json::Error> {
+#[derive(Debug)]
+pub enum ExportError {
+    Json(serde_json::Error),
+    InvalidTopology(&'static str),
+}
+
+impl fmt::Display for ExportError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Json(error) => error.fmt(f),
+            Self::InvalidTopology(message) => f.write_str(message),
+        }
+    }
+}
+impl Error for ExportError {}
+impl From<serde_json::Error> for ExportError {
+    fn from(error: serde_json::Error) -> Self {
+        Self::Json(error)
+    }
+}
+
+pub fn render(topology: &Topology, format: Format) -> Result<String, ExportError> {
     let topology = nasj_core::redact::topology(topology);
+    let mut ids = BTreeSet::new();
+    for node in &topology.nodes {
+        if !ids.insert(node.id.as_str()) {
+            return Err(ExportError::InvalidTopology("duplicate topology node ID"));
+        }
+    }
+    if topology
+        .edges
+        .iter()
+        .any(|e| !ids.contains(e.from.as_str()) || !ids.contains(e.to.as_str()))
+    {
+        return Err(ExportError::InvalidTopology(
+            "topology edge references a missing node",
+        ));
+    }
     match format {
-        Format::Json => serde_json::to_string_pretty(&topology),
+        Format::Json => Ok(serde_json::to_string_pretty(&topology)?),
         Format::Dot => Ok(render_dot(&topology)),
+        Format::Svg => Ok(svg::render(&topology)),
+        Format::Html => html::render(&topology),
     }
 }
 
@@ -42,14 +86,50 @@ fn render_dot(topology: &Topology) -> String {
     }
     for edge in &topology.edges {
         output.push_str(&format!(
-            "  \"{}\" -> \"{}\" [label=\"{:?}\"];\n",
+            "  \"{}\" -> \"{}\" [label=\"{} ({})\"];\n",
             escape_dot(&edge.from),
             escape_dot(&edge.to),
-            edge.kind
+            edge_label(&edge.kind),
+            evidence_label(&edge.evidence),
+        ));
+    }
+    if !topology.warnings.is_empty() {
+        let warnings = topology
+            .warnings
+            .iter()
+            .map(|w| format!("{}: {}", w.code, w.message))
+            .collect::<Vec<_>>()
+            .join("\n");
+        output.push_str(&format!(
+            "  graph [label=\"{}\", labelloc=b];\n",
+            escape_dot(&warnings)
         ));
     }
     output.push_str("}\n");
     output
+}
+
+fn edge_label(kind: &nasj_core::EdgeKind) -> &'static str {
+    use nasj_core::EdgeKind::*;
+    match kind {
+        ListensOn => "listens on",
+        Contains => "contains",
+        RoutesTo => "routes to",
+        ProxiesTo => "proxies to",
+        RedirectsTo => "redirects to",
+        BackedBy => "backed by",
+    }
+}
+
+fn evidence_label(evidence: &nasj_core::Evidence) -> &'static str {
+    use nasj_core::Evidence::*;
+    match evidence {
+        Configured => "configured",
+        Synthetic => "synthetic",
+        Inferred => "inferred",
+        Confirmed => "confirmed",
+        Unresolved => "unresolved",
+    }
 }
 
 #[cfg(test)]
