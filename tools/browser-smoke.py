@@ -98,6 +98,21 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     assert graph.bounding_box()["height"] >= 400
     page.screenshot(path=str(screenshots / "mobile.png"), full_page=True)
 
+    conditional = temporary / "conditional.html"
+    generate(repo / "fixtures/nginx/conditionals/redirect.conf", conditional, "html")
+    page.goto(conditional.as_uri())
+    expect(page.locator("#node-count")).not_to_have_text("—")
+    page.locator("#kind-filter").select_option("condition")
+    expect(page.locator("#matches button")).to_have_count(1)
+    page.locator("#matches button").click()
+    expect(page.locator("#node-fields")).to_contain_text('Symbolic condition')
+    expect(page.locator("#node-fields")).to_contain_text('$host = "example.test"')
+    page.locator("#clear-filters").click()
+    page.locator("#kind-filter").select_option("redirect")
+    page.locator("#matches button").click()
+    expect(page.locator("#node-fields")).to_contain_text('https://$host$request_uri')
+    expect(page.locator("#relationships")).to_contain_text('when true')
+
     hostile = temporary / "hostile.html"
     generate(repo / "fixtures/nginx/hostile.conf", hostile, "html")
     page.goto(hostile.as_uri())

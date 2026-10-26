@@ -100,10 +100,14 @@ fn real_pipeline_maps_listeners_domains_locations_and_upstreams_with_provenance(
         .iter()
         .find(|n| n.label == "location /nested/child")
         .unwrap();
-    assert!(graph
+    assert!(!graph
         .edges
         .iter()
         .any(|e| e.from == nested.id && e.to == upstream.id && e.kind == EdgeKind::ProxiesTo));
+    assert!(graph
+        .edges
+        .iter()
+        .any(|e| e.from == nested.id && e.kind == EdgeKind::BackedBy));
     let debug = format!("{graph:?}");
     assert!(!debug.contains("fixture-secret"));
     assert!(!debug.contains("private response body"));

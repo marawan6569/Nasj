@@ -44,6 +44,10 @@
     $('node-title').textContent = node.label;
     const fields = $('node-fields');
     fields.replaceChildren();
+    if (node.condition) {
+      const condition = node.condition;
+      fields.append(text('dt', 'Symbolic condition'), text('dd', `${condition.variable} ${condition.operator === 'equal' ? '=' : '!='} ${JSON.stringify(condition.value)}${condition.value_redacted ? ' (value redacted)' : ''}`));
+    }
     for (const [key, value] of [...Object.entries({ id: node.id, source: source(node.source) }), ...Object.entries(node.attributes)]) {
       fields.append(text('dt', pretty(key)), text('dd', value));
     }

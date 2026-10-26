@@ -4,12 +4,13 @@ use std::collections::BTreeMap;
 
 mod analyze;
 pub mod config;
+mod control;
 pub mod redact;
 pub mod syntax;
 
 pub use config::{analyze_file, AnalysisOptions};
 
-pub const SCHEMA_VERSION: &str = "0.1";
+pub const SCHEMA_VERSION: &str = "0.2";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -22,6 +23,9 @@ pub enum NodeKind {
     Target,
     StaticRoot,
     Redirect,
+    Response,
+    Condition,
+    RoutingStep,
     Container,
     Service,
     Process,
@@ -36,6 +40,27 @@ pub enum EdgeKind {
     ProxiesTo,
     RedirectsTo,
     BackedBy,
+    Evaluates,
+    WhenTrue,
+    WhenFalse,
+    RespondsWith,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Comparison {
+    Equal,
+    NotEqual,
+}
+
+/// A symbolic comparison, never evaluated by static analysis.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Condition {
+    pub variable: String,
+    pub operator: Comparison,
+    pub value: String,
+    #[serde(default)]
+    pub value_redacted: bool,
 }
 
 /// Evidence is separate from graph connectivity. Static analysis never emits
@@ -74,6 +99,8 @@ pub struct Node {
     pub source: Option<SourceLocation>,
     #[serde(default)]
     pub attributes: BTreeMap<String, String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub condition: Option<Condition>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Edge {
@@ -119,7 +146,7 @@ mod tests {
     #[test]
     fn default_topology_is_empty_and_versioned() {
         let graph = Topology::default();
-        assert_eq!(graph.schema_version, "0.1");
+        assert_eq!(graph.schema_version, SCHEMA_VERSION);
         assert!(graph.nodes.is_empty());
     }
 }

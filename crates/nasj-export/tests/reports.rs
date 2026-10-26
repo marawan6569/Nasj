@@ -104,3 +104,37 @@ fn legacy_graphs_without_provenance_are_never_labeled_configured() {
         .unwrap()
         .contains("provenance unknown"));
 }
+
+#[test]
+fn conditional_control_flow_has_shared_json_dot_svg_goldens_and_html_metadata() {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../fixtures/nginx/conditionals/redirect.conf");
+    let mut graph = analyze_file(&path, &AnalysisOptions::default()).unwrap();
+    graph.sources = vec!["fixtures/conditional.conf".into()];
+    for node in &mut graph.nodes {
+        if let Some(source) = &mut node.source {
+            source.path = "fixtures/conditional.conf".into();
+        }
+    }
+    for edge in &mut graph.edges {
+        if let Some(source) = &mut edge.source {
+            source.path = "fixtures/conditional.conf".into();
+        }
+    }
+    for (format, expected) in [
+        (
+            Format::Json,
+            include_str!("fixtures/conditional.golden.json"),
+        ),
+        (Format::Dot, include_str!("fixtures/conditional.golden.dot")),
+        (Format::Svg, include_str!("fixtures/conditional.golden.svg")),
+    ] {
+        assert_eq!(
+            render(&graph, format).unwrap().trim_end(),
+            expected.trim_end()
+        );
+    }
+    let html = render(&graph, Format::Html).unwrap();
+    assert!(html.contains("https://$host$request_uri"));
+    assert!(html.contains("Symbolic condition"));
+}

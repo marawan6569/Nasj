@@ -118,6 +118,10 @@ fn edge_label(kind: &nasj_core::EdgeKind) -> &'static str {
         ProxiesTo => "proxies to",
         RedirectsTo => "redirects to",
         BackedBy => "backed by",
+        Evaluates => "evaluates",
+        WhenTrue => "true",
+        WhenFalse => "false / otherwise",
+        RespondsWith => "responds with",
     }
 }
 
@@ -152,6 +156,7 @@ mod tests {
             label: "say \"hi\"".into(),
             source: None,
             attributes: BTreeMap::new(),
+            condition: None,
         });
         assert!(render(&graph, Format::Dot).unwrap().contains("\\\"hi\\\""));
     }

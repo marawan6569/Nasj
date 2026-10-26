@@ -1,7 +1,10 @@
 //! Conservative HTTP configuration semantics. This is not request simulation.
 use crate::{
-    redact, syntax::Directive, AnalysisKind, Edge, EdgeKind, Evidence, Node, NodeKind,
-    SourceLocation, Topology, Warning,
+    control::{self, Action, Step},
+    redact,
+    syntax::Directive,
+    AnalysisKind, Comparison, Edge, EdgeKind, Evidence, Node, NodeKind, SourceLocation, Topology,
+    Warning,
 };
 use std::collections::BTreeMap;
 
@@ -30,6 +33,7 @@ impl Analyzer {
                 .iter()
                 .map(|(key, value)| ((*key).into(), redact::text(value)))
                 .collect(),
+            condition: None,
         });
         id
     }
@@ -216,10 +220,10 @@ impl Analyzer {
         }
         let inherited: Vec<_> = inherited
             .iter()
-            .filter(|d| d.name == "root")
+            .filter(|d| matches!(d.name.as_str(), "root" | "error_page"))
             .cloned()
             .collect();
-        self.scope(&server, children, &inherited, false);
+        self.scope(&server, children, &inherited, false, true);
     }
 
     fn scope(
@@ -228,15 +232,31 @@ impl Analyzer {
         children: &[Directive],
         inherited: &[Directive],
         ancestor_uncertain: bool,
+        server_level: bool,
     ) {
+        let inherited_error = inherited.iter().any(|d| d.name == "error_page");
+        let program = if server_level && !inherited_error {
+            control::program(children)
+        } else {
+            None
+        };
+        let supported_if = server_level && program.is_some();
         // Internal redirects/rewrites and extension handlers prevent a claim
         // about an effective destination. Keep containment, drop routing edges.
         let mut uncertain = ancestor_uncertain
+            || inherited_error
             || children.iter().any(|d| {
                 matches!(
                     d.name.as_str(),
-                    "if" | "rewrite" | "try_files" | "error_page" | "mirror" | "limit_except"
-                ) || d.name.ends_with("_by_lua_file")
+                    "rewrite"
+                        | "set"
+                        | "break"
+                        | "try_files"
+                        | "error_page"
+                        | "mirror"
+                        | "limit_except"
+                ) || d.name == "if" && !supported_if
+                    || d.name.ends_with("_by_lua_file")
                     || d.name.starts_with("js_")
             });
         if uncertain {
@@ -247,7 +267,7 @@ impl Analyzer {
                 .and_then(|&index| self.graph.nodes.get(index))
                 .and_then(|node| node.source.clone())
             {
-                self.warn("routing.unresolved", "conditional, rewrite, or unsupported handler context; effective routes are unresolved", &source);
+                self.warn("routing.unresolved", "this rewrite/conditional context is unsupported by static analysis; effective routes are unresolved (not a Nginx validity error)", &source);
             }
         }
         let inherited_alias = inherited.iter().find(|d| d.name == "alias");
@@ -272,8 +292,8 @@ impl Analyzer {
                 );
             }
         }
-        // Resolve root/proxy inheritance. Carry aliases only to diagnose their
-        // unsupported inheritance; return is never propagated as a directive.
+        // Root is inherited; ordinary nested location pass handlers are not.
+        // Carry aliases only to diagnose unsupported inheritance.
         let mut effective = Vec::new();
         for name in ["root", "alias", "proxy_pass"] {
             let local: Vec<_> = children.iter().filter(|d| d.name == name).collect();
@@ -289,37 +309,98 @@ impl Analyzer {
             }
             if let Some(d) = local.first() {
                 effective.push((*d).clone());
-            } else if name != "alias" {
-                if name == "root" && children.iter().any(|d| d.name == "alias") {
+            } else if name == "root" {
+                if children.iter().any(|d| d.name == "alias") {
                     continue;
                 }
                 if let Some(d) = inherited.iter().find(|d| d.name == name) {
                     effective.push(d.clone());
                 }
-            } else if !local_path {
+            } else if name == "alias" && !local_path {
                 if let Some(alias) = inherited_alias {
                     effective.push(alias.clone());
                 }
             }
         }
-        let returns: Vec<_> = children.iter().filter(|d| d.name == "return").collect();
-        let has_return = !returns.is_empty();
-        if returns.len() > 1 {
+        let error_pages: Vec<_> = children
+            .iter()
+            .filter(|d| d.name == "error_page")
+            .cloned()
+            .collect();
+        effective.extend(if error_pages.is_empty() {
+            inherited
+                .iter()
+                .filter(|d| d.name == "error_page")
+                .cloned()
+                .collect()
+        } else {
+            error_pages
+        });
+        // root is configuration metadata even when a content handler replaces
+        // static serving. Ordinary named/prefix locations do not inherit pass
+        // handlers; Nginx's special noname/limit_except contexts are excluded.
+        if let Some(root) = effective.iter().find(|d| d.name == "root") {
+            if let Some(node) = self
+                .node_index
+                .get(owner)
+                .and_then(|&i| self.graph.nodes.get_mut(i))
+            {
+                node.attributes.insert(
+                    "configured_root".into(),
+                    redact::text(&root.args.first().cloned().unwrap_or_default()),
+                );
+                node.attributes.insert(
+                    "root_origin".into(),
+                    if children.iter().any(|d| d.name == "root") {
+                        "local"
+                    } else {
+                        "inherited"
+                    }
+                    .into(),
+                );
+                node.attributes.insert(
+                    "root_source".into(),
+                    format!("{}:{}", root.source.path, root.source.line),
+                );
+            }
+        }
+        let handlers: Vec<_> = children
+            .iter()
+            .filter(|d| {
+                matches!(
+                    d.name.as_str(),
+                    "proxy_pass" | "fastcgi_pass" | "uwsgi_pass" | "scgi_pass" | "grpc_pass"
+                )
+            })
+            .collect();
+        let unsupported = handlers.iter().find(|d| d.name != "proxy_pass");
+        if let Some(d) = unsupported {
+            self.unresolved(owner,d,"this upstream content handler is unsupported by static analysis; no effective destination is asserted (not a Nginx validity error)");
+        }
+        if handlers.len() > 1 {
+            uncertain = true;
             self.unresolved(
                 owner,
-                returns[1],
-                "multiple return directives are not simulated",
+                handlers[1],
+                "multiple content handlers; no effective destination is asserted",
             );
         }
-        if !uncertain && returns.len() <= 1 {
-            if let Some(d) = returns.first() {
+        let returns: Vec<_> = children.iter().filter(|d| d.name == "return").collect();
+        let has_control = !returns.is_empty() || children.iter().any(|d| d.name == "if");
+        if !uncertain {
+            if let Some(steps) = program.filter(|steps| !steps.is_empty()) {
+                self.control_flow(owner, steps);
+            } else if let Some(d) = returns.first() {
                 self.redirect(owner, d);
-            } else {
-                for d in &effective {
-                    match d.name.as_str() {
-                        "proxy_pass" => self.proxy(owner, d),
-                        "root" | "alias" => self.static_path(owner, d),
-                        _ => {}
+            } else if unsupported.is_none() {
+                if let Some(proxy) = effective.iter().find(|d| d.name == "proxy_pass") {
+                    self.proxy(owner, proxy);
+                } else {
+                    for d in effective
+                        .iter()
+                        .filter(|d| matches!(d.name.as_str(), "root" | "alias"))
+                    {
+                        self.static_path(owner, d);
                     }
                 }
             }
@@ -333,12 +414,6 @@ impl Analyzer {
                         "nested context is not analyzed",
                         &child.source,
                     );
-                }
-                if matches!(
-                    child.name.as_str(),
-                    "fastcgi_pass" | "uwsgi_pass" | "scgi_pass" | "grpc_pass"
-                ) {
-                    self.unresolved(owner, child, "non-HTTP proxy handler is unsupported");
                 }
                 continue;
             }
@@ -380,7 +455,7 @@ impl Analyzer {
                 &[("match", matching.into()), ("pattern", pattern.into())],
             );
             self.edge(owner, &id, EdgeKind::Contains, &child.source);
-            self.scope(&id, body, &effective, uncertain || has_return);
+            self.scope(&id, body, &effective, uncertain || has_control, false);
         }
     }
 
@@ -454,43 +529,144 @@ impl Analyzer {
         self.edge(owner, &id, EdgeKind::BackedBy, &d.source);
     }
 
-    fn redirect(&mut self, owner: &str, d: &Directive) {
-        let (status, destination) = match d.args.as_slice() {
-            [url] if url.starts_with("http://") || url.starts_with("https://") => {
-                ("302", url.as_str())
-            }
-            [code, url] if matches!(code.as_str(), "301" | "302" | "303" | "307" | "308") => {
-                (code.as_str(), url.as_str())
-            }
-            [code] | [code, _] if code.parse::<u16>().is_ok_and(|n| (100..=599).contains(&n)) => {
+    fn action_node(&mut self, action: Action, d: &Directive) -> String {
+        match action {
+            Action::Response { status } => self.node(
+                NodeKind::Response,
+                &format!("return {status}"),
+                &d.source,
+                &[("status", status), ("response", "body omitted".into())],
+            ),
+            Action::Redirect { status, expression } => {
+                let dynamic = expression.contains('$');
                 let id = self.node(
                     NodeKind::Redirect,
-                    &format!("return {code}"),
+                    &format!("{status} → {expression}"),
                     &d.source,
                     &[
-                        ("status", code.clone()),
-                        ("response", "body omitted".into()),
+                        ("status", status),
+                        ("target_expression", expression),
+                        (
+                            "destination_resolution",
+                            if dynamic { "dynamic" } else { "literal" }.into(),
+                        ),
                     ],
                 );
-                self.edge(owner, &id, EdgeKind::Contains, &d.source);
-                return;
+                if dynamic {
+                    self.mark_unresolved(&id);
+                }
+                id
             }
-            _ => {
-                self.unresolved(owner, d, "unsupported return arguments");
-                return;
-            }
-        };
-        if destination.contains('$') {
-            self.unresolved(owner, d, "dynamic redirect destination");
-            return;
         }
-        let id = self.node(
-            NodeKind::Redirect,
-            destination,
-            &d.source,
-            &[("status", status.into())],
-        );
-        self.edge(owner, &id, EdgeKind::RedirectsTo, &d.source);
+    }
+
+    fn redirect(&mut self, owner: &str, d: &Directive) {
+        let Some(action) = control::action(d) else {
+            self.unresolved(
+                owner,
+                d,
+                "return arguments are unsupported by static analysis (not a Nginx validity error)",
+            );
+            return;
+        };
+        let kind = if matches!(action, Action::Redirect { .. }) {
+            EdgeKind::RedirectsTo
+        } else {
+            EdgeKind::RespondsWith
+        };
+        let id = self.action_node(action, d);
+        self.edge(owner, &id, kind, &d.source);
+    }
+
+    fn control_flow(&mut self, owner: &str, steps: Vec<Step<'_>>) {
+        if steps.iter().any(|step| matches!(step, Step::If { .. })) {
+            if let Some(node) = self
+                .node_index
+                .get(owner)
+                .and_then(|&i| self.graph.nodes.get_mut(i))
+            {
+                node.attributes
+                    .entry("routing".into())
+                    .or_insert("conditional".into());
+            }
+        }
+        let mut pending = owner.to_owned();
+        let mut previous = None;
+        for step in steps {
+            match step {
+                Step::If {
+                    directive,
+                    condition,
+                    action,
+                    action_source,
+                } => {
+                    let operator = if condition.operator == Comparison::Equal {
+                        "="
+                    } else {
+                        "!="
+                    };
+                    let label = format!("{} {operator} {:?}", condition.variable, condition.value);
+                    let id = self.node(
+                        NodeKind::Condition,
+                        &label,
+                        &directive.source,
+                        &[("phase", "server_rewrite".into())],
+                    );
+                    if let Some(node) = self
+                        .node_index
+                        .get(&id)
+                        .and_then(|&i| self.graph.nodes.get_mut(i))
+                    {
+                        node.condition = Some(condition);
+                    }
+                    self.edge(
+                        &pending,
+                        &id,
+                        if previous.is_some() {
+                            EdgeKind::WhenFalse
+                        } else {
+                            EdgeKind::Evaluates
+                        },
+                        previous.unwrap_or(&directive.source),
+                    );
+                    let target = self.action_node(action, action_source);
+                    self.edge(&id, &target, EdgeKind::WhenTrue, &directive.source);
+                    pending = id;
+                    previous = Some(&directive.source);
+                }
+                Step::Return { directive, action } => {
+                    let kind = if previous.is_some() {
+                        EdgeKind::WhenFalse
+                    } else if matches!(action, Action::Redirect { .. }) {
+                        EdgeKind::RedirectsTo
+                    } else {
+                        EdgeKind::RespondsWith
+                    };
+                    let target = self.action_node(action, directive);
+                    self.edge(
+                        &pending,
+                        &target,
+                        kind,
+                        previous.unwrap_or(&directive.source),
+                    );
+                    return;
+                }
+            }
+        }
+        if let Some(source) = previous {
+            let id = self.node(
+                NodeKind::RoutingStep,
+                "Continue to location matching (not simulated)",
+                source,
+                &[
+                    ("phase", "location_selection".into()),
+                    ("routing", "unresolved".into()),
+                ],
+            );
+            self.edge(&pending, &id, EdgeKind::WhenFalse, source);
+            self.mark_unresolved(owner);
+            self.warn("routing.fallthrough","a false conditional continues to location matching; the final outcome is not simulated (not a Nginx validity error)",source);
+        }
     }
 }
 

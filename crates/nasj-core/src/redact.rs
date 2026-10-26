@@ -56,6 +56,15 @@ pub fn topology(input: &Topology) -> Topology {
     for node in &mut graph.nodes {
         node.id = text(&node.id);
         node.label = text(&node.label);
+        if let Some(condition) = &mut node.condition {
+            let value = if sensitive_key(&condition.variable) {
+                "[redacted]".into()
+            } else {
+                text(&condition.value)
+            };
+            condition.value_redacted |= value != condition.value;
+            condition.value = value;
+        }
         for (key, value) in &mut node.attributes {
             *value = if sensitive_key(key) {
                 "[redacted]".into()
