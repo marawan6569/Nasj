@@ -109,3 +109,22 @@ diagnostics with escaped source paths even in strict mode. Input opens additiona
 reject final-component symlink replacement. No discovery or privileged IO added.
 Validation after audit: 26 workspace tests; required gates and browser/CSP checks
 are rerun for this review branch. No PRs merged, releases made or issues closed.
+
+## Review handoff
+
+| Phase | Changed areas | PR / implementation commit | Verified Actions run |
+| --- | --- | --- | --- |
+| P0 | Workspace, CLI/DOT checks, lockfile, CI, plan | #1 / `7f252d6` | 40393434723 passed |
+| P1a | core syntax, fixtures, isolated spike, ADR | #8 / `e7851e8` | 40393921731 passed |
+| P1b | core input/semantics/model/redaction, CLI, fixtures | #9 / `925c24f` | 40394983790 passed |
+| P2 | exporters/viewer, goldens, browser tools/CI | #10 / `989e63a` | 40396305004 passed |
+| P3 | READMEs, architecture/spec/security/contribution/release docs | #11 / `88dff67` | 40396988049 passed |
+| P4 | proposed discovery/server ADRs, roadmap | #12 / `0321792` | 40397413019 passed |
+| Final audit | core/CLI/exporter safety and negative regressions | #13 / `b9c3d16` | Check current PR head |
+
+Review in dependency order; PR #1 remains a draft. Final branch is
+`fix/analysis-uncertainty-hardening`; main was not pushed. All work remains
+unmerged. Missing branding assets, unverified repository protections, experimental
+schema/renumbering IDs, conservative semantic exclusions, simple graph layout and
+Chromium-only browser coverage are the remaining release concerns. The next task
+is maintainer review and release-checklist validation, not runtime discovery.

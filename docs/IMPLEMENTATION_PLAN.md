@@ -136,3 +136,23 @@ risks and the next task. Initial blockers: missing corrected branding assets;
 GitHub CLI unavailable (connector and SSH Git are alternatives). Repository branch
 protection requires an API/settings capability and appropriate plan/permissions;
 record actual status and do not imply required checks are enforced without proof.
+
+## Implemented review stack
+
+Execution progressed beyond planning. These changes are implemented for review,
+not merged/released. See [EXECUTION_LOG.md](EXECUTION_LOG.md) for checks and risks.
+
+| Work | PR | Implementation commit |
+| --- | --- | --- |
+| P0 stabilization and this plan | #1 | `7f252d6` |
+| P1a parser comparison, ADR and syntax | #8 | `e7851e8` |
+| P1b includes and real topology | #9 | `976a015`, `925c24f` |
+| P2 SVG and offline HTML | #10 | `989e63a` |
+| P3 docs and release readiness | #11 | `88dff67` |
+| P4 future architecture only | #12 | `0321792` |
+| Final uncertainty/provenance/safety audit | #13 | `b9c3d16` |
+
+The current preview has 26 workspace tests plus the isolated parser comparison
+and offline Chromium suite. Corrected branding remains blocked on approved
+assets. Repository required-check enforcement remains unverified. v0.2/v0.3 code
+is intentionally deferred; final schema/release decisions require review.

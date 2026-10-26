@@ -9,7 +9,9 @@ Code listed below is an implemented preview awaiting maintainer review.
 | Parser research and syntax | Comparison spike, ADR, bounded parser and fixtures | PR #8 → #1; issue #2 |
 | Real HTTP topology | Includes, semantics, configured evidence, provenance and JSON/DOT | PR #9 → #8; issues #2/#3 |
 | Portable reports | SVG and offline interactive HTML; security/browser checks | PR #10 → #9; issue #4 |
-| Documentation and release readiness | English/Arabic usage, architecture and checklist | Documentation PR; issue #6 |
+| Documentation and release readiness | English/Arabic usage, architecture and checklist | PR #11 → #10; issue #6 |
+| Future architecture | Discovery/evidence and optional localhost server proposals only | PR #12 → #11; issue #5 |
+| Final safety audit | Explicit alias/duplicate uncertainty, unknown provenance and private reports | PR #13 → #12 |
 | Approved branding assets | Blocked: corrected originals absent | Issue #6 |
 | Required-check/branch protection settings | Unverified; available connector cannot configure settings | Issue #7 |
 
