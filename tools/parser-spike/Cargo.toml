@@ -1,0 +1,13 @@
+[package]
+name = "nasj-parser-spike"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# Isolated research dependencies never enter the NASJ executable.
+[workspace]
+
+[dependencies]
+nginx-config = "=0.13.2"
+nginx-lint-parser = { version = "=0.24.0", default-features = false }
+misc-conf = "=0.1.2"

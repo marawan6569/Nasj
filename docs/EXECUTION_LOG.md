@@ -22,3 +22,12 @@ connector operations; enforcement is unverified and issue #7 remains open.
 Approved logo assets are missing. No issues closed or PRs merged.
 
 Next: parser comparison fixtures and ADR for issue #2 on a dependent branch.
+
+## P1a — parser research
+
+PR #1 CI passed on `7f252d6` (Actions run 40393434723). Researched and executed
+three published parser candidates in an isolated spike. ADR-0001 records concrete
+behavior, maintenance/licensing and alternatives. Implemented a bounded generic
+syntax parser with source locations and no production dependencies; added
+sanitized syntax and malformed-input fixtures. Include resolution remains the
+next focused PR. Neither parser research nor mapping is marked merged/completed.
