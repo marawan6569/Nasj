@@ -79,6 +79,7 @@ pub fn topology(input: &Topology) -> Topology {
     }
     for warning in &mut graph.warnings {
         warning.message = text(&warning.message);
+        warning.local_context = None;
     }
     graph
 }

@@ -61,7 +61,9 @@ in the model; no runtime discovery is implemented. Variables, duplicate upstream
 names and unsupported routing contexts produce diagnostics and omit
 invented proxy edges. A graph is not a request simulator, DNS lookup, Nginx validity
 check or runtime reachability assertion. Semantic limitations remain warnings;
-the CLI's `--strict` option rejects any warning.
+the CLI's `--strict` option rejects warning/error diagnostics and permits info.
+Optional empty globs are info; required input failures always abort. Private
+include-pattern context stays local to CLI diagnostics and out of reports.
 
 Narrow server rewrite programs use symbolic condition nodes and ordered true/false
 edges to redirect/response actions; variables are not evaluated. Content-handler

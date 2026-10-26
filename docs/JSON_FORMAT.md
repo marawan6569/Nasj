@@ -52,9 +52,14 @@ evidence describes guarded instructions, not a guarantee the branch is taken.
 Configured edges describe declarations, not successful
 requests, DNS resolution, endpoint reachability or location precedence.
 
-Warnings have `code`, fixed explanatory `message`, and nullable `source`. Syntax,
+The legacy `warnings` collection contains all diagnostics: `code`, fixed
+`message`, nullable `source` and `severity` (`info`, `warning`, `error`). Missing
+legacy severity defaults to warning. Optional unmatched include globs are info.
+Private `local_context` (such as the exact include pattern) is never serialized
+or rendered; only the local CLI displays bounded escaped/redacted context. Syntax,
 read, include-scope and resource-limit failures return an error and no graph.
-Semantic limitations are warnings; `map --strict` rejects any warning. Unknown
+Semantic limitations are warnings; `map --strict` rejects warning/error and
+allows info. Errors abort even without strict mode. Unknown
 unrelated directives are ignored. No complete Nginx validity check is implied.
 
 URL userinfo and all query/fragment contents are redacted. Return response bodies

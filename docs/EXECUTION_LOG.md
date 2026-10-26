@@ -140,3 +140,14 @@ schema 0.2, source provenance, no variable substitution, explicit unresolved
 fallthrough and conservative unsupported cases. ADR-0004 records scope and
 compatibility. All four exporters and conditional JSON/DOT/SVG goldens updated.
 Only synthetic fixtures are used; no real deployment data/configuration was read.
+
+## Field validation — diagnostic severity
+
+Added Info/Warning/Error diagnostics, retaining the legacy serialized `warnings`
+collection and Warning type alias. Optional unmatched globs are Info; required
+literal/read failures remain Error and abort regardless of strict mode. Strict
+mode blocks Warning/Error, permits Info, and still prints all diagnostics. Local
+CLI context shows a bounded control-escaped, URL-redacted pattern; local_context
+is stripped at export and never serialized. HTML, SVG and DOT show severity.
+Added strict-mode, missing literal, control/credential redaction, exported privacy,
+legacy severity and offline severity-panel checks. PR #14 CI passed at `88af4d2`.

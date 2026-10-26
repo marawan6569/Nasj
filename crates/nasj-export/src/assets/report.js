@@ -144,14 +144,18 @@
   $('node-count').textContent = data.nodes.length;
   $('edge-count').textContent = data.edges.length;
   $('warning-count').textContent = data.warnings.length;
-  $('review-warnings').textContent = `${data.warnings.length} analysis warning${data.warnings.length === 1 ? '' : 's'} · Review`;
+  const warningCount = data.warnings.filter(diagnostic => diagnostic.severity === 'warning' || !diagnostic.severity).length;
+  const infoCount = data.warnings.filter(diagnostic => diagnostic.severity === 'info').length;
+  const errorCount = data.warnings.filter(diagnostic => diagnostic.severity === 'error').length;
+  $('review-warnings').textContent = `${warningCount} analysis warning${warningCount === 1 ? '' : 's'} · ${infoCount} info · ${errorCount} errors · Review`;
   $('review-warnings').addEventListener('click', () => $('diagnostics').scrollIntoView({ block: 'start' }));
   data.warnings.forEach(warning => {
-    const item = text('li', `${warning.code}: ${warning.message}`, 'warning');
+    const severity = ['info', 'warning', 'error'].includes(warning.severity) ? warning.severity : 'warning';
+    const item = text('li', `${severity.toUpperCase()} · ${warning.code}: ${warning.message}`, `diagnostic ${severity}`);
     if (warning.source) item.append(text('small', source(warning.source)));
     $('warnings').append(item);
   });
-  if (!data.warnings.length) $('warnings').append(text('li', 'No analysis warnings.', 'subtle'));
+  if (!data.warnings.length) $('warnings').append(text('li', 'No analysis diagnostics.', 'subtle'));
   data.sources.forEach(path => $('sources').append(text('li', path)));
   if (!data.sources.length) $('sources').append(text('li', data.analysis === 'synthetic' ? 'Synthetic topology; no files read.' : 'No source files recorded.'));
   applyFilters();

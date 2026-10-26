@@ -2,7 +2,7 @@
 use crate::{
     analyze,
     syntax::{self, Directive, ParseError},
-    SourceLocation, Topology, Warning,
+    Severity, SourceLocation, Topology, Warning,
 };
 use std::{
     collections::BTreeSet,
@@ -180,8 +180,10 @@ impl Resolver {
                     if paths.is_empty() {
                         self.warnings.push(Warning {
                             code: "include.empty".into(),
-                            message: "include glob matched no files".into(),
+                            message: "optional include glob matched no files; check the pattern if configuration was expected".into(),
                             source: Some(directive.source.clone()),
+                            severity: Severity::Info,
+                            local_context: Some(format!("include pattern: {}",crate::redact::text(pattern))),
                         });
                     }
                     for path in paths {

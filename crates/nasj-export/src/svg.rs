@@ -181,10 +181,11 @@ pub(crate) fn render(graph: &Topology) -> String {
     }
     for (i, warning) in graph.warnings.iter().enumerate() {
         output.push_str(&format!(
-            "<text x=\"48\" y=\"{}\" class=\"graph-note\"><title>{}</title>{}</text>\n",
+            "<text x=\"48\" y=\"{}\" class=\"graph-note\" data-severity=\"{}\"><title>{}</title>{}</text>\n",
             graph_bottom + 24 + i * 24,
+            warning.severity.as_str(),
             escape(&warning.message),
-            short(&format!("{}: {}", warning.code, warning.message), 110)
+            short(&format!("{}: {}: {}", warning.severity.as_str(), warning.code, warning.message), 110)
         ));
     }
     output.push_str("</svg>\n");

@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use nasj_core::{
-    analyze_file, AnalysisKind, AnalysisOptions, Edge, EdgeKind, Evidence, Node, NodeKind, Topology,
+    analyze_file, AnalysisKind, AnalysisOptions, Edge, EdgeKind, Evidence, Node, NodeKind,
+    Severity, Topology,
 };
 use nasj_export::{render, Format};
 use std::{collections::BTreeMap, io::Write, path::PathBuf, process::ExitCode};
@@ -31,7 +32,7 @@ enum Command {
         /// Permit declared includes outside the configuration prefix.
         #[arg(long)]
         allow_external_includes: bool,
-        /// Fail without writing a report if analysis emits any warnings.
+        /// Fail on warning/error diagnostics; informational diagnostics do not fail.
         #[arg(long)]
         strict: bool,
         #[arg(short, long, value_enum, default_value_t = OutputFormat::Json)]
@@ -121,17 +122,33 @@ fn run() -> Result<(), String> {
                     .as_ref()
                     .map(|s| format!("{}:{}: ", s.path.escape_debug(), s.line))
                     .unwrap_or_default();
+                let context = warning
+                    .local_context
+                    .as_deref()
+                    .map(|value| {
+                        let value: String =
+                            nasj_core::redact::text(value).chars().take(512).collect();
+                        format!(" ({})", value.escape_debug())
+                    })
+                    .unwrap_or_default();
                 let _ = writeln!(
                     std::io::stderr().lock(),
-                    "nasj: {location}{}: {}",
+                    "nasj: {}: {location}{}: {}{context}",
+                    warning.severity.as_str(),
                     warning.code,
                     warning.message
                 );
             }
-            if strict && !graph.warnings.is_empty() {
+            let blocking = graph
+                .warnings
+                .iter()
+                .filter(|d| d.severity.blocks_strict())
+                .count();
+            if strict && blocking != 0
+                || graph.warnings.iter().any(|d| d.severity == Severity::Error)
+            {
                 return Err(format!(
-                    "analysis emitted {} warning(s); strict mode wrote no report",
-                    graph.warnings.len()
+                    "analysis emitted {blocking} warning/error diagnostic(s); no report written"
                 ));
             }
             (graph, format, output)
@@ -168,7 +185,7 @@ fn main() -> ExitCode {
     match run() {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
-            let _ = writeln!(std::io::stderr().lock(), "nasj: {e}");
+            let _ = writeln!(std::io::stderr().lock(), "nasj: error: {e}");
             ExitCode::FAILURE
         }
     }

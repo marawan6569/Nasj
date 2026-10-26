@@ -10,7 +10,9 @@ includes nested inside other files. `--prefix DIR` changes that configuration
 prefix. Globs are sorted; repeated files expand in each context; canonical-path
 cycles fail. By default all includes must stay within the canonical prefix,
 including symlink targets. `--allow-external-includes` explicitly permits declared
-paths outside that boundary. An unmatched glob warns; missing literals fail.
+paths outside that boundary. An unmatched glob emits informational `include.empty`;
+missing literals and failed glob enumeration/reads fail. This follows optional
+Nginx glob behavior and does not mean the configuration is invalid.
 Input must be regular UTF-8 files. Paths are not expanded as shell commands or
 environment variables. Nonblocking opens reject special files without waiting
 on a FIFO. Concurrent malicious replacement of an entire directory tree is not
@@ -20,8 +22,10 @@ Budgets: 4 MiB/file, 16 MiB total reads, 1024 file expansions, 32 include levels
 64 combined syntax levels, 200,000 syntax tokens/file. Limits fail without a
 partial report. No configuration is modified. Output files use create-new and
 refuse existing files/symlinks, protecting configuration and previous reports.
-On Unix, newly created reports use mode 0600. Warnings are also printed to stderr,
-including in strict mode, with escaped source paths and fixed diagnostic text.
+On Unix, newly created reports use mode 0600. Diagnostics are also printed to
+stderr, including in strict mode. Empty-glob patterns appear only in this local
+operator context, redacted and control-escaped with bounded display length. The
+pattern/context is excluded from all report formats.
 
 HTTP mapping covers explicit port/address/IPv6/Unix listeners, `listen ... ssl`,
 server names, exact/prefix/preferred-prefix/regex/named locations, nested
@@ -65,6 +69,11 @@ are retained in the internal AST but are not otherwise exported or evaluated.
 These conservative exclusions can omit configured destinations; warnings make
 that limitation visible. Static `configured` edges never assert runtime truth.
 
-`--strict` produces no report on any warning. The JSON warnings/source inspector
+`--strict` produces no report on Warning or Error diagnostics. Info diagnostics
+remain visible and do not cause failure. Input/syntax/include errors are Error
+and abort with no report regardless of strict mode. Unsupported static analysis
+is Warning, not proof of invalid Nginx. Legacy diagnostics without severity default
+to Warning. The JSON `warnings` field retains its old name but holds all severity
+levels; HTML distinguishes them by text labels and colors. The diagnostics/source inspector
 are essential when consuming a non-strict map. The experimental schema is
 documented in [JSON_FORMAT.md](JSON_FORMAT.md).
