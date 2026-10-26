@@ -35,7 +35,7 @@ nasj --help
 For an explicit preview checkout before those PRs merge:
 
 ```sh
-git clone --branch fix/routing-final-audit https://github.com/marawan6569/Nasj.git
+git clone --branch fix/report-search-context https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 ```
@@ -55,7 +55,7 @@ nasj map --config ./nginx.conf --format html -o report.html
 ```
 
 Open `report.html` directly in a browser. It embeds all assets and supports zoom,
-pan, search, type/unresolved filters, selection, source/evidence inspection and
+pan, global search with connected routing context, type/unresolved filters, selection, source/evidence inspection and
 light/dark themes. No server or internet is needed.
 
 Use unused output paths: existing files and symlinks are never overwritten.
@@ -135,7 +135,7 @@ are missing, so branding publication remains pending.
 See [specification](docs/SPEC.md), [architecture](docs/ARCHITECTURE.md),
 [roadmap](docs/ROADMAP.md), [implementation plan](docs/IMPLEMENTATION_PLAN.md),
 [JSON format](docs/JSON_FORMAT.md), [release checklist](docs/RELEASE_CHECKLIST.md)
-and [execution evidence](docs/EXECUTION_LOG.md).
+[release readiness](docs/RELEASE_READINESS.md) and [execution evidence](docs/EXECUTION_LOG.md).
 
 [اقرأ بالعربية](README.ar.md)
 

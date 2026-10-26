@@ -156,3 +156,14 @@ The current preview has 26 workspace tests plus the isolated parser comparison
 and offline Chromium suite. Corrected branding remains blocked on approved
 assets. Repository required-check enforcement remains unverified. v0.2/v0.3 code
 is intentionally deferred; final schema/release decisions require review.
+
+
+## Final v0.1 UX scope
+
+The provisional vhost visualization is the accepted direction; no redesign or
+framework is planned before v0.1. The focused follow-up on #17 adds bounded
+routing-aware global search, useful configured-host selection, readable framing
+and mobile gesture/inspector polish. Parser/model/schema 0.2 stay unchanged.
+See [VALIDATION_PLAN.md](VALIDATION_PLAN.md) for execution and
+[RELEASE_READINESS.md](RELEASE_READINESS.md) for Ready/Needs Review/Blocked gates,
+merge order, licensing, packaging and maintainer verification commands.

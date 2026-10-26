@@ -1,16 +1,18 @@
 # First release checklist
 
 No release/merge has been approved. Check boxes describe release work, not claims
-of completion. See EXECUTION_LOG.md and PR descriptions for actual test evidence.
+of completion. See [RELEASE_READINESS.md](RELEASE_READINESS.md), EXECUTION_LOG.md
+and PR descriptions for actual test evidence.
 
 ## Review and repository policy
 
 - [ ] Maintainer reviews/merges the dependency stack in order:
-  #1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 → #15 → #16 → #17;
+  #1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 → #15 → #16 → #17 → the final UX PR (base #17);
   retarget bases as needed.
 - [ ] Resolve review comments and inspect Actions for the exact approved commits.
 - [ ] Configure and verify required `test` CI check and restrictions on direct main
-  pushes using repository settings; current enforcement is unverified.
+  pushes using repository settings. The final UX review read `protected: false`
+  on main and an empty ruleset list; enforcement is currently absent.
 - [ ] Keep issues #2–#7 open until their own criteria are satisfied and merged.
   Branding and discovery issues cannot be closed from the static preview alone.
 
@@ -26,7 +28,9 @@ of completion. See EXECUTION_LOG.md and PR descriptions for actual test evidence
 - [ ] Verify no inherited static destination beside proxy/unsupported handlers;
   review normal nested location handler boundaries and ordered conditional returns.
 - [ ] Inspect redaction, include scope/symlinks, nonregular files and output refusal.
-- [ ] Review dependency licenses and vulnerabilities for the exact lockfiles at
+- [ ] Review the [locked dependency license inventory](DEPENDENCY_LICENSES.md),
+  prepare required third-party notices for the chosen distribution, and check
+  dependency vulnerabilities for the exact lockfiles at
   release time; no current dependency-audit claim is made by this checklist.
 
 ## Reports and documentation

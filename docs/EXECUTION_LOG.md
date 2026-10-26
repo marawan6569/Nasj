@@ -211,3 +211,51 @@ Browser captures were reviewed locally, not published as deployment assets.
 All new fixtures are synthetic. The four original review comments on #9/#10
 received linked responses. No main push, force push, merge, release, issue closure,
 privileged operation or real Nginx/config/report access occurred.
+
+
+## Final UX and v0.1 review
+
+Fetched latest remotes and all open PRs. #17 at `0724bd9` remained cumulative;
+its Actions run 40414057285 passed. Read every #16 conversation comment and its
+empty review/thread lists; new sanitized feedback 6429292719 reproduced: backend
+search showed 1 node/0 edges and lexical host ordering selected HTTP redirect-only.
+No earlier shared branch was rewritten; work uses `fix/report-search-context`.
+
+Search now uses indexed, visited, deterministic incoming paths plus outgoing paths
+from direct matches and ancestor guard outcomes, with 40 direct matches, 200 nodes,
+24 hops and 4000 edge visits. Direct/context styles and accessible labels differ;
+filters choose matches without hiding their paths. Limit/incompleteness notices
+are visible. Shared backends retain actual callers; context does not expand via
+sibling hosts. The synthetic unique backend now shows 6 nodes/5 real edges,
+including both declared domain aliases, host, location and upstream.
+
+Configured TLS application hosts rank first using protocol/effective content edges;
+otherwise effective handler owners, responses and reachable context choose the
+most informative host, with stable ties. HTTPS-only redirects do not displace HTTP
+applications. The 40-node fixture now starts on portal HTTPS. Readable framing
+centers meaningful paths, fits small conditional graphs, keeps selected matches
+inside frame and reports offscreen nodes. Phone/tablet controls gain 44px targets,
+two-pointer pinch/pan/cancellation and explicit inspector/graph navigation. No
+parser, schema, evidence, strict-mode, native SVG/DOT/JSON or runtime changes.
+
+Validation: all required fmt/locked Clippy (-D warnings)/42 locked workspace tests/
+locked build, parser comparison, JSON/DOT/SVG goldens and CSP checks pass. Expanded
+offline Chromium suite passes path-aware backend/shared/domain/static/conditional
+queries, filters, source/evidence inspection, host-policy fallbacks/nonstandard
+ports/ties, disconnected/empty results and bounded 40/602-node cases. Laptop,
+phone and tablet captures were inspected; actual Chromium touch pan/pinch/cancel/
+tap pass. Zero external requests, page/CSP errors or dialogs. A fresh optimized
+source installation and installed help/demo/strict multi-vhost HTML generation
+succeeded under a temporary user root. Firefox 157.0 and WebKit 27.2 downloaded,
+but missing GTK/Pango/multimedia libraries prevent launching; neither passed here.
+No privileged install was attempted. Final pushed-head CI belongs in the UX PR.
+
+Read-only GitHub checks now establish main is unprotected (required checks off)
+and rulesets are empty; maintainer configuration is a release blocker. NASJ declares
+MIT; locked license inventory has no missing declarations, with Unicode-3.0 notice
+requirements recorded. Exact distribution notices/current vulnerability audit and
+packaging remain review tasks. Approved corrected art is still absent; propose
+explicit text-only v0.1 deferral, keep #6 open. RELEASE_READINESS.md classifies
+all gates and recommends v0.1.0/source-first with final verification commands.
+No production input/report, merge, tag/publication, main push, issue closure,
+privilege escalation, Nginx edit/reload or discovery was performed.
