@@ -361,12 +361,12 @@ impl Analyzer {
             return;
         };
         // Unix sockets can contain a URI after :/; keep the socket destination.
-        let authority = if rest.starts_with("unix:") {
-            rest.split(":/").next().unwrap_or(rest)
+        let authority = if let Some(socket) = rest.strip_prefix("unix:") {
+            format!("unix:{}", socket.split(":/").next().unwrap_or(socket))
         } else {
-            rest.split(['/', '?', '#']).next().unwrap_or("")
+            rest.split(['/', '?', '#']).next().unwrap_or("").to_owned()
         };
-        if authority.is_empty() || authority.contains('@') || !valid_endpoint(authority) {
+        if authority.is_empty() || authority.contains('@') || !valid_endpoint(&authority) {
             self.unresolved(owner, d, "invalid or credential-bearing proxy destination");
             return;
         }
@@ -384,7 +384,7 @@ impl Analyzer {
             Some(id) => id,
             None => self.node(
                 NodeKind::Target,
-                authority,
+                &authority,
                 &d.source,
                 &[("url", redact::text(url)), ("state", "configured".into())],
             ),
@@ -397,7 +397,7 @@ impl Analyzer {
             self.unresolved(owner, d, "static path requires one argument");
             return;
         };
-        if path.contains('$') {
+        if path.contains('$') || d.children.is_some() {
             self.unresolved(
                 owner,
                 d,
@@ -504,8 +504,8 @@ fn hostname(value: &str) -> bool {
 }
 
 fn valid_endpoint(value: &str) -> bool {
-    if value.starts_with("unix:") {
-        return value.len() > 5;
+    if let Some(path) = value.strip_prefix("unix:") {
+        return path.starts_with('/') && path.len() > 1 && !path.contains(['$', '?', '#']);
     }
     if value.is_empty()
         || value.contains(|ch: char| {

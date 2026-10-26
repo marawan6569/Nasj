@@ -259,3 +259,52 @@ fn excessive_include_depth_and_malformed_input_fail_closed() {
         "syntax.block"
     );
 }
+
+#[test]
+fn unix_proxy_socket_is_not_misread_as_a_hostname() {
+    let graph = map(&fixture("unix.conf"));
+    assert!(graph.warnings.is_empty(), "{:?}", graph.warnings);
+    assert_eq!(
+        graph
+            .nodes
+            .iter()
+            .filter(|n| n.kind == NodeKind::Target && n.label == "unix:/run/example.sock")
+            .count(),
+        2
+    );
+    assert!(!graph.nodes.iter().any(|n| n.label == "unix"));
+}
+
+#[cfg(unix)]
+#[test]
+fn unreadable_includes_and_fifo_inputs_fail_without_blocking() {
+    use std::os::unix::fs::PermissionsExt;
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path().join("nginx.conf");
+    let included = dir.path().join("private.conf");
+    fs::write(&root, "http { include private.conf; }").unwrap();
+    fs::write(&included, "server { listen 80; }").unwrap();
+    fs::set_permissions(&included, fs::Permissions::from_mode(0o000)).unwrap();
+    // Root test runners can still read mode-000 files; the normal user path
+    // must produce a structured input.read diagnostic.
+    if fs::read(&included).is_err() {
+        assert_eq!(
+            analyze_file(&root, &AnalysisOptions::default())
+                .unwrap_err()
+                .code,
+            "input.read"
+        );
+    }
+    let fifo = dir.path().join("input.fifo");
+    assert!(std::process::Command::new("mkfifo")
+        .arg(&fifo)
+        .status()
+        .unwrap()
+        .success());
+    assert_eq!(
+        analyze_file(&fifo, &AnalysisOptions::default())
+            .unwrap_err()
+            .code,
+        "input.type"
+    );
+}
