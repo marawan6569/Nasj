@@ -38,3 +38,18 @@ guarded ordered returns with no fabricated variable substitution; optional glob
 info separated from incompleteness warnings; useful initial multi-vhost viewing;
 all shared model/export/security checks and final cumulative CI green. Record
 results, limitations, commit/PR links and remaining release blockers in the log.
+
+## Implemented review stack
+
+| Work | PR | Implementation |
+| --- | --- | --- |
+| Effective handlers and symbolic conditional returns | #14 | `88af4d2` |
+| Diagnostic severity/private include context | #15 | `81726ef` |
+| Readable virtual-host focus/native grouping | #16 | `0d41ef3` |
+| Final return-order/reachability/privacy audit | #17 | `0f737b8` |
+
+Final cumulative branch: `fix/routing-final-audit`. The earlier #1/#8–#13 stack
+is retained; nothing is merged. All 42 workspace tests and the browser suite pass
+locally; exact-head CI evidence is recorded in the PRs/log. The final audit was
+added after implementation review to keep known termination separate from
+unsupported evaluation and sanitize derived condition labels for library callers.
