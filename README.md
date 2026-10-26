@@ -1,66 +1,131 @@
-# NASJ — نَسْج
+# NASJ — نسج
 
 **Weave your infrastructure into clarity.**
 
-NASJ is a Rust-first, CLI-first project for mapping Nginx configurations into understandable infrastructure topology. It is designed for safe, offline analysis and portable reports.
+NASJ maps Nginx HTTP configuration into a source-aware infrastructure topology.
+It is a Rust CLI that reads configuration files and declared includes, then writes
+JSON, Graphviz DOT, standalone SVG or a single-file interactive HTML report.
+Analysis and report viewing work offline, without running Nginx or a web server.
 
-> **Status: early development, unmerged preview.** Read-only Nginx analysis and JSON/DOT/SVG/offline HTML export work on the feature branch. No release is available.
+> **Unreleased development preview.** This checkout contains implementation awaiting
+> review in [PR #1](https://github.com/marawan6569/Nasj/pull/1),
+> [#8](https://github.com/marawan6569/Nasj/pull/8),
+> [#9](https://github.com/marawan6569/Nasj/pull/9) and
+> [#10](https://github.com/marawan6569/Nasj/pull/10). The default branch may lag this
+> preview. No published binary/crates.io release is available.
 
-## Roadmap
+## Install the preview
 
-| Version | Scope |
-| --- | --- |
-| **v0.1** | Parse Nginx configs and recursive includes; graph domains, listeners, locations, proxy targets and upstreams; export JSON, DOT, SVG, and standalone interactive HTML |
-| **v0.2** | Opt-in discovery of Docker containers, systemd services and local listening processes; evidence-based matching |
-| **v0.3** | Optional built-in web server with a local dashboard |
+Install a stable [Rust toolchain](https://rustup.rs). A native linker is needed to
+build from source. From a checkout containing the implementation:
 
-## Developer preview
+```sh
+cargo install --locked --path crates/nasj-cli
+nasj --help
+```
 
-Install the [Rust toolchain](https://rustup.rs), then:
+For an explicit preview checkout before those PRs merge:
+
+```sh
+git clone --branch feat/offline-reports https://github.com/marawan6569/Nasj.git
+cd Nasj
+cargo install --locked --path crates/nasj-cli
+```
+
+The binary is `nasj`; make sure Cargo's bin directory is on PATH. Runtime mapping
+requires neither Graphviz, Python, Node.js, network access nor elevated privileges.
+The Rust workspace uses the stable toolchain; current validation uses Rust 1.99.1.
+No older minimum Rust version has been promised or tested.
+
+## Map configuration
+
+```sh
+nasj map --config ./nginx.conf --format json
+nasj map --config ./nginx.conf --format dot -o topology.dot
+nasj map --config ./nginx.conf --format svg -o topology.svg
+nasj map --config ./nginx.conf --format html -o report.html
+```
+
+Open `report.html` directly in a browser. It embeds all assets and supports zoom,
+pan, search, type/unresolved filters, selection, source/evidence inspection and
+light/dark themes. No server or internet is needed.
+
+Use unused output paths: existing files and symlinks are never overwritten.
+Without `-o`, the report goes to stdout. Static analysis never changes/reloads
+Nginx, runs shell commands from configuration, inspects processes or connects to
+Docker. The `demo` command is a separate **synthetic** graph:
+
+```sh
+nasj demo --format html -o demo.html
+```
+
+Declared includes are sorted and resolved relative to the root configuration
+directory, including nested includes. They are confined to that directory after
+symlink resolution. For an explicit configuration prefix or intentional includes
+outside it:
+
+```sh
+nasj map --config ./nginx.conf --prefix ./config --format json
+nasj map --config ./nginx.conf --allow-external-includes --format json
+nasj map --config ./nginx.conf --strict --format json
+```
+
+`--strict` writes no report if any warning is emitted. Syntax/read/include failures
+always fail without a partial graph. Warnings are included in every format and
+shown in the HTML diagnostics inspector.
+
+## What the preview analyzes
+
+- Explicit HTTP/TLS listeners, IPv4/IPv6/Unix addresses and virtual host names.
+- Server and exact/prefix/regex/named/nested location blocks.
+- HTTP(S) proxy targets, named upstreams and multiple configured members.
+- Return responses/redirects, document roots/aliases, recursive/glob includes.
+- Original file/line provenance, deterministic graph output and structured diagnostics.
+
+These are **configured relationships**, not verified runtime infrastructure.
+Variable proxy destinations, conditional routes and unsupported rewrite contexts
+remain unresolved and have no invented proxy edges. NASJ does not simulate Nginx
+request matching or replace `nginx -t`. Embedded-language blocks and non-HTTP
+proxy handlers are outside the supported mapping scope. Read the
+[analysis contract](docs/ANALYSIS.md) for exact limits and conservative exclusions.
+
+Reports omit unrelated directives/headers/return bodies, redact URL credentials
+and query/fragment contents, and escape untrusted output. Infrastructure names and
+source paths remain visible; review reports before sharing. Arbitrary secret
+recognition is not guaranteed. See [security](SECURITY.md).
+
+## Development
 
 ```sh
 cargo build --workspace
-cargo run -p nasj-cli -- --help
-cargo run -p nasj-cli -- demo --format json
-cargo run -p nasj-cli -- demo --format dot -o topology.dot
+cargo run -p nasj-cli -- map --config fixtures/nginx/topology/nginx.conf --format json
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-The `demo` command emits **synthetic** topology data only. To analyze real configuration:
+The recursive fixture deliberately produces uncertainty warnings. Parser comparison
+and browser checks have separate development-only dependencies; see
+[contributing](CONTRIBUTING.md) and [reports](docs/REPORTS.md).
 
-```sh
-cargo run -p nasj-cli -- map --config ./nginx.conf --format json
-cargo run -p nasj-cli -- map --config ./nginx.conf --format dot -o topology.dot
-```
+## Architecture and roadmap
 
-Includes are confined to the configuration directory by default. See the
-[analysis contract](docs/ANALYSIS.md) for prefix options, warnings and limitations.
-Output refuses to overwrite existing files. Portable reports:
+| Layer | Responsibility |
+| --- | --- |
+| `nasj-core` | Syntax, include resolution, static semantics, canonical model and redaction |
+| `nasj-export` | JSON/DOT/SVG and embedded offline HTML consuming the same model |
+| `nasj-cli` | Arguments, explicit input selection and output IO |
 
-```sh
-nasj map --config /etc/nginx/nginx.conf --format html -o report.html
-nasj map --config /etc/nginx/nginx.conf --format svg -o topology.svg
-```
+v0.1 is awaiting review and release validation. **v0.2** plans optional Docker,
+systemd and process correlation with evidence; **v0.3** plans an optional local
+web server. Neither future system is implemented. Corrected approved logo assets
+are missing, so branding publication remains pending.
 
-## Architecture
-
-- `crates/nasj-core` — canonical versioned topology model and Nginx analysis.
-- `crates/nasj-export` — export formats for the canonical model.
-- `crates/nasj-cli` — a single `nasj` executable.
-- `docs/` — specification and milestone scope.
-
-## Principles
-
-- **Read-only**: never edit or reload Nginx.
-- **Offline-first**: no telemetry or automatic uploads.
-- **Honest results**: ambiguous or dynamic routes must not be represented as confirmed.
-- **Source-aware**: preserve the file and line number that produced each relationship.
-- **Secure export**: escape untrusted data and redact secrets before generating reports.
-
-See [the specification](docs/SPEC.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [contributing guide](CONTRIBUTING.md).
+See [specification](docs/SPEC.md), [architecture](docs/ARCHITECTURE.md),
+[roadmap](docs/ROADMAP.md), [implementation plan](docs/IMPLEMENTATION_PLAN.md),
+[JSON format](docs/JSON_FORMAT.md), [release checklist](docs/RELEASE_CHECKLIST.md)
+and [execution evidence](docs/EXECUTION_LOG.md).
 
 [اقرأ بالعربية](README.ar.md)
 
-NASJ is an independent open-source project, not affiliated with F5 or NGINX.
-
-Licensed under [MIT](LICENSE).
+NASJ is independent and is not affiliated with F5 or NGINX. Licensed under [MIT](LICENSE).

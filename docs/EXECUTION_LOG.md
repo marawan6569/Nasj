@@ -70,3 +70,17 @@ Limitations: SVG layout can have crossing edges and requires zoom on larger maps
 the browser suite currently covers Chromium only. No arbitrary config secret
 detection or runtime verification is promised. Corrected branding remains missing.
 Next: documentation/release checklist and future discovery/server architecture.
+
+## P3 — documentation and release readiness
+
+PR #10 passed Actions run 40396305004 on `989e63a`, including the offline browser
+suite. Updated English/Arabic README installation and actual CLI examples,
+architecture/specification/roadmap status, contributor/security guidance,
+changelog and first-release checklist. Checked local documentation links and
+CLI help. No screenshots or unapproved logo artwork added to the repository.
+Approved corrected PNGs remain absent; branding issue #6 stays pending. Required
+repository branch protections remain unverified. No PRs merged or issues closed.
+
+Validation: all four workspace gates pass (23 tests), local Markdown links exist,
+and `cargo install --locked --path crates/nasj-cli --root /tmp/nasj-install-preview`
+succeeded. The installed optimized binary mapped the Unix fixture in strict mode.
