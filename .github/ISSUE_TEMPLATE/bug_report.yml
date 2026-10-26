@@ -1,0 +1,17 @@
+name: Bug report
+description: Report a reproducible bug (sanitize private config)
+title: "bug: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Never post private production configs, credentials or tokens.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
