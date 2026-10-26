@@ -33,6 +33,13 @@ and redirect. `response` is a return action, `condition` is a symbolic decision,
 and `routing_step` is an unresolved phase continuation. Container/service/process
 are reserved for future discovery.
 
+Server attributes include `virtual_host` (primary configured name), `server_names`
+and normalized `listeners`. Labels distinguish HTTP/HTTPS/port while source lines
+distinguish repeated blocks. These are declarations, not deduplicated websites.
+`configured_root`, `root_origin` and `root_source` are inspection metadata and
+must not be interpreted as effective static routes beside a proxy/unsupported
+handler. Only emitted destination edges describe supported content handling.
+
 Condition nodes have typed `condition: { variable, operator, value, value_redacted }`.
 Operators are `equal` / `not_equal`; values are display data, never evaluated.
 This optional field is omitted for other nodes. Sensitive comparison values are

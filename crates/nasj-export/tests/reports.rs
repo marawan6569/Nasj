@@ -154,3 +154,22 @@ fn diagnostic_severity_survives_reports_but_private_glob_context_never_does() {
     let legacy: Topology = serde_json::from_str(include_str!("fixtures/graph.json")).unwrap();
     assert_eq!(legacy.warnings[0].severity, nasj_core::Severity::Warning);
 }
+
+#[test]
+fn condition_metadata_is_escaped_and_redirect_query_secrets_are_redacted() {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../fixtures/nginx/conditionals/escaping.conf");
+    let graph = analyze_file(&path, &AnalysisOptions::default()).unwrap();
+    assert!(graph.nodes.iter().any(|n| n.condition.is_some()));
+    for format in [Format::Json, Format::Dot, Format::Svg, Format::Html] {
+        assert!(!render(&graph, format)
+            .unwrap()
+            .contains("fixture-condition-secret"));
+    }
+    let html = render(&graph, Format::Html).unwrap();
+    assert!(!html.contains("<img src=x"));
+    assert_eq!(html.matches("</script>").count(), 2);
+    assert!(render(&graph, Format::Svg)
+        .unwrap()
+        .contains("&lt;/script&gt;"));
+}

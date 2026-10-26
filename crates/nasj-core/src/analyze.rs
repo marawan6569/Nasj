@@ -6,7 +6,7 @@ use crate::{
     AnalysisKind, Comparison, Edge, EdgeKind, Evidence, Node, NodeKind, Severity, SourceLocation,
     Topology, Warning,
 };
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 struct Analyzer {
     graph: Topology,
@@ -136,11 +136,53 @@ impl Analyzer {
             self.warn("server.block", "server requires a block", &directive.source);
             return;
         };
+        let names: Vec<_> = children
+            .iter()
+            .filter(|d| d.name == "server_name")
+            .flat_map(|d| d.args.iter())
+            .filter(|name| !name.contains('$'))
+            .cloned()
+            .collect();
+        let primary = names
+            .first()
+            .map(String::as_str)
+            .unwrap_or("unnamed virtual host");
+        let listeners: BTreeSet<_> = children
+            .iter()
+            .filter(|d| d.name == "listen")
+            .filter_map(|d| {
+                d.args
+                    .first()
+                    .and_then(|address| listener(address))
+                    .map(|(_, port)| {
+                        format!(
+                            "{} :{}",
+                            if d.args.iter().any(|arg| arg == "ssl") {
+                                "HTTPS"
+                            } else {
+                                "HTTP"
+                            },
+                            if port.is_empty() { "unix" } else { &port }
+                        )
+                    })
+            })
+            .collect();
+        let summary = listeners.into_iter().collect::<Vec<_>>().join(", ");
+        let summary = if summary.is_empty() {
+            "implicit / unsupported listener".into()
+        } else {
+            summary
+        };
         let server = self.node(
             NodeKind::Server,
-            "server",
+            &format!("{primary} · {summary}"),
             &directive.source,
-            &[("state", "configured".into())],
+            &[
+                ("state", "configured".into()),
+                ("virtual_host", primary.into()),
+                ("server_names", names.join(", ")),
+                ("listeners", summary),
+            ],
         );
         let mut listens = 0;
         for child in children {

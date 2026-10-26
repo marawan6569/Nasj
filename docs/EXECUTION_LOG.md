@@ -151,3 +151,30 @@ CLI context shows a bounded control-escaped, URL-redacted pattern; local_context
 is stripped at export and never serialized. HTML, SVG and DOT show severity.
 Added strict-mode, missing literal, control/credential redaction, exported privacy,
 legacy severity and offline severity-panel checks. PR #14 CI passed at `88af4d2`.
+
+## Field validation — grouped visualization
+
+Added semantic server identity (names/listeners/source), deterministic virtual-host
+lanes and a shared upstream area, mean-order sweeps, and a readable initial host
+focus instead of full-graph shrinking. Domain-grouped HTTP/HTTPS navigation keeps
+blocks distinct. Full overview, Fit view, Readable scale, global search, filters,
+keyboard/mouse inspection, source metadata, zoom/pan, themes and mobile remain
+offline. Focus follows only existing edges, lazily retains at most eight layouts,
+indexes search text once and keeps one SVG node per model node. No dependencies
+or fabricated topology edges were added for presentation.
+
+Validation uses an entirely synthetic four-vhost/40-node deployment-shaped fixture
+and a generated 100-vhost/602-node case. Laptop/mobile captures were reviewed;
+cards begin at readable screen scale. Tests assert deterministic distinct lanes,
+nonoverlapping cards and removal of an adversarial crossing. Condition metadata
+injection and inherited error-page exclusions add security/correctness coverage.
+All 40 workspace tests and offline Chromium checks passed locally, including
+global navigation, CSP, source/guard/severity inspection and zero external
+requests/browser errors. PR #15 Actions passed at `81726ef`.
+
+Remaining limitations: compare-and-single-return server conditions only; no full
+request matching; some overview crossings and large focused hosts need pan/search;
+browser coverage is Chromium. Schema 0.2 requires old exhaustive consumers to
+update. Approved branding remains missing and required branch protection remains
+unverified. Maintainer review/release validation is still required; no merge,
+release or issue closure is performed by this work.

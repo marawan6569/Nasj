@@ -6,7 +6,8 @@ of completion. See EXECUTION_LOG.md and PR descriptions for actual test evidence
 ## Review and repository policy
 
 - [ ] Maintainer reviews/merges the dependency stack in order:
-  #1 → #8 → #9 → #10 → #11 → #12 → #13; retarget bases as needed.
+  #1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 → #15, then the vhost visualization
+  follow-up; retarget bases as needed.
 - [ ] Resolve review comments and inspect Actions for the exact approved commits.
 - [ ] Configure and verify required `test` CI check and restrictions on direct main
   pushes using repository settings; current enforcement is unverified.
@@ -18,9 +19,12 @@ of completion. See EXECUTION_LOG.md and PR descriptions for actual test evidence
 - [ ] Run fmt, Clippy with warnings denied, workspace tests and build on the final
   release commit with Cargo.lock; verify a clean checkout and source installation.
 - [ ] Rerun the isolated parser comparison and review ADR-0001/known exclusions.
-- [ ] Review experimental schema 0.1 and settle compatibility/ID stability policy.
+- [ ] Review experimental schema 0.2 (independent of product version), typed
+  condition/branch semantics, diagnostic severity and compatibility/ID policy.
 - [ ] Validate representative sanitized deployment snapshots and resource limits.
 - [ ] Check inherited/conditional/dynamic routing and warnings with no invented edges.
+- [ ] Verify no inherited static destination beside proxy/unsupported handlers;
+  review normal nested location handler boundaries and ordered conditional returns.
 - [ ] Inspect redaction, include scope/symlinks, nonregular files and output refusal.
 - [ ] Review dependency licenses and vulnerabilities for the exact lockfiles at
   release time; no current dependency-audit claim is made by this checklist.
@@ -31,6 +35,8 @@ of completion. See EXECUTION_LOG.md and PR descriptions for actual test evidence
 - [ ] Pass CSP hash and offline browser suite on final assets; manually inspect
   layout/readability and keyboard use in Chromium, Firefox and Safari/WebKit.
 - [ ] Exercise larger graphs and document practical layout/performance limits.
+- [ ] Review initial readable vhost focus and full overview on representative
+  synthetic laptop/mobile reports; check same-domain HTTP/HTTPS/source identity.
 - [ ] Review reports for accidental infrastructure disclosure before publishing examples.
 - [ ] Confirm English/Arabic docs and help match the released executable.
 - [ ] Replace preview-branch installation references with the approved release ref.

@@ -3,6 +3,7 @@ use nasj_core::Topology;
 use std::{collections::BTreeSet, error::Error, fmt};
 
 mod html;
+mod layout;
 mod svg;
 
 #[derive(Debug, Clone, Copy)]

@@ -168,3 +168,19 @@ fn missing_fallback_is_an_explicit_unresolved_location_selection_step() {
         .any(|w| w.code == "routing.fallthrough"));
     assert!(!graph.edges.iter().any(|e| e.kind == EdgeKind::ProxiesTo));
 }
+
+#[test]
+fn inherited_error_page_prevents_claiming_a_terminal_fallback_response() {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("inherited-error.conf");
+    std::fs::write(&path,"http { error_page 404 /fallback; server { listen 80; if ($host = example.test) { return 301 https://$host$request_uri; } return 404; } }").unwrap();
+    let graph = analyze_file(&path, &AnalysisOptions::default()).unwrap();
+    assert!(graph
+        .warnings
+        .iter()
+        .any(|d| d.code == "routing.unresolved"));
+    assert!(!graph.nodes.iter().any(|n| matches!(
+        n.kind,
+        NodeKind::Redirect | NodeKind::Response | NodeKind::Condition
+    )));
+}

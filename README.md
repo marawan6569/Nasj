@@ -28,7 +28,7 @@ nasj --help
 For an explicit preview checkout before those PRs merge:
 
 ```sh
-git clone --branch fix/analysis-uncertainty-hardening https://github.com/marawan6569/Nasj.git
+git clone --branch feat/vhost-focused-topology https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 ```
@@ -71,7 +71,7 @@ nasj map --config ./nginx.conf --allow-external-includes --format json
 nasj map --config ./nginx.conf --strict --format json
 ```
 
-`--strict` writes no report if any warning is emitted. Syntax/read/include failures
+`--strict` blocks warning/error diagnostics and permits informational empty-glob notices. Syntax/read/include failures
 always fail without a partial graph. Warnings are included in every format and
 shown in the HTML diagnostics inspector.
 
@@ -84,8 +84,11 @@ shown in the HTML diagnostics inspector.
 - Original file/line provenance, deterministic graph output and structured diagnostics.
 
 These are **configured relationships**, not verified runtime infrastructure.
-Variable proxy destinations, conditional routes and unsupported rewrite contexts
-remain unresolved and have no invented proxy edges. NASJ does not simulate Nginx
+Variable proxy destinations and unsupported rewrite contexts remain unresolved,
+with no invented proxy/static destination edges. Simple server-level conditional
+returns have explicit guarded true/false outcomes; dynamic redirect expressions
+remain symbolic. Reports start with readable, domain-grouped virtual-host focus
+and offer a complete infrastructure overview. NASJ does not simulate Nginx
 request matching or replace `nginx -t`. Embedded-language blocks and non-HTTP
 proxy handlers are outside the supported mapping scope. Read the
 [analysis contract](docs/ANALYSIS.md) for exact limits and conservative exclusions.

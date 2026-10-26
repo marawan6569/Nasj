@@ -1,9 +1,9 @@
-use crate::{edge_label, evidence_label};
+use crate::{
+    edge_label, evidence_label,
+    layout::{self, CARD_H, CARD_W},
+};
 use nasj_core::{AnalysisKind, NodeKind, Topology};
-use std::collections::{BTreeMap, VecDeque};
-
-const CARD_W: usize = 260;
-const CARD_H: usize = 88;
+use std::collections::BTreeMap;
 
 pub(crate) fn escape(value: &str) -> String {
     let mut output = String::new();
@@ -67,53 +67,10 @@ pub(crate) fn render(graph: &Topology) -> String {
         .enumerate()
         .map(|(i, n)| (n.id.as_str(), i))
         .collect();
-    let mut outgoing = vec![Vec::new(); graph.nodes.len()];
-    let mut indegree = vec![0usize; graph.nodes.len()];
-    for edge in &graph.edges {
-        if let (Some(&from), Some(&to)) =
-            (index.get(edge.from.as_str()), index.get(edge.to.as_str()))
-        {
-            outgoing[from].push(to);
-            indegree[to] += 1;
-        }
-    }
-    let mut queue: VecDeque<_> = indegree
-        .iter()
-        .enumerate()
-        .filter(|(_, n)| **n == 0)
-        .map(|(i, _)| i)
-        .collect();
-    let mut ranks = vec![0; graph.nodes.len()];
-    while let Some(from) = queue.pop_front() {
-        for &to in &outgoing[from] {
-            ranks[to] = ranks[to].max(ranks[from] + 1);
-            indegree[to] -= 1;
-            if indegree[to] == 0 {
-                queue.push_back(to);
-            }
-        }
-    }
-    let mut rows = BTreeMap::new();
-    let points: Vec<_> = ranks
-        .iter()
-        .map(|rank| {
-            let row = rows.entry(*rank).or_insert(0usize);
-            let point = (48 + rank * (CARD_W + 150), 110 + *row * (CARD_H + 48));
-            *row += 1;
-            point
-        })
-        .collect();
-    let width = points
-        .iter()
-        .map(|(x, _)| x + CARD_W + 48)
-        .max()
-        .unwrap_or(720)
-        .max(720);
-    let graph_bottom = points
-        .iter()
-        .map(|(_, y)| y + CARD_H + 48)
-        .max()
-        .unwrap_or(240);
+    let layout = layout::compute(graph);
+    let points = &layout.points;
+    let width = layout.width;
+    let graph_bottom = layout.bottom;
     let height =
         graph_bottom + graph.warnings.len() * 24 + if graph.warnings.is_empty() { 0 } else { 40 };
     let analysis = match graph.analysis {
@@ -123,11 +80,11 @@ pub(crate) fn render(graph: &Topology) -> String {
     };
     let mut output = format!(
         r##"<svg xmlns="http://www.w3.org/2000/svg" id="topology-graph" viewBox="0 0 {width} {height}" role="img" aria-labelledby="graph-title graph-description">
-<title id="graph-title">NASJ topology</title><desc id="graph-description">{}; {} nodes, {} relationships, {} warnings. Source locations and uncertainty are included.</desc>
+<title id="graph-title">NASJ topology</title><desc id="graph-description">{}; {} nodes, {} relationships, {} diagnostics. Source locations and uncertainty are included.</desc>
 <style>.node-card{{fill:var(--card,#fff)}}.node-label{{font:600 14px system-ui,sans-serif;fill:var(--ink,#192b40)}}.node-kind,.node-source,.edge-label,.graph-note{{font:12px system-ui,sans-serif;fill:var(--muted,#53657a)}}.node-source{{font-size:11px}}.edge-path{{fill:none;stroke:var(--edge,#7e91a5);stroke-width:1.5}}.edge-label{{font-size:10px;paint-order:stroke;stroke:var(--canvas,#f5f8fc);stroke-width:4px;stroke-linejoin:round}}.graph-heading{{font:700 21px system-ui,sans-serif;fill:var(--ink,#192b40)}}</style>
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7e91a5"/></marker></defs>
 <rect width="100%" height="100%" fill="var(--canvas,#f5f8fc)"/>
-<text x="48" y="40" class="graph-heading">NASJ · نسج</text><text x="48" y="65" class="graph-note">{analysis} · {} nodes · {} relationships · {} warnings</text>
+<text x="48" y="40" class="graph-heading svg-heading">NASJ · نسج</text><text x="48" y="65" class="graph-note svg-summary">{analysis} · {} nodes · {} relationships · {} diagnostics</text>
 "##,
         escape(analysis),
         graph.nodes.len(),
@@ -137,6 +94,11 @@ pub(crate) fn render(graph: &Topology) -> String {
         graph.edges.len(),
         graph.warnings.len()
     );
+    for group in &layout.groups {
+        let server = group.server.map(|i| i.to_string()).unwrap_or_default();
+        output.push_str(&format!(r#"<g class="vhost-group" data-server="{server}"><rect x="{}" y="{}" width="{}" height="{}" rx="12" fill="var(--card,#fff)" fill-opacity="0.28" stroke="var(--edge,#7e91a5)" stroke-dasharray="4 4"/><text x="{}" y="{}" class="graph-heading"><title>{}</title>{}</text></g>
+"#,group.x,group.y,group.width,group.height,group.x+20,group.y+32,escape(&group.label),short(&group.label,85)));
+    }
     for (i, edge) in graph.edges.iter().enumerate() {
         let (Some(&from), Some(&to)) = (index.get(edge.from.as_str()), index.get(edge.to.as_str()))
         else {
@@ -153,6 +115,25 @@ pub(crate) fn render(graph: &Topology) -> String {
     for (i, node) in graph.nodes.iter().enumerate() {
         let (x, y) = points[i];
         let (kind, color) = kind(&node.kind);
+        let kind = if node.kind == NodeKind::Server {
+            short(
+                &format!(
+                    "server · {}",
+                    node.attributes
+                        .get("listeners")
+                        .map(String::as_str)
+                        .unwrap_or("")
+                ),
+                38,
+            )
+        } else {
+            kind.into()
+        };
+        let card_label = if node.kind == NodeKind::Server {
+            node.attributes.get("virtual_host").unwrap_or(&node.label)
+        } else {
+            &node.label
+        };
         let source = node
             .source
             .as_ref()
@@ -174,14 +155,14 @@ pub(crate) fn render(graph: &Topology) -> String {
             .get("routing")
             .is_some_and(|value| value == "unresolved");
         output.push_str(&format!(r#"<g class="node" data-node="{i}" transform="translate({x} {y})" tabindex="0" role="group" aria-label="{}"><title>{} · {}</title><rect class="node-card" width="{CARD_W}" height="{CARD_H}" rx="10" stroke="{color}" stroke-width="1.5"/><text x="16" y="23" class="node-kind">{kind}{}</text><text x="16" y="48" class="node-label">{}</text><text x="16" y="71" class="node-source">{}</text></g>
-"#, escape(&node.label),escape(&node.label),escape(&full_source), if unresolved { " · unresolved" } else { "" },short(&node.label,29),short(&source,37)));
+"#, escape(&node.label),escape(&node.label),escape(&full_source), if unresolved { " · unresolved" } else { "" },short(card_label,29),short(&source,37)));
     }
     if graph.nodes.is_empty() {
-        output.push_str("<text x=\"48\" y=\"140\" class=\"graph-note\">No configured nodes. Review the analysis warnings.</text>\n");
+        output.push_str("<text x=\"48\" y=\"140\" class=\"graph-note\">No configured nodes. Review the analysis diagnostics.</text>\n");
     }
     for (i, warning) in graph.warnings.iter().enumerate() {
         output.push_str(&format!(
-            "<text x=\"48\" y=\"{}\" class=\"graph-note\" data-severity=\"{}\"><title>{}</title>{}</text>\n",
+            "<text x=\"48\" y=\"{}\" class=\"graph-note svg-diagnostic\" data-severity=\"{}\"><title>{}</title>{}</text>\n",
             graph_bottom + 24 + i * 24,
             warning.severity.as_str(),
             escape(&warning.message),
