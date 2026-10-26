@@ -14,7 +14,7 @@
   let drag = null;
   let selected = null;
   const pretty = value => value.replaceAll('_', ' ');
-  const source = value => value ? `${value.path}:${value.line}` : 'No source (synthetic data)';
+  const source = value => value ? `${value.path}:${value.line}` : 'No source metadata';
   const text = (tag, value, className) => {
     const element = document.createElement(tag);
     element.textContent = value;
@@ -149,6 +149,6 @@
   });
   if (!data.warnings.length) $('warnings').append(text('li', 'No analysis warnings.', 'subtle'));
   data.sources.forEach(path => $('sources').append(text('li', path)));
-  if (!data.sources.length) $('sources').append(text('li', 'Synthetic topology; no files read.'));
+  if (!data.sources.length) $('sources').append(text('li', data.analysis === 'synthetic' ? 'Synthetic topology; no files read.' : 'No source files recorded.'));
   applyFilters();
 })();

@@ -94,3 +94,18 @@ authentication, host/origin checks and a separate online CSP. Primary Docker,
 systemd and kernel documentation informed the proposals. No discovery/server
 crates, commands, dependencies, sockets or privileged operations were introduced.
 Issue #5 stays open; v0.2 implementation is deferred until v0.1 is validated.
+
+## Final audit — uncertainty and report confidentiality
+
+Found and fixed silent nested-alias/duplicate-directive uncertainty, including
+empty child locations. Invalid numeric/Unix listeners now warn without invented
+listeners. Added fixture regressions; indexed node/upstream lookup avoids repeated
+linear scans on large uncertain graphs. Legacy JSON missing evidence/provenance
+defaults to unresolved/unknown, and exporters label it honestly. Normal static
+analysis still explicitly emits configured evidence; demo remains synthetic.
+
+New reports use Unix mode 0600 and refuse existing paths; CLI prints fixed
+diagnostics with escaped source paths even in strict mode. Input opens additionally
+reject final-component symlink replacement. No discovery or privileged IO added.
+Validation after audit: 26 workspace tests; required gates and browser/CSP checks
+are rerun for this review branch. No PRs merged, releases made or issues closed.

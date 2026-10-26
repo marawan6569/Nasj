@@ -43,20 +43,21 @@ pub enum EdgeKind {
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Evidence {
-    #[default]
     Configured,
     Synthetic,
     Inferred,
     Confirmed,
+    #[default]
     Unresolved,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AnalysisKind {
-    #[default]
     Configuration,
     Synthetic,
+    #[default]
+    Unknown,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -104,7 +105,7 @@ impl Default for Topology {
     fn default() -> Self {
         Self {
             schema_version: SCHEMA_VERSION.to_owned(),
-            analysis: AnalysisKind::Configuration,
+            analysis: AnalysisKind::Unknown,
             sources: Vec::new(),
             nodes: Vec::new(),
             edges: Vec::new(),

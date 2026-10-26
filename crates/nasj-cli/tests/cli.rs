@@ -71,4 +71,22 @@ fn real_map_writes_json_and_never_overwrites_any_existing_file() {
     let output = nasj(&["map", "--config", config.to_str().unwrap(), "--strict"]);
     assert!(!output.status.success());
     assert!(output.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&output.stderr).contains("routing.unresolved"));
+}
+
+#[cfg(unix)]
+#[test]
+fn report_output_is_private_by_default() {
+    use std::os::unix::fs::PermissionsExt;
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("report.html");
+    assert!(
+        nasj(&["demo", "--format", "html", "-o", path.to_str().unwrap()])
+            .status
+            .success()
+    );
+    assert_eq!(
+        std::fs::metadata(path).unwrap().permissions().mode() & 0o777,
+        0o600
+    );
 }

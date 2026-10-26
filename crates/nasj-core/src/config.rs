@@ -80,7 +80,7 @@ impl Resolver {
         #[cfg(unix)]
         {
             use std::os::unix::fs::OpenOptionsExt;
-            options.custom_flags(libc::O_NONBLOCK);
+            options.custom_flags(libc::O_NONBLOCK | libc::O_NOFOLLOW);
         }
         let file = options
             .open(&path)
