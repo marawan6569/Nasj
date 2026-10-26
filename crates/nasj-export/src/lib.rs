@@ -8,9 +8,10 @@ pub enum Format {
 }
 
 pub fn render(topology: &Topology, format: Format) -> Result<String, serde_json::Error> {
+    let topology = nasj_core::redact::topology(topology);
     match format {
-        Format::Json => serde_json::to_string_pretty(topology),
-        Format::Dot => Ok(render_dot(topology)),
+        Format::Json => serde_json::to_string_pretty(&topology),
+        Format::Dot => Ok(render_dot(&topology)),
     }
 }
 
