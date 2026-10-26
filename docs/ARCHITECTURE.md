@@ -89,3 +89,7 @@ v0.2 discovery will use optional adapters outside static core analysis, preserve
 observations and confidence, and accept fixture snapshots. v0.3's optional
 localhost server will reuse the same core/export APIs. Neither is implemented;
 their design must not introduce runtime work into ordinary `nasj map`.
+
+Proposals: [ADR-0002 discovery/evidence](adr/0002-optional-discovery-evidence.md)
+and [ADR-0003 localhost server](adr/0003-optional-local-server.md). No crates,
+commands or dependencies for these versions were added.

@@ -29,6 +29,8 @@ service observations and local TCP/process listeners. Retain source/time,
 network namespace, permission gaps and confirmed/inferred/unresolved evidence.
 No automatic root access, Docker socket use or default discovery in `map`.
 Begin implementation only after v0.1 is sufficiently validated.
+See [ADR-0002](adr/0002-optional-discovery-evidence.md) for the observation model,
+adapter order, matching rules, permission gaps and test gates.
 
 ## v0.3 — optional local web server (planned)
 
@@ -36,3 +38,5 @@ Reuse core analysis/export APIs with an optional local dashboard. Default bind
 127.0.0.1; retain offline CLI/report workflows and explicit filesystem scope.
 Authentication, request/path isolation and bounded concurrent work must be designed
 before exposing a network endpoint. No server/runtime is implemented now.
+See [ADR-0003](adr/0003-optional-local-server.md) for the proposed data boundary,
+token/origin policy, immutable snapshots and offline-CSP separation.

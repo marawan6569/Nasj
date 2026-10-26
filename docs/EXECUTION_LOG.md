@@ -84,3 +84,13 @@ repository branch protections remain unverified. No PRs merged or issues closed.
 Validation: all four workspace gates pass (23 tests), local Markdown links exist,
 and `cargo install --locked --path crates/nasj-cli --root /tmp/nasj-install-preview`
 succeeded. The installed optimized binary mapped the Unix fixture in strict mode.
+
+## P4 — future architecture only
+
+ADR-0002 proposes optional snapshot-first discovery adapters, explicit permissions,
+namespace/time/identity evidence and confirmed/inferred/unresolved correlations.
+ADR-0003 proposes an optional loopback server with immutable selected snapshots,
+authentication, host/origin checks and a separate online CSP. Primary Docker,
+systemd and kernel documentation informed the proposals. No discovery/server
+crates, commands, dependencies, sockets or privileged operations were introduced.
+Issue #5 stays open; v0.2 implementation is deferred until v0.1 is validated.
