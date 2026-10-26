@@ -178,3 +178,16 @@ browser coverage is Chromium. Schema 0.2 requires old exhaustive consumers to
 update. Approved branding remains missing and required branch protection remains
 unverified. Maintainer review/release validation is still required; no merge,
 release or issue closure is performed by this work.
+
+## Final ordered-return audit
+
+An additional synthetic regression verifies `return` followed by unreachable
+rewrite/set/return instructions and full conditional-return coverage before
+location selection. Later instructions no longer obscure the terminal outcome;
+skipped child locations retain containment and explicit unreachable metadata
+without unsupported-analysis warnings or invented effective destinations. This
+private reachability state keeps unsupported evaluation distinct from known
+termination. Required gates and the full browser suite are rerun cumulatively.
+The audit also verifies external model callers cannot leak a redacted condition
+value through a stale derived label; condition labels are rebuilt from sanitized
+typed metadata at export. No generic secret-detection guarantee is introduced.

@@ -39,6 +39,9 @@ distinguish repeated blocks. These are declarations, not deduplicated websites.
 `configured_root`, `root_origin` and `root_source` are inspection metadata and
 must not be interpreted as effective static routes beside a proxy/unsupported
 handler. Only emitted destination edges describe supported content handling.
+Configured child locations skipped by a terminal server return carry
+`reachability: unreachable_after_return`; they have no effective destination edges.
+This differs from unsupported analysis (`routing: unresolved`).
 
 Condition nodes have typed `condition: { variable, operator, value, value_redacted }`.
 Operators are `equal` / `not_equal`; values are display data, never evaluated.

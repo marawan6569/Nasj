@@ -64,6 +64,14 @@ pub fn topology(input: &Topology) -> Topology {
             };
             condition.value_redacted |= value != condition.value;
             condition.value = value;
+            if node.kind == crate::NodeKind::Condition {
+                let operator = if condition.operator == crate::Comparison::Equal {
+                    "="
+                } else {
+                    "!="
+                };
+                node.label = format!("{} {operator} {:?}", condition.variable, condition.value);
+            }
         }
         for (key, value) in &mut node.attributes {
             *value = if sensitive_key(key) {

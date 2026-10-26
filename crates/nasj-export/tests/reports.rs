@@ -173,3 +173,21 @@ fn condition_metadata_is_escaped_and_redirect_query_secrets_are_redacted() {
         .unwrap()
         .contains("&lt;/script&gt;"));
 }
+
+#[test]
+fn public_condition_values_are_redacted_in_both_metadata_and_derived_labels() {
+    let mut graph = graph();
+    graph.nodes[0].kind = nasj_core::NodeKind::Condition;
+    graph.nodes[0].label = "$http_authorization = fixture-condition-credential".into();
+    graph.nodes[0].condition = Some(nasj_core::Condition {
+        variable: "$http_authorization".into(),
+        operator: nasj_core::Comparison::Equal,
+        value: "fixture-condition-credential".into(),
+        value_redacted: false,
+    });
+    for format in [Format::Json, Format::Dot, Format::Svg, Format::Html] {
+        assert!(!render(&graph, format)
+            .unwrap()
+            .contains("fixture-condition-credential"));
+    }
+}
