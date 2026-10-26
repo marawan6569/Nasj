@@ -1,0 +1,10 @@
+name: Feature request
+description: Suggest functionality for NASJ
+title: "feat: "
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Problem and proposed solution
+    validations:
+      required: true
