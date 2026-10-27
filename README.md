@@ -65,6 +65,48 @@ nasj --version
 Building may fetch Rust dependencies; the installed mapping CLI and HTML reports
 work offline. `main` continues development while `v0.1.0` remains fixed.
 
+## Linux installation
+
+**Binary downloads are staged for review and are not public yet.** Keep using
+the working source quick start above until a maintainer approves publication.
+The release page currently provides source assets only. See
+[distribution and validation](docs/DISTRIBUTION.md) for compatibility evidence.
+
+1. **Recommended after publication: precompiled archive (no Rust).** Download
+   the archive for your architecture and `SHA256SUMS-binaries` from the
+   [release page](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
+   The following commands are staged examples for those future downloads:
+
+   ```sh
+   # x86_64; use linux-aarch64 for a validated ARM64 release instead
+   sha256sum --ignore-missing --check SHA256SUMS-binaries
+   tar -xzf nasj-v0.1.0-linux-x86_64.tar.gz
+   install -Dm755 nasj-v0.1.0-linux-x86_64/nasj "$HOME/.local/bin/nasj"
+   "$HOME/.local/bin/nasj" --version
+   ```
+
+   Check that the intended archive was reported `OK`; put `~/.local/bin` on
+   `PATH`. Keep the bundled notices with any redistributed copies.
+
+2. **Debian / Ubuntu / Linux Mint, after publication.** Download the package
+   matching your system architecture (`dpkg --print-architecture`) and the
+   binary checksum file from the same release page. For amd64:
+
+   ```sh
+   sha256sum --ignore-missing --check SHA256SUMS-binaries
+   sudo apt install ./nasj_0.1.0_amd64.deb
+   nasj --version
+   # Remove when needed: sudo apt remove nasj
+   ```
+
+   Use `nasj_0.1.0_arm64.deb` only when its native validation and publication
+   are confirmed. A compatible glibc and libgcc are required; package management
+   checks the derived dependencies. Linux Mint itself requires separate validation.
+
+3. **Build from source, available now.** Use the Cargo-based quick start above
+   (`main` for development, immutable `v0.1.0` for that release). Building needs
+   Rust and a linker; running an installed binary does not.
+
 ## Explore a configuration
 
 ```sh

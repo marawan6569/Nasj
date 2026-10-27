@@ -68,3 +68,51 @@ HTML embeds only NASJ-owned CSS/JavaScript and generated SVG/JSON, with no
 vendored visualization framework. The source-first distribution excludes fetched
 dependencies and browser caches. Any later binary/vendored distribution needs an
 exact notice review; no claim of a completed legal/CVE audit is made.
+
+## Binary notice review
+
+Binary assets are prepared separately and remain unpublished. The source-only
+inventory above is historical context, not the binary notice bundle.
+Release tooling uses Cargo 1.99.1 metadata with `--locked --filter-platform`
+for the actual native GNU target. The v0.1.0 graph has **35 external packages**
+on Linux, including proc macros, build and test dependencies. Windows/EFI-only
+packages are excluded by Cargo's target resolution. Including dev dependencies
+is a conservative superset of code in the shipped executable.
+
+The checked-in `tools/release/license-policy.json` records package identities,
+crate archive SHA-256, declared expressions, and the paths and SHA-256 of **74
+actual upstream license/copyright files**. The script verifies this closed set
+before copying every text verbatim. It also preserves upstream authors/repository
+metadata and source copyright lines in per-package `ATTRIBUTION.txt` files.
+MIT is selected from the offered alternatives. `unicode-ident 1.0.27` retains
+its **additional Unicode-3.0 requirement** and `LICENSE-UNICODE`, including
+the Unicode copyright and permission notice. `strsim` and `zmij` have MIT-only
+texts; `memchr` offers MIT/Unlicense; `rustix` and `linux-raw-sys` offer MIT
+alongside Apache/LLVM alternatives and supply separate COPYRIGHT material.
+Those alternatives' complete texts are retained too.
+
+The policy also pins Rust 1.99.1's `COPYRIGHT-library.html` and all 12 supplied
+license texts. This covers the upstream library notice inventory and bundled
+standard-library dependencies; it does not bundle the compiler executable or
+compiler source. It retains upstream notices even for library portions absent
+from this executable. glibc and libgcc are runtime OS dependencies, not bundled.
+
+For dependency/toolchain updates:
+
+1. Resolve the **approved release source** lockfile on every proposed target.
+   Compare normal/build/dev/proc-macro coverage and target condition changes.
+2. Read each new/changed crate's actual license, copyright, notices and relevant
+   source headers. Do not infer full terms from an SPDX string or copy only MIT
+   when an expression also requires another license. Examine standard-library
+   notice changes when updating Rust.
+3. Update the explicit policy in a reviewed PR only after identifying all required
+   texts and mandatory additional terms. Hashes can be calculated with SHA-256;
+   there is deliberately no automatic policy acceptance/update mode.
+4. Run native packaging on each target. New/removed packages, changed crate
+   archives, changed expressions, missing/added notice files, or changed notice
+   hashes must fail until reviewed. Inspect the physical archive and Debian
+   notice directories and the generated `inventory.json`.
+
+If coverage is uncertain, mark that architecture BLOCKED. Tooling does not
+discover arbitrary legal obligations automatically; policy updates require
+human review. No legal opinion, CVE audit or reproducibility certification is made.

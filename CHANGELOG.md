@@ -4,6 +4,13 @@
 
 Post-release documentation tracks the published release and the main development branch.
 
+- Prepare native GNU/Linux x86_64 and ARM64 archives and Debian packages from
+  an explicitly approved immutable release SHA, using pinned Rust 1.99.1.
+- Add reviewed dependency notice gates, runtime/container validation, checksums,
+  provenance and a separate explicitly approved additive release backfill workflow.
+- Stage consistent English/Arabic binary installation instructions; binaries
+  remain unpublished. Historical v0.1.0 source assets and tag are unchanged.
+
 ## [0.1.0](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0) — 2026-10-27
 
 First official source-first release, published at 03:27:17 UTC from

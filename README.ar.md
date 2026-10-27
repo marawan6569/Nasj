@@ -70,6 +70,47 @@ nasj --version
 قد يتطلب البناء تنزيل اعتماديات Rust؛ تعمل الأداة المثبتة وتقارير HTML دون اتصال.
 يستمر التطوير على `main`، بينما يبقى الوسم `v0.1.0` ثابتًا.
 
+## التثبيت على Linux
+
+**الحزم التنفيذية قيد المراجعة ولم تُنشر للعامة بعد.** استخدم خطوات البناء من
+المصدر أعلاه حتى يوافق المشرف على النشر. تحتوي صفحة الإصدار حاليًا على ملفات
+المصدر فقط. راجع [التوزيع والتحقق](docs/DISTRIBUTION.md) لأدلة التوافق.
+
+1. **الخيار الموصى به بعد النشر: أرشيف تنفيذي جاهز، دون Rust.** نزّل أرشيف
+   معمارية جهازك وملف `SHA256SUMS-binaries` من
+   [صفحة الإصدار](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
+   الأوامر التالية أمثلة جاهزة للاستخدام بعد إتاحة الملفات:
+
+   ```sh
+   # x86_64; use linux-aarch64 for a validated ARM64 release instead
+   sha256sum --ignore-missing --check SHA256SUMS-binaries
+   tar -xzf nasj-v0.1.0-linux-x86_64.tar.gz
+   install -Dm755 nasj-v0.1.0-linux-x86_64/nasj "$HOME/.local/bin/nasj"
+   "$HOME/.local/bin/nasj" --version
+   ```
+
+   تأكد من ظهور `OK` بجانب الأرشيف المطلوب، وأضف `~/.local/bin` إلى `PATH`.
+   احتفظ بإشعارات التراخيص المرفقة مع أي نسخ تعيد توزيعها.
+
+2. **Debian / Ubuntu / Linux Mint بعد النشر.** نزّل الحزمة الموافقة لنتيجة
+   `dpkg --print-architecture` وملف تحقق الحزم التنفيذية من صفحة الإصدار نفسها.
+   مثال لمعمارية amd64:
+
+   ```sh
+   sha256sum --ignore-missing --check SHA256SUMS-binaries
+   sudo apt install ./nasj_0.1.0_amd64.deb
+   nasj --version
+   # Remove when needed: sudo apt remove nasj
+   ```
+
+   استخدم `nasj_0.1.0_arm64.deb` فقط بعد تأكيد اجتياز اختبارات ARM64 الأصلية
+   ونشرها. يلزم إصدار متوافق من glibc وlibgcc؛ تتحقق إدارة الحزم من الاعتماديات
+   المستنتجة من الملف التنفيذي. يحتاج Linux Mint نفسه إلى تحقق مستقل.
+
+3. **البناء من المصدر متاح الآن.** اتبع خطوات Cargo أعلاه: `main` للتطوير،
+   والوسم الثابت `v0.1.0` لهذا الإصدار. يتطلب البناء Rust وأداة ربط، بينما
+   لا يحتاج تشغيل الملف التنفيذي المثبت إلى Rust.
+
 ## استكشاف الإعدادات
 
 <div dir="ltr">
