@@ -6,13 +6,13 @@ Binary assets are not yet public. Use the
 [tooling procedure](../tools/release/README.md) and
 [validation report](BINARY_VALIDATION_v0.1.0.md).
 
-- [ ] Annotated tag and approved SHA verified; all packages match release version.
-- [ ] Native x86_64 locked tests/build, ELF/GLIBC inspection, archive and Debian package pass.
-- [ ] Native ARM64 equivalent checks pass, or ARM64 is explicitly deferred.
-- [ ] Full locked dependency and Rust library notices reviewed and physically bundled.
-- [ ] lintian passes; clean native Ubuntu/Debian archive/install/four exports/removal pass.
-- [ ] Checksums verified after packaging and transfer; provenance/size/hash report reviewed.
-- [ ] Existing main CI stays green; bilingual pending installation instructions agree.
+- [x] Annotated tag and approved SHA verified; all packages match release version.
+- [x] Native x86_64 locked tests/build, ELF/GLIBC inspection, archive and Debian package pass.
+- [x] Native ARM64 equivalent checks pass, or ARM64 is explicitly deferred.
+- [x] Full locked dependency and Rust library notices reviewed and physically bundled.
+- [x] lintian passes; clean native Ubuntu/Debian archive/install/four exports/removal pass.
+- [x] Checksums verified after packaging and transfer; provenance/size/hash report reviewed.
+- [x] Existing main CI stays green; bilingual pending installation instructions agree.
 - [ ] Maintainer reviews and merges tooling PR; dispatch preparation on approved main tooling SHA.
 - [ ] Configure protected `release-binaries` environment and approve concrete selected assets.
 - [ ] Separately dispatch/approve additive publication; never replace original assets, tags or notes.

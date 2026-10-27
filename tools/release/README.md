@@ -10,8 +10,10 @@ lockfile or the historical tag to accommodate packaging; report a source blocker
 
 1. Review/merge the implementation PR with maintainer approval. Its PR trigger
    exercises the same native packaging/runtime jobs for v0.1.0 with read-only
-   permissions. PR artifacts are ineligible for public upload. GitHub requires
-   the workflow on the default branch before manual dispatch is available.
+   permissions. PR artifacts are ineligible for public upload. Once GitHub has
+   registered the workflow through the PR, CLI dispatch on the implementation
+   branch can validate manual inputs during review (verified for this PR).
+   Publication accepts only a subsequent approved main preparation run.
 2. Run **Linux release preparation** on main with the existing tag, approved SHA
    and `both` (or `x86_64` when ARM64 is deferred):
 
