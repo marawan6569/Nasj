@@ -8,14 +8,17 @@
     {
       "id": "n000001",
       "kind": "server",
-      "label": "server",
+      "label": "example.test · HTTP :80",
       "source": {
         "path": "fixtures/conditional.conf",
         "line": 2
       },
       "attributes": {
+        "listeners": "HTTP :80",
         "routing": "conditional",
-        "state": "configured"
+        "server_names": "example.test",
+        "state": "configured",
+        "virtual_host": "example.test"
       }
     },
     {

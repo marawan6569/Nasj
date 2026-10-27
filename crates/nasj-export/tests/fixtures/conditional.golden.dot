@@ -1,6 +1,6 @@
 digraph nasj {
   rankdir=LR;
-  "n000001" [label="server"];
+  "n000001" [label="example.test · HTTP :80"];
   "n000002" [label="80"];
   "n000003" [label="example.test"];
   "n000004" [label="$host = \"example.test\""];

@@ -28,7 +28,7 @@ nasj --help
 لتجربة فرع التنفيذ قبل دمجه:
 
 ```sh
-git clone --branch fix/analysis-uncertainty-hardening https://github.com/marawan6569/Nasj.git
+git clone --branch feat/vhost-focused-topology https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 ```
@@ -69,7 +69,7 @@ nasj map --config ./nginx.conf --allow-external-includes --format json
 nasj map --config ./nginx.conf --strict --format json
 ```
 
-يمنع `--strict` إنشاء التقرير عند وجود أي تحذير. تؤدي أخطاء الصياغة والقراءة
+يمنع `--strict` إنشاء التقرير عند وجود تحذير أو خطأ، ويسمح بالملاحظات المعلوماتية لأنماط التضمين الاختيارية الفارغة. تؤدي أخطاء الصياغة والقراءة
 والتضمين إلى الفشل دون خريطة جزئية. تظهر التحذيرات في جميع الصيغ وفي لوحة
 التشخيص داخل تقرير HTML.
 
@@ -112,3 +112,5 @@ cargo build --workspace
 [الأمان](SECURITY.md) · [الترخيص MIT](LICENSE)
 
 المشروع مستقل ولا يتبع F5 أو NGINX.
+
+تسجل النسخة شروط الخادم البسيطة ومخرجاتها عند تحقق الشرط أو عدم تحققه دون تقييم المتغيرات. يبدأ التقرير بعرض مقروء لخادم افتراضي مع تجميع نطاقاته وخيارات HTTP/HTTPS، ويمكن اختيار خريطة البنية الكاملة. صيغة JSON التجريبية هي 0.2، وهي مستقلة عن رقم إصدار المنتج.

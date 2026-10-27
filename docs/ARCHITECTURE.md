@@ -73,11 +73,16 @@ See [ADR-0004](adr/0004-ordered-conditional-returns.md) for schema 0.2 and exclu
 
 ## Reports and security
 
-JSON documents the experimental versioned model, sources and warnings. DOT quotes
-all IDs/labels. SVG uses native deterministic graph layering and XML escaping.
+JSON documents the experimental versioned model, sources and diagnostics. DOT quotes
+all IDs/labels. SVG uses native vhost lanes, mean-order layering and XML escaping.
 HTML embeds the SVG, redacted model and local assets. Its viewer uses DOM text
 creation, a script hash CSP and no network permissions. See
 [REPORTS.md](REPORTS.md) for interaction and browser validation details.
+
+The HTML viewer starts at readable scale for one selected virtual host and offers
+the complete overview, grouped HTTP/HTTPS navigation and global search. Focus
+geometry is lazy with a bounded cache, one SVG node per model node, and no graph
+library/network dependency. This presentation does not create new topology edges.
 
 Raw directives, headers, certificate contents and response bodies are excluded.
 URL userinfo/query/fragment data and sensitive attribute values are redacted.

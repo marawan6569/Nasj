@@ -14,29 +14,50 @@ nasj map --config ./nginx.conf --format html -o report.html
 Choose unused output paths: existing files and symlinks are never overwritten.
 JSON uses the [experimental schema](JSON_FORMAT.md), ordered attributes, sorted
 source paths and deterministic input traversal. DOT quotes/escapes IDs and labels,
-displays relationship evidence, and includes warning text. Graphviz can optionally
+displays relationship evidence, and includes severity-labeled diagnostics. Graphviz can optionally
 render DOT externally; NASJ does not invoke it or require it.
 
 SVG is a standalone XML document with native layout and embedded styling. DAGs
-use deterministic longest-path columns; arbitrary cyclic model inputs use a
-finite fallback layout. Node titles preserve full labels/source locations while
-cards abbreviate long text. Layout is intentionally simple: edges can cross and
-large graphs need zoom/inspection. This is not an optimized Graphviz replacement.
+use separate virtual-host lanes and a shared upstream area, with deterministic
+longest-path columns and bounded mean-order sweeps to reduce crossings. Arbitrary
+cycles have a finite fallback. Node titles preserve full labels/source locations;
+server cards show domain/listener/source identity. Related HTTP/HTTPS blocks stay
+separate declarations while navigation groups them under the same primary domain.
+No website identity or unconditional redirect relationship is inferred from names.
 
 Open `report.html` directly in a modern browser with no server or internet.
 The single file embeds the SVG, sanitized JSON, CSS and vanilla JavaScript. Use
-search (literal text, including source paths), the node-type filter, unresolved
-filter, zoom buttons/wheel, drag to pan, Fit graph, and node selection. The
+the domain-grouped View selector, global search (literal text, including source
+paths), type/unresolved filters, zoom buttons/wheel, drag to pan, Fit view, and node selection. The
 inspector shows attributes, file/line provenance, relationships and their evidence.
 Keyboard users can focus nodes and press Enter/Space; `/` focuses search and
 Escape clears selection. Themes use the system preference initially and can be
 toggled. Small screens place the inspector below the graph. Result lists show
 the first 200 matches; the graph keeps all matching nodes.
 
+The initial view focuses one virtual host at readable scale instead of shrinking
+the entire topology to fit. Cards are approximately 260 screen pixels wide on
+laptop/mobile; pan or select a result to reach offscreen nodes. Readable scale
+restores that view; Fit view deliberately fits the current layout. Full
+infrastructure overview remains available in the View selector and SVG export.
+Search temporarily spans every virtual host; clearing it restores the selected
+view. Type/unresolved filters hide nodes within the layout without reordering it.
+The inspector includes typed symbolic guards and guarded relationship evidence.
+
+Vhost focus layouts are computed lazily, follow configured outgoing relationships
+and domain declarations, and retain at most eight cached layouts. Shared upstream
+members are included only for the selected focus. There is one SVG node per model
+node; no precomputed SVG copy per vhost or bundled graph library. Search text is
+indexed once. Layout is deterministic and intentionally simple: some crossings
+remain, full overview can be large, and large focused hosts still require pan or
+search. No optimized graph-library or unlimited-size performance claim is made.
+
 The report runs no discovery and never opens source files. `configured` means a
 declaration, not runtime verification. Read diagnostics before interpreting routes.
 JavaScript-disabled browsers show the static diagram. Filtering hides nodes and
-their incident edges; Fit graph restores the original complete diagram bounds.
+their incident edges; Fit view restores the current context bounds. Diagnostics
+use severity text and color (info/warning/error); optional empty includes are not
+presented as configuration errors. Exact include patterns remain local to CLI.
 
 ## Security contract
 
@@ -71,3 +92,10 @@ desktop/mobile captures. The checks assert XML validity, actual interaction,
 responsive overflow, source/evidence inspection, zero injected DOM/script
 execution, zero external requests and zero browser errors. These are development
 dependencies; generated reports and the Rust executable require none of them.
+
+The synthetic multi-vhost check covers paired HTTP/HTTPS blocks, source identity,
+focus/global search/filter restoration, readable initial cards, complete overview,
+mobile and themes at laptop/mobile widths. A separate 100-vhost/602-node generated
+fixture verifies navigation and one-to-one DOM/model nodes. Rust tests assert
+nonoverlapping cards, distinct lanes, deterministic geometry and crossing removal
+on an adversarial two-edge ordering. Browser verification currently uses Chromium.
