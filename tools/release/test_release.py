@@ -100,6 +100,61 @@ class ReleaseTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "dependency set changed"):
                 release.notices({"packages": []}, Path(name) / "notices", "1.99.1")
 
+    def test_unicode_notice_is_bundled_and_missing_or_changed_text_blocks(self):
+        with tempfile.TemporaryDirectory() as name:
+            base = Path(name)
+            root = base / "registry/src/test/unicode-ident-1.0.27"
+            root.mkdir(parents=True)
+            cache = base / "registry/cache/test"
+            cache.mkdir(parents=True)
+            crate = cache / "unicode-ident-1.0.27.crate"
+            crate.write_bytes(b"fixture archive")
+            (root / "LICENSE-MIT").write_text("fixture MIT text")
+            unicode_file = root / "LICENSE-UNICODE"
+            unicode_file.write_text("fixture Unicode copyright and license text")
+            package = {
+                "name": "unicode-ident",
+                "version": "1.0.27",
+                "source": "registry+https://github.com/rust-lang/crates.io-index",
+                "manifest_path": str(root / "Cargo.toml"),
+                "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+                "authors": [],
+            }
+            policy = {
+                "toolchain": "fixture",
+                "packages": {
+                    "unicode-ident@1.0.27": {
+                        "license": package["license"],
+                        "crate_checksum": release.sha(crate),
+                        "files": {p.name: release.sha(p) for p in root.iterdir()},
+                    }
+                },
+                "rust_notices": {},
+            }
+            release.write_json(base / "license-policy.json", policy)
+            with patch("release.HERE", base), patch(
+                "release.run", return_value=str(base)
+            ):
+                release.notices({"packages": [package]}, base / "bundle", "fixture")
+                self.assertEqual(
+                    (base / "bundle/unicode-ident@1.0.27/LICENSE-UNICODE").read_bytes(),
+                    unicode_file.read_bytes(),
+                )
+                self.assertIn(
+                    "MIT AND Unicode-3.0",
+                    (base / "bundle/unicode-ident@1.0.27/ATTRIBUTION.txt").read_text(),
+                )
+                unicode_file.unlink()
+                with self.assertRaisesRegex(ValueError, "notice inventory changed"):
+                    release.notices(
+                        {"packages": [package]}, base / "missing", "fixture"
+                    )
+                unicode_file.write_text("changed license text")
+                with self.assertRaisesRegex(ValueError, "unreviewed license text"):
+                    release.notices(
+                        {"packages": [package]}, base / "changed", "fixture"
+                    )
+
     def test_publication_rejects_wrong_source_and_unexpected_files(self):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name)
@@ -108,6 +163,10 @@ class ReleaseTests(unittest.TestCase):
                 "tag": "v0.1.0",
                 "commit": release.APPROVED_V010,
                 "tooling_commit": "tooling",
+                "target": "x86_64-unknown-linux-gnu",
+                "license_policy_sha256": release.sha(
+                    release.HERE / "license-policy.json"
+                ),
                 "artifacts": [
                     "nasj-v0.1.0-linux-x86_64.tar.gz",
                     "nasj_0.1.0_amd64.deb",

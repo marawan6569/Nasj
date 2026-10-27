@@ -6,7 +6,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
-from release import checksums, identity, require, run, sha, TARGETS
+from release import checksums, identity, require, run, sha, TARGETS, HERE
 
 
 def api(repo, endpoint):
@@ -27,6 +27,11 @@ def validate(directory, tag, commit, tooling_sha):
         )
         require(meta["tag"] == tag and meta["commit"] == commit, "wrong release source")
         require(meta["tooling_commit"] == tooling_sha, "build tooling commit mismatch")
+        require(meta["target"] == TARGETS[arch][0], "target provenance mismatch")
+        require(
+            meta["license_policy_sha256"] == sha(HERE / "license-policy.json"),
+            "notice policy mismatch",
+        )
         artifacts = [
             f"nasj-{tag}-linux-{arch}.tar.gz",
             f"nasj_{tag[1:]}_{TARGETS[arch][1]}.deb",

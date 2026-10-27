@@ -28,6 +28,9 @@ lockfile or the historical tag to accommodate packaging; report a source blocker
    Rust/Cargo installation, version/help, all four strict exports, Debian
    metadata/layout/install/removal and absence of maintainer scripts. All
    installation happens in disposable containers, using synthetic configuration.
+   Lintian treats every remaining error/warning as a failure. Only
+   `initial-upload-closes-no-bugs` is suppressed: this upstream package is not
+   a Debian archive upload, so there is no Debian ITP bug to cite.
 4. Only when **every selected target** passes, collect rechecks source identity
    and emits `reviewed-linux-binaries` with `SHA256SUMS-binaries`. Failed ARM64
    cannot be advertised by successful x86_64. If ARM64 is blocked, dispatch a new

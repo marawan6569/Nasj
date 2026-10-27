@@ -385,23 +385,22 @@ def prepare(args):
             "license_policy_sha256": sha(HERE / "license-policy.json"),
         }
         # Determine dependencies with Debian's installed symbols/shlibs databases.
-        debroot = work / "deb"
-        (debroot / "debian").mkdir(parents=True)
+        debroot = work / "debian/nasj"
+        (work / "debian").mkdir()
         (debroot / "usr/bin").mkdir(parents=True)
         shutil.copy2(binary, debroot / "usr/bin/nasj")
-        (debroot / "debian/control").write_text(
+        (work / "debian/control").write_text(
             "Source: nasj\nSection: utils\nPriority: optional\nMaintainer: "
             + MAINTAINER
             + "\n\nPackage: nasj\nArchitecture: any\nDescription: read-only Nginx infrastructure mapper\n"
         )
-        deps = run("dpkg-shlibdeps", "-O", "-eusr/bin/nasj", cwd=debroot)
+        deps = run("dpkg-shlibdeps", "-O", "-edebian/nasj/usr/bin/nasj", cwd=work)
         require(
             deps.startswith("shlibs:Depends=") and "\n" not in deps,
             "unexpected dpkg-shlibdeps output",
         )
         provenance["debian_depends"] = deps.removeprefix("shlibs:Depends=")
         write_json(tree / "BUILD-METADATA.json", provenance)
-        (debroot / "debian").rename(work / "dependency-probe")
         (debroot / "DEBIAN").mkdir()
         doc = debroot / "usr/share/doc/nasj"
         shutil.copytree(tree, doc, ignore=shutil.ignore_patterns("nasj"))
@@ -411,7 +410,7 @@ def prepare(args):
             + "\nDependency notices, copyright holders and full license texts: third-party/\n"
         )
         changelog = (
-            f"nasj ({version}-1) stable; urgency=medium\n\n  * Binary distribution of immutable {args.tag} ({args.commit}).\n\n -- {MAINTAINER}  "
+            f"nasj ({version}-1) stable; urgency=medium\n\n  * Binary distribution of immutable {args.tag}.\n    Source: {args.commit}.\n\n -- {MAINTAINER}  "
             + run("date", "-u", f"--date=@{epoch}", "+%a, %d %b %Y %H:%M:%S +0000")
             + "\n"
         )
@@ -485,11 +484,14 @@ def prepare(args):
             stdout=subprocess.DEVNULL,
         )
         if shutil.which("lintian"):
+            # Vendor binaries are not a Debian archive upload: no ITP bug exists.
             subprocess.run(
                 [
                     "lintian",
                     "--fail-on",
                     "error,warning",
+                    "--suppress-tags",
+                    "initial-upload-closes-no-bugs",
                     str(output / artifact_names[1]),
                 ],
                 check=True,
@@ -530,7 +532,11 @@ def collect(args):
     directory = Path(args.directory).resolve()
     names = []
     commits = set()
-    for arch in args.architectures.split(","):
+    tooling_commits = set()
+    lockfiles = set()
+    architectures = args.architectures.split(",")
+    require(len(set(architectures)) == len(architectures), "duplicate architecture")
+    for arch in architectures:
         require(arch in TARGETS, "unsupported architecture")
         checksum = directory / f"SHA256SUMS-{arch}"
         subprocess.run(
@@ -544,6 +550,13 @@ def collect(args):
             "artifact provenance mismatch",
         )
         commits.add(meta["commit"])
+        tooling_commits.add(meta["tooling_commit"])
+        lockfiles.add(meta["lockfile_sha256"])
+        require(meta["target"] == TARGETS[arch][0], "target provenance mismatch")
+        require(
+            meta["license_policy_sha256"] == sha(HERE / "license-policy.json"),
+            "notice policy mismatch",
+        )
         expected = [
             f"nasj-{args.tag}-linux-{arch}.tar.gz",
             f"nasj_{args.tag[1:]}_{TARGETS[arch][1]}.deb",
@@ -551,6 +564,9 @@ def collect(args):
         require(meta["artifacts"] == expected, "unexpected artifact names")
         names.extend([*expected, f"build-{arch}.json"])
     require(len(commits) == 1, "mixed source commits")
+    require(
+        len(tooling_commits) == 1 and len(lockfiles) == 1, "mixed tooling or lockfiles"
+    )
     (directory / "SHA256SUMS-binaries").write_text(
         "".join(f"{sha(directory / n)}  {n}\n" for n in sorted(names))
     )
