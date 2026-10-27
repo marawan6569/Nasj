@@ -17,13 +17,13 @@
 - v0.2 adds opt-in Docker/systemd/process correlation and confidence/provenance.
 - v0.3 adds an optional localhost web dashboard.
 
-## Implementation status (unreleased preview)
+## Implementation status (v0.1.0 preparation)
 
-The feature PR stack now contains bounded generic syntax parsing, recursive/glob
+Main now contains bounded generic syntax parsing, recursive/glob
 include resolution, conservative HTTP topology analysis, versioned JSON/DOT,
 native SVG and standalone interactive HTML. A separate `demo` remains synthetic.
-Workspace gates, fixtures/goldens and Chromium offline checks validate the preview.
-This does not assert that any PR is merged or that v0.1 has been released.
+Workspace gates, fixtures/goldens and Chromium offline checks validate the implementation.
+The complete PR stack is merged; public v0.1.0 publication remains unapproved.
 
 See [ANALYSIS.md](ANALYSIS.md) for supported semantics, read scope and resource
 limits; [REPORTS.md](REPORTS.md) for report behavior; and

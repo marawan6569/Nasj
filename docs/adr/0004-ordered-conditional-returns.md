@@ -1,6 +1,6 @@
 # ADR-0004: narrow ordered conditional returns and handler precedence
 
-Status: implemented for review, unreleased. Product milestone: v0.1.
+Status: implemented and merged via #14/#17, unreleased. Product milestone: v0.1.
 
 The field report and all PR #9/#10 comments were reviewed against cumulative
 `e035f6b`. Two destination bugs remained: inherited root was emitted beside a

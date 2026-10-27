@@ -1,6 +1,6 @@
 # ADR-0001: bounded generic Nginx syntax and owned include resolution
 
-Date: 2026-10-26. Status: implemented for review; not merged. Related: #2, #3.
+Date: 2026-10-26. Status: implemented and merged via #8. Related: #2, #3.
 
 ## Evidence
 

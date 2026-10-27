@@ -1,5 +1,11 @@
 # Execution log
 
+Current status (2026-10-27): the complete #1/#8–#19 stack is merged into main.
+Public v0.1.0 publication awaits separate approval; branch protection is explicitly
+deferred. The earlier sections below are historical records of their stated
+commits, test counts and permissions, superseded by the release-preparation entry
+and [current readiness](RELEASE_READINESS.md).
+
 ## P0 — bootstrap stabilization, 2026-10-26
 
 Baseline: PR #1 at `de99e0b` failed GitHub Actions at formatting; subsequent CI
@@ -310,3 +316,64 @@ the PR dependency stack, schema, licenses/notices and packaging before release.
 No merges, release tags/publication, main/force pushes, issue closures, privileged
 operations, Nginx edits/reloads or discovery were performed. Final pushed-head
 CI/PR links are attached to the branding PR rather than inferred from base CI.
+
+
+## Authorized final stack merge and source release preparation — 2026-10-27
+
+Authenticated as repository owner with admin permission; fetched remotes and
+verified a clean tree. Audited every open PR, description, original exact-head
+Actions, review submission/thread list and conversation. Earlier routing/search
+findings have implementation replies and regression coverage; no unresolved
+inline threads/change requests. Reviewed cumulative code, fixtures, redaction,
+CSP, conditional routing, branding and dependency boundaries. No new blocker found.
+
+Maintainer explicitly authorized merges and deferred branch protection. Marked #1
+ready and merged all 13 PRs into main in order using GitHub merge commits; each
+successor was retargeted to main. Binary incremental diffs matched their original
+reviewed diffs byte for byte. Each merged tree equals its PR head and retains that
+head as the second parent. GitHub briefly recalculated mergeability after base
+changes; no conflicts or content resolutions. No history rewriting, force/main
+push, bypass, branch deletion or repository-settings change.
+
+| PR | Merge commit SHA |
+| --- | --- |
+| [#1](https://github.com/marawan6569/Nasj/pull/1) | `790cb722521863a36f052d98b50bf9775a6a87ca` |
+| [#8](https://github.com/marawan6569/Nasj/pull/8) | `6e8931b34a2f1ad8c03ec8c206aafc1948c496f6` |
+| [#9](https://github.com/marawan6569/Nasj/pull/9) | `9b79b9b9c33221db832c108f002125518fe3c09c` |
+| [#10](https://github.com/marawan6569/Nasj/pull/10) | `f103478379e49442cd127e6c5e786943f3721e93` |
+| [#11](https://github.com/marawan6569/Nasj/pull/11) | `9b0ea88e48b6235413134a6a06e9b2da33d5873d` |
+| [#12](https://github.com/marawan6569/Nasj/pull/12) | `7804c8262ddff58ea488b1be2cecfc124877636c` |
+| [#13](https://github.com/marawan6569/Nasj/pull/13) | `7f3d8e1ef0c9f084aa617a299a16035258b7ff11` |
+| [#14](https://github.com/marawan6569/Nasj/pull/14) | `6f3562ee6147879773c19b547310fc495b13d330` |
+| [#15](https://github.com/marawan6569/Nasj/pull/15) | `f3e30e97ed477ec1643601f3aeb4511e4eb19059` |
+| [#16](https://github.com/marawan6569/Nasj/pull/16) | `50fe1d06bd6ceb11f2fdbe53877f17c13f3ac7f6` |
+| [#17](https://github.com/marawan6569/Nasj/pull/17) | `436f1d8252dbeb2ff49af103fdca12e1878e6a93` |
+| [#18](https://github.com/marawan6569/Nasj/pull/18) | `e8c4cc9daafc5ea920597f2e7486e1aa3aaacded` |
+| [#19](https://github.com/marawan6569/Nasj/pull/19) | `a7d7e3897dc9e35d6689439aa6a5c8e4588895e2` |
+
+Post-stack main a7d7e3897dc9e35d6689439aa6a5c8e4588895e2 has exactly #19's tree
+b8ec18b2d0aa5bc117ecedfb21d6308e301025f3, preserving all 42 original commits.
+Actions 40433761704 passed on this main SHA. Required local fmt/locked Clippy
+(-D warnings)/43 workspace tests/locked build and parser fmt/1 comparison test,
+JSON/DOT/SVG goldens, XML, CSP hash, PNG integrity and full offline Chromium suite
+passed. Chromium includes branded themes/moved-file/no-JS, retained search paths,
+mobile/touch and 40/602-node cases, with zero external requests/browser errors.
+Fresh GitHub clone/optimized locked offline source installation (cached Rust
+packages) and installed version/help/map-help/strict synthetic HTML/demo JSON pass.
+All public/test inputs are synthetic; no deployment configuration/report accessed.
+
+Source-first 0.1.0 chosen; all workspace versions/MIT verified. Exact workspace
+inventory matches 40 external packages; separate parser spike has 78 external
+packages with license declarations. Source archive will contain no vendored Rust
+packages/browsers/binary; source notices and exact archive/checksum/publication
+commands prepared. No CVE/legal audit, MSRV, non-Linux, Firefox/WebKit, physical-device,
+signed/reproducible binary or registry-readiness claim. Schema 0.2 remains experimental.
+
+Focused docs/v0.1.0-release-preparation updates both READMEs to main installation
+and main push CI badge, changelog, notes, distribution/notices, checklist, roadmap,
+architecture/spec and historical record status. Required checks/Actions must pass
+on its PR before merge and run again on final main. The PR final validation comment
+records final SHA/Actions/local results/archive hash without a self-referential
+commit. Publication approval is still withheld: no tag, release, uploaded assets
+or crates.io publication. Branding issue #6 was closed as completed with linked
+merge/CI/asset evidence; unrelated and discovery/server issues remain open.

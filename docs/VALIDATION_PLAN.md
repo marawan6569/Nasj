@@ -1,5 +1,11 @@
 # Field-validation follow-up plan
 
+Current status (2026-10-27): the complete #1/#8–#19 stack is merged into main.
+Public v0.1.0 publication awaits separate approval; branch protection is explicitly
+deferred. The earlier sections below are historical records of their stated
+commits, test counts and permissions, superseded by the release-preparation entry
+and [current readiness](RELEASE_READINESS.md).
+
 Baseline: cumulative `fix/analysis-uncertainty-hardening` at `e035f6b`.
 Inspected all local/remote branches and PRs #1/#8–#13; all heads have green CI.
 Read all conversation comments, review submissions and inline threads on #9/#10
