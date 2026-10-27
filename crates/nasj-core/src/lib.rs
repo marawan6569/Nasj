@@ -2,6 +2,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+pub mod syntax;
+
 pub const SCHEMA_VERSION: &str = "0.1";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
