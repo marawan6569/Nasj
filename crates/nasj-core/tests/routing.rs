@@ -184,3 +184,28 @@ fn inherited_error_page_prevents_claiming_a_terminal_fallback_response() {
         NodeKind::Redirect | NodeKind::Response | NodeKind::Condition
     )));
 }
+
+#[test]
+fn terminal_server_programs_ignore_later_rewrites_and_mark_skipped_locations_unreachable() {
+    let graph = map("conditionals/termination.conf");
+    assert!(graph.warnings.is_empty(), "{:?}", graph.warnings);
+    assert!(graph
+        .nodes
+        .iter()
+        .any(|n| n.kind == NodeKind::Response && n.attributes["status"] == "204"));
+    assert!(!graph
+        .nodes
+        .iter()
+        .any(|n| n.attributes.get("status").is_some_and(|s| s == "503")));
+    for location in graph.nodes.iter().filter(|n| n.kind == NodeKind::Location) {
+        assert_eq!(
+            location.attributes["reachability"],
+            "unreachable_after_return"
+        );
+        assert!(!graph.edges.iter().any(|e| e.from == location.id
+            && matches!(
+                e.kind,
+                EdgeKind::BackedBy | EdgeKind::ProxiesTo | EdgeKind::RespondsWith
+            )));
+    }
+}

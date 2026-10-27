@@ -15,6 +15,13 @@ Analysis and report viewing work offline, without running Nginx or a web server.
 > [#13](https://github.com/marawan6569/Nasj/pull/13). The default branch may lag this
 > preview. No published binary/crates.io release is available.
 
+Field-validation follow-ups are [#14](https://github.com/marawan6569/Nasj/pull/14),
+[#15](https://github.com/marawan6569/Nasj/pull/15),
+[#16](https://github.com/marawan6569/Nasj/pull/16) and
+[#17](https://github.com/marawan6569/Nasj/pull/17). They add guarded ordered returns,
+severity-aware diagnostics and readable vhost-focused navigation. The current
+experimental JSON schema is 0.2, independent of product version.
+
 ## Install the preview
 
 Install a stable [Rust toolchain](https://rustup.rs). A native linker is needed to
@@ -28,7 +35,7 @@ nasj --help
 For an explicit preview checkout before those PRs merge:
 
 ```sh
-git clone --branch feat/vhost-focused-topology https://github.com/marawan6569/Nasj.git
+git clone --branch fix/routing-final-audit https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 ```

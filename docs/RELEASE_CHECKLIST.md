@@ -6,8 +6,8 @@ of completion. See EXECUTION_LOG.md and PR descriptions for actual test evidence
 ## Review and repository policy
 
 - [ ] Maintainer reviews/merges the dependency stack in order:
-  #1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 → #15, then the vhost visualization
-  follow-up; retarget bases as needed.
+  #1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 → #15 → #16 → #17;
+  retarget bases as needed.
 - [ ] Resolve review comments and inspect Actions for the exact approved commits.
 - [ ] Configure and verify required `test` CI check and restrictions on direct main
   pushes using repository settings; current enforcement is unverified.

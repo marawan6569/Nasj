@@ -28,7 +28,7 @@ nasj --help
 لتجربة فرع التنفيذ قبل دمجه:
 
 ```sh
-git clone --branch feat/vhost-focused-topology https://github.com/marawan6569/Nasj.git
+git clone --branch fix/routing-final-audit https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 ```
@@ -81,7 +81,7 @@ nasj map --config ./nginx.conf --strict --format json
 تحتفظ الخريطة بمصدر الإعداد ورقم السطر.
 
 العلاقات تصف **الإعدادات المعلنة** ولا تؤكد أن الخدمة تعمل فعليا. تبقى الوجهات
-المتغيرة والمسارات الشرطية وسياقات إعادة الكتابة غير المدعومة غير محسومة،
+المتغيرة والشروط غير المدعومة وسياقات إعادة الكتابة غير المدعومة غير محسومة،
 ولا تختلق الأداة روابط إلى وجهات مفترضة. لا تحاكي اختيار المسار لطلب حقيقي،
 ولا تستبدل فحص `nginx -t`. راجع [عقد التحليل](docs/ANALYSIS.md) للحدود الدقيقة.
 

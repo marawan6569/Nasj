@@ -14,6 +14,13 @@ struct Analyzer {
     node_index: BTreeMap<String, usize>,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Reachability {
+    Possible,
+    Unresolved,
+    Terminated,
+}
+
 impl Analyzer {
     fn node(
         &mut self,
@@ -267,7 +274,7 @@ impl Analyzer {
             .filter(|d| matches!(d.name.as_str(), "root" | "error_page"))
             .cloned()
             .collect();
-        self.scope(&server, children, &inherited, false, true);
+        self.scope(&server, children, &inherited, Reachability::Possible, true);
     }
 
     fn scope(
@@ -275,7 +282,7 @@ impl Analyzer {
         owner: &str,
         children: &[Directive],
         inherited: &[Directive],
-        ancestor_uncertain: bool,
+        reachability: Reachability,
         server_level: bool,
     ) {
         let inherited_error = inherited.iter().any(|d| d.name == "error_page");
@@ -285,25 +292,37 @@ impl Analyzer {
             None
         };
         let supported_if = server_level && program.is_some();
+        let terminated = reachability == Reachability::Terminated;
+        if terminated {
+            if let Some(node) = self
+                .node_index
+                .get(owner)
+                .and_then(|&i| self.graph.nodes.get_mut(i))
+            {
+                node.attributes
+                    .insert("reachability".into(), "unreachable_after_return".into());
+            }
+        }
         // Internal redirects/rewrites and extension handlers prevent a claim
         // about an effective destination. Keep containment, drop routing edges.
-        let mut uncertain = ancestor_uncertain
+        let mut uncertain = reachability != Reachability::Possible
             || inherited_error
-            || children.iter().any(|d| {
-                matches!(
-                    d.name.as_str(),
-                    "rewrite"
-                        | "set"
-                        | "break"
-                        | "try_files"
-                        | "error_page"
-                        | "mirror"
-                        | "limit_except"
-                ) || d.name == "if" && !supported_if
-                    || d.name.ends_with("_by_lua_file")
-                    || d.name.starts_with("js_")
-            });
-        if uncertain {
+            || !supported_if
+                && children.iter().any(|d| {
+                    matches!(
+                        d.name.as_str(),
+                        "rewrite"
+                            | "set"
+                            | "break"
+                            | "try_files"
+                            | "error_page"
+                            | "mirror"
+                            | "limit_except"
+                    ) || d.name == "if" && !supported_if
+                        || d.name.ends_with("_by_lua_file")
+                        || d.name.starts_with("js_")
+                });
+        if uncertain && !terminated {
             self.mark_unresolved(owner);
             if let Some(source) = self
                 .node_index
@@ -418,7 +437,7 @@ impl Analyzer {
             })
             .collect();
         let unsupported = handlers.iter().find(|d| d.name != "proxy_pass");
-        if let Some(d) = unsupported {
+        if let Some(d) = unsupported.filter(|_| !terminated) {
             self.unresolved(owner,d,"this upstream content handler is unsupported by static analysis; no effective destination is asserted (not a Nginx validity error)");
         }
         if handlers.len() > 1 {
@@ -431,6 +450,11 @@ impl Analyzer {
         }
         let returns: Vec<_> = children.iter().filter(|d| d.name == "return").collect();
         let has_control = !returns.is_empty() || children.iter().any(|d| d.name == "if");
+        let terminal_here = !uncertain
+            && (program
+                .as_ref()
+                .is_some_and(|steps| matches!(steps.last(), Some(Step::Return { .. })))
+                || !server_level && returns.first().and_then(|d| control::action(d)).is_some());
         if !uncertain {
             if let Some(steps) = program.filter(|steps| !steps.is_empty()) {
                 self.control_flow(owner, steps);
@@ -499,7 +523,14 @@ impl Analyzer {
                 &[("match", matching.into()), ("pattern", pattern.into())],
             );
             self.edge(owner, &id, EdgeKind::Contains, &child.source);
-            self.scope(&id, body, &effective, uncertain || has_control, false);
+            let child_reachability = if terminated || terminal_here {
+                Reachability::Terminated
+            } else if uncertain || has_control {
+                Reachability::Unresolved
+            } else {
+                Reachability::Possible
+            };
+            self.scope(&id, body, &effective, child_reachability, false);
         }
     }
 

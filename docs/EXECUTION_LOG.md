@@ -178,3 +178,36 @@ browser coverage is Chromium. Schema 0.2 requires old exhaustive consumers to
 update. Approved branding remains missing and required branch protection remains
 unverified. Maintainer review/release validation is still required; no merge,
 release or issue closure is performed by this work.
+
+## Final ordered-return audit
+
+An additional synthetic regression verifies `return` followed by unreachable
+rewrite/set/return instructions and full conditional-return coverage before
+location selection. Later instructions no longer obscure the terminal outcome;
+skipped child locations retain containment and explicit unreachable metadata
+without unsupported-analysis warnings or invented effective destinations. This
+private reachability state keeps unsupported evaluation distinct from known
+termination. Required gates and the full browser suite are rerun cumulatively.
+The audit also verifies external model callers cannot leak a redacted condition
+value through a stale derived label; condition labels are rebuilt from sanitized
+typed metadata at export. No generic secret-detection guarantee is introduced.
+
+## Field-validation handoff
+
+| Change | PR / implementation | Verified CI |
+| --- | --- | --- |
+| Handler precedence / conditional control flow | #14 / `88af4d2` | 40410926975 passed |
+| Info/warning/error / include privacy | #15 / `81726ef` | 40411782959 passed |
+| Vhost focus / native layout / source identity | #16 / `0d41ef3` | 40413417940 passed |
+| Return termination / derived-label privacy | #17 / `0f737b8` | Check current PR head |
+
+Final local validation: fmt, locked Clippy with warnings denied, 42 locked workspace
+tests and locked build; isolated parser comparison; conditional/normal JSON/DOT/SVG
+goldens; CSP hash; offline Chromium laptop/mobile, four-vhost/40-node and
+100-vhost/602-node checks; malicious data and condition metadata; no page errors or
+external requests. Independent Graphviz accepted normal/hostile conditional and
+multi-vhost DOT (font metric fallback warnings in the minimal local checker).
+Browser captures were reviewed locally, not published as deployment assets.
+All new fixtures are synthetic. The four original review comments on #9/#10
+received linked responses. No main push, force push, merge, release, issue closure,
+privileged operation or real Nginx/config/report access occurred.

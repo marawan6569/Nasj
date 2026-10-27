@@ -52,6 +52,10 @@ Simple server-level conditional returns are recorded in directive order: literal
 `$variable = value` / `!=` tests, with one return in each if body. True edges lead
 to return actions; false edges lead to the next decision or fallback return. The
 first unconditional return stops this sequence. Redirect variables stay symbolic;
+later rewrite instructions are not executed or used to obscure that return.
+If every branch terminates before location selection, configured child locations
+are retained as containment with `reachability: unreachable_after_return` and no
+effective destinations or unsupported-analysis warning for merely being skipped.
 response bodies remain omitted. A missing fallback reaches an unresolved location
 selection step. This is a control-flow description, not a request outcome or
 variable substitution. See [ADR-0004](adr/0004-ordered-conditional-returns.md).
