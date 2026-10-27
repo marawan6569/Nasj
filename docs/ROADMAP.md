@@ -12,8 +12,9 @@ Code listed below is an implemented preview awaiting maintainer review.
 | Documentation and release readiness | English/Arabic usage, architecture and checklist | PR #11 → #10; issue #6 |
 | Future architecture | Discovery/evidence and optional localhost server proposals only | PR #12 → #11; issue #5 |
 | Final safety audit | Explicit alias/duplicate uncertainty, unknown provenance and private reports | PR #13 → #12 |
-| Approved branding assets | Blocked: corrected originals absent | Issue #6 |
-| Required-check/branch protection settings | Unverified; available connector cannot configure settings | Issue #7 |
+| Final report UX | Connected search, useful host selection, readable framing and touch | PR #18 → #17 |
+| Approved branding assets | Integrated: originals, themed offline logo, READMEs and checks; awaiting review | Branding PR → #18; issue #6 stays open until merged |
+| Required-check/branch protection settings | Blocked: main is unprotected, no rulesets; maintainer action required | Issue #7 |
 
 ## v0.1 — validate and release static mapping
 

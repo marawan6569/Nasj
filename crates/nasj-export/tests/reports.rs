@@ -191,3 +191,29 @@ fn public_condition_values_are_redacted_in_both_metadata_and_derived_labels() {
             .contains("fixture-condition-credential"));
     }
 }
+
+#[test]
+fn approved_branding_is_embedded_without_broadening_other_csp_permissions() {
+    let html = render(&graph(), Format::Html).unwrap();
+    assert_eq!(html.matches("<img ").count(), 2);
+    assert_eq!(html.matches("alt=\"NASJ — نسج\"").count(), 2);
+    assert!(html.contains("<h1>NASJ topology</h1>"));
+    assert!(html.contains("img-src data:; connect-src 'none'; object-src 'none'"));
+    assert!(html.contains("default-src 'none'; script-src 'sha256-"));
+    assert!(html.contains("base-uri 'none'; form-action 'none'"));
+    assert!(!html.contains("'unsafe-eval'"));
+    assert!(!html.contains("<script src="));
+    for asset in [
+        include_str!("../src/assets/brand-primary-light.data-uri"),
+        include_str!("../src/assets/brand-primary-dark.data-uri"),
+        include_str!("../src/assets/brand-icon.data-uri"),
+    ] {
+        let asset = asset.trim();
+        assert!(asset.starts_with("data:image/png;base64,iVBORw0KGgo"));
+        assert!(asset[22..]
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || "+/=".contains(c)));
+        assert!(html.contains(asset));
+    }
+    assert_eq!(render(&graph(), Format::Html).unwrap(), html);
+}

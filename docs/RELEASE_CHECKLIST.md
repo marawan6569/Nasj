@@ -1,13 +1,14 @@
 # First release checklist
 
-No release/merge has been approved. Check boxes describe release work, not claims
-of completion. See [RELEASE_READINESS.md](RELEASE_READINESS.md), EXECUTION_LOG.md
-and PR descriptions for actual test evidence.
+No release/merge has been approved. Checked branding items describe verified
+implementation, not merge or release approval. Other boxes remain final-release
+tasks. See [RELEASE_READINESS.md](RELEASE_READINESS.md), EXECUTION_LOG.md and PR
+descriptions for actual test evidence.
 
 ## Review and repository policy
 
 - [ ] Maintainer reviews/merges the dependency stack in order:
-  #1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 → #15 → #16 → #17 → the final UX PR (base #17);
+  #1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 → #15 → #16 → #17 → #18 → the branding PR (base #18);
   retarget bases as needed.
 - [ ] Resolve review comments and inspect Actions for the exact approved commits.
 - [ ] Configure and verify required `test` CI check and restrictions on direct main
@@ -44,9 +45,12 @@ and PR descriptions for actual test evidence.
 - [ ] Review reports for accidental infrastructure disclosure before publishing examples.
 - [ ] Confirm English/Arabic docs and help match the released executable.
 - [ ] Replace preview-branch installation references with the approved release ref.
-- [ ] Obtain approved corrected `نسج` assets (single-dot initial ن), verify pixels,
-  transparency, sizes and filenames. Otherwise document explicit branding deferral
-  and keep issue #6 open. Never substitute or regenerate the misspelled artwork.
+- [x] Integrate supplied approved `نسج` originals, verify the one-dot ن visually,
+  record dimensions/alpha/checksums, and add themed offline report/README assets.
+- [x] Validate embedded PNGs, CSP image restriction, no-JS/moved-file portability
+  and a public-safe synthetic README screenshot.
+- [ ] Maintainer accepts and merges the branding PR before considering issue #6
+  complete. No logo regeneration or letterform edits were made.
 
 ## Packaging and approval
 

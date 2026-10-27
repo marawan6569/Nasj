@@ -3,6 +3,9 @@ use nasj_core::{AnalysisKind, Topology};
 
 const CSS: &str = include_str!("assets/report.css");
 const JS: &str = include_str!("assets/report.js");
+const LOGO_LIGHT: &str = include_str!("assets/brand-primary-light.data-uri");
+const LOGO_DARK: &str = include_str!("assets/brand-primary-dark.data-uri");
+const ICON: &str = include_str!("assets/brand-icon.data-uri");
 const SCRIPT_HASH: &str = include_str!("assets/report.sha256");
 
 pub(crate) fn render(graph: &Topology) -> Result<String, ExportError> {
@@ -20,12 +23,15 @@ pub(crate) fn render(graph: &Topology) -> Result<String, ExportError> {
         AnalysisKind::Unknown => "Unknown provenance",
     };
     let hash = SCRIPT_HASH.trim();
+    let logo_light = LOGO_LIGHT.trim();
+    let logo_dark = LOGO_DARK.trim();
+    let icon = ICON.trim();
     Ok(format!(
         r#"<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-{hash}'; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>NASJ · Infrastructure topology</title><style>{CSS}</style></head><body>
-<header><div class="brand"><span class="wordmark">NASJ</span><span class="arabic" lang="ar" dir="rtl">نسج</span><div><h1>Infrastructure topology</h1><p class="subtle">Weave your infrastructure into clarity.</p></div></div><span class="badge">{mode} · Offline report</span></header>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-{hash}'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>NASJ · Infrastructure topology</title><link rel="icon" type="image/png" href="{icon}"><style>{CSS}</style></head><body>
+<header><div class="brand"><span class="brand-art"><img class="brand-logo brand-light" src="{logo_light}" width="320" height="166" alt="NASJ — نسج"><img class="brand-logo brand-dark" src="{logo_dark}" width="320" height="166" alt="NASJ — نسج"></span><div><h1>NASJ topology</h1><p class="subtle">Weave your infrastructure into clarity.</p></div></div><span class="badge">{mode} · Offline report</span></header>
 <div class="toolbar" aria-label="Graph controls"><label class="search">Search all virtual hosts<input id="search" type="search" placeholder="Domain, route, backend or source…" maxlength="200" autocomplete="off"></label><label class="view-picker">View<select id="vhost-view"><option value="">Full infrastructure overview</option></select></label><label>Node type<select id="kind-filter"><option value="">All types</option></select></label><label class="check"><input id="unresolved-only" type="checkbox">Unresolved only</label><button id="clear-filters" type="button">Reset filters</button><button id="theme" type="button" aria-pressed="false">Dark theme</button></div>
 <main class="workspace"><section class="graph-panel" aria-label="Topology graph"><div class="graph-tools"><button id="zoom-in" type="button" aria-label="Zoom in">+</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button><button id="readable" type="button">Readable scale</button><button id="fit" type="button">Fit view</button><button id="inspect-selection" type="button" aria-controls="selection" hidden>Inspect selection</button><span id="view-caption" class="subtle" aria-live="polite"></span></div><div class="graph-container">{diagram}</div><div class="graph-footer"><span id="visible-count" aria-live="polite">Loading graph…</span><span id="frame-note" aria-live="polite"></span><span id="search-limit" hidden></span></div></section>
 <aside aria-label="Topology inspector"><section><h2>Topology overview</h2><div class="stats"><div class="stat"><strong id="node-count">—</strong><span>Graph nodes</span></div><div class="stat"><strong id="edge-count">—</strong><span>Relationships</span></div></div><button id="review-warnings" type="button">Review diagnostics</button><p class="subtle">Configuration describes intent. Runtime reachability and request routing have not been verified.</p></section>

@@ -15,7 +15,9 @@ privilege escalation, Docker socket access, discovery or telemetry is performed.
 Reports omit unrelated configuration/headers/return bodies, redact URL userinfo,
 query/fragment contents and sensitive attribute values, and escape all untrusted
 HTML/XML/DOT strings. HTML embeds local assets and denies network access with a
-script-hash CSP. Infrastructure names, document paths and source paths remain
+script-hash CSP. Image permissions allow only data URIs for the fixed approved
+PNG logos/favicon; no untrusted SVG or configuration-provided image URL is inserted.
+Infrastructure names, document paths and source paths remain
 visible. Generic secret recognition is not guaranteed; review before sharing.
 
 For hostile filesystem trees that can change concurrently, use a trusted snapshot.

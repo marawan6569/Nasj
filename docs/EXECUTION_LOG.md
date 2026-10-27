@@ -19,7 +19,7 @@ placeholder still fails explicitly. No parser/report support is claimed here.
 GitHub CLI is absent; authenticated GitHub connector and SSH Git are available.
 Required-check/branch-protection configuration cannot be managed by the available
 connector operations; enforcement is unverified and issue #7 remains open.
-Approved logo assets are missing. No issues closed or PRs merged.
+Approved logo assets were unavailable at this initial inspection (resolved in the official branding follow-up). No issues closed or PRs merged.
 
 Next: parser comparison fixtures and ADR for issue #2 on a dependent branch.
 
@@ -68,7 +68,7 @@ accepted ordinary and hostile DOT using temporary local libraries/plugins.
 
 Limitations: SVG layout can have crossing edges and requires zoom on larger maps;
 the browser suite currently covers Chromium only. No arbitrary config secret
-detection or runtime verification is promised. Corrected branding remains missing.
+detection or runtime verification is promised. Corrected branding was unavailable in this phase (now integrated in the branding follow-up).
 Next: documentation/release checklist and future discovery/server architecture.
 
 ## P3 — documentation and release readiness
@@ -78,7 +78,7 @@ suite. Updated English/Arabic README installation and actual CLI examples,
 architecture/specification/roadmap status, contributor/security guidance,
 changelog and first-release checklist. Checked local documentation links and
 CLI help. No screenshots or unapproved logo artwork added to the repository.
-Approved corrected PNGs remain absent; branding issue #6 stays pending. Required
+Approved corrected PNGs were not yet supplied at this phase; branding issue #6 stays pending. Required
 repository branch protections remain unverified. No PRs merged or issues closed.
 
 Validation: all four workspace gates pass (23 tests), local Markdown links exist,
@@ -124,7 +124,7 @@ are rerun for this review branch. No PRs merged, releases made or issues closed.
 
 Review in dependency order; PR #1 remains a draft. Final branch is
 `fix/analysis-uncertainty-hardening`; main was not pushed. All work remains
-unmerged. Missing branding assets, unverified repository protections, experimental
+unmerged. At this handoff, unavailable branding assets, unverified repository protections, experimental
 schema/renumbering IDs, conservative semantic exclusions, simple graph layout and
 Chromium-only browser coverage are the remaining release concerns. The next task
 is maintainer review and release-checklist validation, not runtime discovery.
@@ -175,8 +175,8 @@ requests/browser errors. PR #15 Actions passed at `81726ef`.
 Remaining limitations: compare-and-single-return server conditions only; no full
 request matching; some overview crossings and large focused hosts need pan/search;
 browser coverage is Chromium. Schema 0.2 requires old exhaustive consumers to
-update. Approved branding remains missing and required branch protection remains
-unverified. Maintainer review/release validation is still required; no merge,
+update. At this phase branding had not yet been supplied and branch protection was
+unverified; later handoffs below record both findings. Maintainer review/release validation is still required; no merge,
 release or issue closure is performed by this work.
 
 ## Final ordered-return audit
@@ -254,8 +254,59 @@ Read-only GitHub checks now establish main is unprotected (required checks off)
 and rulesets are empty; maintainer configuration is a release blocker. NASJ declares
 MIT; locked license inventory has no missing declarations, with Unicode-3.0 notice
 requirements recorded. Exact distribution notices/current vulnerability audit and
-packaging remain review tasks. Approved corrected art is still absent; propose
-explicit text-only v0.1 deferral, keep #6 open. RELEASE_READINESS.md classifies
+packaging remain review tasks. At that UX handoff approved art had not yet been supplied; text-only deferral
+was proposed. The later official branding follow-up supersedes that proposal; #6 stays open pending merge. RELEASE_READINESS.md classifies
 all gates and recommends v0.1.0/source-first with final verification commands.
 No production input/report, merge, tag/publication, main push, issue closure,
 privilege escalation, Nginx edit/reload or discovery was performed.
+
+
+## Official branding and README integration — 2026-10-27
+
+Reverified remotes and #18 at `fd1de75`, green Actions 40419935602. User-supplied
+`NASJ_Logos_Corrected_v2.zip` was found in the project root. Inspected every entry
+before temporary extraction: eight regular files, bounded sizes/compression,
+no traversal/absolute/duplicate/backslash paths, symlinks, special files or
+encryption. All seven 1254×1254 PNG variants decoded. Visually verified wordmarks
+spell نسج with exactly one dot over ن, including light/dark background composites;
+icon/app variants contain the mark only. Source PNGs carry no metadata fields.
+
+Selected four byte-identical originals: color transparent primary, white transparent
+primary, transparent icon-only and color app icon. Kept alternate opaque variants
+in the transport archive to avoid unused binaries. Manifest records complete
+inventory, SHA-256, dimensions/modes/alpha and derivative crop/size/hash. Display
+copies only omit outer canvas and proportionally resize; no generated art,
+recoloring, letterform edits or arbitrary visual filters. Preserved originals.
+
+English/Arabic READMEs now have themed approved hero images, a real Rust CI badge,
+a source-only unreleased preview quick start, actual features/limits, connected
+search explanation, consistent documentation links, contributor/MIT information
+and clearly planned-only v0.2/v0.3. Added a current-renderer screenshot from the
+synthetic multi-vhost fixture, normalizing checkout source prefixes before capture.
+No production data or private filesystem paths occur in that public preview.
+
+HTML embeds small light/dark PNG wordmarks and an app-icon favicon in fixed data
+URIs, with aspect-preserving CSS and alt text/heading fallback. The sole CSP image
+permission change is `img-src data:`; viewer hash and all other restrictions remain.
+No untrusted SVG, network images or runtime dependency; CLI help/version/structured
+outputs and schema 0.2/parser/routing remain unchanged. Source archive stays local,
+ignored, intact. Branding availability/checklist/readiness references are updated;
+older log entries now explicitly describe their historical missing-asset state.
+
+Validation: 43 workspace tests, required fmt/locked Clippy (-D warnings)/locked
+build, parser comparison, unchanged JSON/DOT/SVG goldens, script CSP and new PNG
+checksum/CRC/dimension/base64 checks pass. Expanded offline Chromium suite passed
+themes, image decode/alt/aspect, 1440×900/390×844/768×1024, copied HTML without
+adjacent files, no-JS static branding and hostile-image exclusion, alongside all
+40/602-node routing/search/touch checks. Zero external requests, page/CSP errors
+or injected dialogs. Light/dark desktop/mobile captures and the normalized README
+preview were reviewed visually. Fresh optimized offline source installation,
+installed help/version, strict branded report generation and synthetic JSON demo
+passed. Firefox/WebKit coverage remains unavailable as recorded previously.
+
+Issue #6 remains open until acceptance/merge. Read-only GitHub checks still show
+main unprotected and no rulesets; no settings were changed. Maintainers must review
+the PR dependency stack, schema, licenses/notices and packaging before release.
+No merges, release tags/publication, main/force pushes, issue closures, privileged
+operations, Nginx edits/reloads or discovery were performed. Final pushed-head
+CI/PR links are attached to the branding PR rather than inferred from base CI.

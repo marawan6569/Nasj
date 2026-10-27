@@ -114,7 +114,8 @@ Untrusted strings are XML-escaped and embedded JSON encodes `<`, `>`, `&` and
 Unicode line separators so it cannot close the inert script element. The viewer
 uses textContent/DOM creation, without eval or untrusted HTML insertion. A CSP
 allows only the exact hashed viewer script, inline local styles and no network,
-images, objects, forms or external base URL. No fonts/CDNs/telemetry/server are
+external image hosts, objects, forms or external base URL. Only trusted PNG
+data URIs are allowed by `img-src data:`; other CSP directives are unchanged. No fonts/CDNs/telemetry/server are
 required. No source file links execute or load anything. Offline does not make a
 report public: infrastructure names and source paths remain visible, and generic
 secret detection is not promised. Review before sharing.
@@ -123,6 +124,21 @@ When editing `src/assets/report.js`, run `python3 tools/report-csp.py` and commi
 the new hash. CI checks the hash and opens hostile/ordinary/empty reports with
 the browser offline. Golden files cover JSON/DOT/SVG. Refresh explicitly with
 `cargo run -p nasj-export --example generate_golden`, then review the diff.
+
+## Official branding
+
+The header embeds the approved light/dark PNG wordmarks and a PNG favicon as
+fixed data URIs. CSS switches the logo with the report theme while preserving its
+aspect ratio; useful alt text and the NASJ heading provide an accessible fallback.
+JavaScript-disabled viewing retains the light logo and static diagram. Moving
+only the generated HTML retains all branding. No untrusted SVG markup or remote
+image source is inserted. See [asset provenance](../assets/logos/README.md).
+
+`python3 tools/branding.py --check` verifies original/display checksums, PNG
+integrity and exact base64 packaging in CI. No image libraries are required at
+runtime or for this check. Chromium tests decode the PNGs, verify themed/mobile
+layout, copy the HTML alone and open it without JavaScript. Hostile input tests
+allow exactly the two approved logo elements and no injected images.
 
 ## Browser regression checks
 
@@ -164,3 +180,11 @@ disconnected nodes, empty results and hop/node/match limits. Viewports include
 100-vhost/602-node graph checks bounded shared-backend context and full caller
 paths for retained hosts. All browser checks require zero external requests,
 page errors, CSP console errors or injected dialogs.
+
+
+The README preview is reproducible with the same development Python/browser:
+`python tools/report-preview.py`. It maps only `fixtures/nginx/multi-vhost.conf`,
+normalizes the checkout prefix in the example's source metadata, selects a backend
+and captures the actual viewer. The CLI's analysis/export provenance is unchanged.
+Review the generated image before committing it; never substitute a deployment
+report or screenshot.

@@ -8,6 +8,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 
 from playwright.sync_api import expect, sync_playwright
+from report_brand_checks import check_branding, assert_only_brand_images
 from report_ux_checks import check_search_context, check_mobile, check_large_search, check_selection_policy
 
 repo = Path(__file__).resolve().parent.parent
@@ -47,6 +48,7 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     assert int(page.locator("#node-count").inner_text()) > 10
     assert page.locator("#sources li").count() == 5
     expect(page.locator("#review-warnings")).to_contain_text("2 analysis warnings")
+    check_branding(browser, page, report, temporary, screenshots, errors, requests, dialogs)
     graph = page.locator("#topology-graph")
     readable_view = graph.get_attribute("viewBox")
     page.locator("#fit").click()
@@ -192,7 +194,7 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     page.goto(hostile.as_uri())
     expect(page.locator("#node-count")).not_to_have_text("—")
     assert page.locator("script").count() == 2
-    assert page.locator("img,iframe,object").count() == 0
+    assert_only_brand_images(page)
     assert page.evaluate("window.nasjInjected === undefined")
     payload = json.loads(page.locator("#topology-data").text_content())
     assert any("</script>" in node["label"] for node in payload["nodes"])
@@ -209,7 +211,7 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     page.locator('#matches button').click()
     expect(page.locator('#node-fields')).to_contain_text('</script><img')
     assert page.evaluate('window.nasjInjected === undefined')
-    assert page.locator('img,iframe,object').count() == 0
+    assert_only_brand_images(page)
     assert 'fixture-condition-secret' not in hostile_condition.read_text()
 
     odd_config = temporary / "odd.conf"
@@ -230,4 +232,4 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     assert all(url.startswith("file:") for url in requests), requests
     context.close()
     browser.close()
-    print(f"PASS ({arguments.browser}): offline file reports; XML; zoom/pan; selection; global search/filters; conditional/source/evidence inspection; severity; themes; laptop/mobile vhost layouts; 100 vhosts/602 nodes; hostile/empty data; no external requests or browser errors")
+    print(f"PASS ({arguments.browser}): offline file reports; approved PNG branding/themes/moved-file/no-JS; XML; zoom/pan; selection; global search/filters; conditional/source/evidence inspection; severity; themes; laptop/mobile vhost layouts; 100 vhosts/602 nodes; hostile/empty data; no external requests or browser errors")
