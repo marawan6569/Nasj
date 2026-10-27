@@ -14,8 +14,9 @@
 
 <div dir="rtl">
 
-> **صدر NASJ v0.1.0 رسميًا.** [ملاحظات الإصدار وتنزيل المصدر](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
-> يوزَّع الإصدار من المصدر مع بصمات SHA-256؛ لا تتوفر ملفات تنفيذية أو حزمة على crates.io.
+> **صدر NASJ v0.1.0 رسميًا.** [ملاحظات الإصدار والتنزيلات](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
+> تتوفر أرشيفات Linux التنفيذية وحزم Debian لمعمارِيّتَي x86_64 وARM64، والمصدر،
+> مع بصمات SHA-256. لا تتوفر حزمة على crates.io.
 
 قد تتوزع قواعد Nginx بين مضيفين افتراضيين ومسارات متداخلة وملفات تضمين متعددة.
 يجمعها نسج في خريطة واحدة: تتبّع النطاق إلى الخادم ووجهة الوكيل العكسي، وافحص
@@ -31,30 +32,76 @@
 - **مصادر وتشخيصات واضحة:** الملف ورقم السطر، ومستويات معلومات وتحذير وخطأ، وتمييز الإعدادات المعلنة عن بيانات العرض الاصطناعية.
 - **قراءة فقط:** لا تعديل للإعدادات، ولا إعادة تحميل لـNginx، ولا رفع للصلاحيات، ولا قياس عن بُعد أو اكتشاف تلقائي عبر الشبكة.
 
-## البدء السريع
+## البدء السريع: ملف Linux تنفيذي جاهز (موصى به)
 
-ثبّت [أدوات Rust المستقرة](https://rustup.rs) وأداة الربط الخاصة بنظامك.
-ثم ابنِ الأداة من `main`، الفرع الرسمي الافتراضي للتطوير:
+تتوفر الآن أرشيفات تنفيذية وحزم Debian لمعمارِيّتَي **x86_64 وARM64 (aarch64)**
+في [الإصدار v0.1.0](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0)، دون
+الحاجة إلى Rust. اجتازت المعماريتان اختبارات تشغيل أصلية على **Ubuntu 22.04
+وDebian 12**. الملفات مرتبطة ديناميكيًا بمكتبات GNU/Linux؛ يحتاج Linux Mint
+والتوزيعات الأخرى إلى تحقق مستقل. راجع [التوزيع والبصمات](docs/DISTRIBUTION.md)
+لمتطلبات التشغيل الدقيقة.
+
+نزّل الأرشيف الموافق لجهازك وثبّته ضمن حسابك:
 
 <div dir="ltr">
 
 ```sh
-git clone --branch main https://github.com/marawan6569/Nasj.git
-cd Nasj
-cargo install --locked --path crates/nasj-cli
-nasj --help
-nasj map --config fixtures/nginx/multi-vhost.conf --strict --format html -o report.html
+case "$(uname -m)" in
+  x86_64) nasj_arch=x86_64 ;;
+  aarch64|arm64) nasj_arch=aarch64 ;;
+  *) echo "Unsupported architecture" >&2; exit 1 ;;
+esac
+nasj_download_dir=$(mktemp -d /tmp/nasj-download-XXXXXX)
+cd "$nasj_download_dir"
+nasj_release_url=https://github.com/marawan6569/Nasj/releases/download/v0.1.0
+curl -fLO "$nasj_release_url/nasj-v0.1.0-linux-$nasj_arch.tar.gz"
+curl -fLO "$nasj_release_url/SHA256SUMS-binaries"
+sha256sum --ignore-missing --check SHA256SUMS-binaries
+tar -xzf "nasj-v0.1.0-linux-$nasj_arch.tar.gz"
+install -Dm755 "nasj-v0.1.0-linux-$nasj_arch/nasj" "$HOME/.local/bin/nasj"
+"$HOME/.local/bin/nasj" --version
+"$HOME/.local/bin/nasj" --help
 ```
 
 </div>
 
-افتح `report.html` مباشرة في المتصفح. يستخدم المثال ملفات اختبار اصطناعية فقط،
-ويصدر ملاحظتين معلوماتيتين لأنماط تضمين اختيارية لا تطابق أي ملفات.
-تأكد من وجود مجلد أدوات Cargo في `PATH`. جرى التحقق على Linux x86_64 باستخدام
-Rust 1.99.1؛ لم يُتحقق بعد من إصدارات Rust الأقدم أو الأنظمة الأخرى.
-لا يحتاج التشغيل إلى Graphviz أو Python أو Node.js أو اتصال بالإنترنت أو Nginx يعمل فعليًا.
+نفّذ كل خطوة فقط بعد نجاح السابقة، وتأكد من ظهور `OK` بجانب الأرشيف المطلوب.
+أضف `~/.local/bin` إلى `PATH` لتشغيل `nasj` مباشرة. احتفظ بإشعارات التراخيص عند
+إعادة توزيع النسخ. تعمل الأداة وتقارير HTML دون اتصال؛ لا يحتاج التشغيل إلى
+Graphviz أو Python أو Node.js أو Nginx يعمل فعليًا.
 
-لتثبيت هذا الإصدار المحدد، استخدم الوسم الثابت `v0.1.0` بدلًا من فرع التطوير:
+### حزمة Debian / Ubuntu
+
+استخدم مجلدًا جديدًا واختر الحزمة الموافقة لنتيجة `dpkg --print-architecture`:
+
+<div dir="ltr">
+
+```sh
+nasj_deb_arch=$(dpkg --print-architecture)
+case "$nasj_deb_arch" in amd64|arm64) ;; *) echo "Unsupported architecture" >&2; exit 1 ;; esac
+nasj_download_dir=$(mktemp -d /tmp/nasj-deb-XXXXXX)
+cd "$nasj_download_dir"
+nasj_release_url=https://github.com/marawan6569/Nasj/releases/download/v0.1.0
+curl -fLO "$nasj_release_url/nasj_0.1.0_$nasj_deb_arch.deb"
+curl -fLO "$nasj_release_url/SHA256SUMS-binaries"
+sha256sum --ignore-missing --check SHA256SUMS-binaries
+sudo apt install "./nasj_0.1.0_$nasj_deb_arch.deb"
+nasj --version
+# Remove when needed: sudo apt remove nasj
+```
+
+</div>
+
+إصدار الحزمة `0.1.0-1`، ويعرض سطر الأوامر `nasj 0.1.0`. الاعتماديات هي
+`libc6 (>= 2.34)` و`libgcc-s1 (>= 4.2)`. أقل إصدار glibc اختُبر فعليًا هو 2.35
+على Ubuntu 22.04؛ لا تكفي متطلبات الرموز وحدها لإثبات التوافق على أنظمة أخرى.
+يحتاج تثبيت الحزمة وإزالتها إلى صلاحيات الإدارة، بينما لا يحتاج تحليل الإعدادات
+إليها. تتحقق البصمات من البايتات ولا تعني توقيع الملفات أو قابلية إعادة إنتاج البناء.
+
+### التثبيت من المصدر
+
+ثبّت [أدوات Rust المستقرة](https://rustup.rs) وأداة الربط الخاصة بنظامك.
+لتثبيت الإصدار الثابت:
 
 <div dir="ltr">
 
@@ -63,53 +110,20 @@ git clone --branch v0.1.0 https://github.com/marawan6569/Nasj.git Nasj-v0.1.0
 cd Nasj-v0.1.0
 cargo install --locked --path crates/nasj-cli
 nasj --version
+nasj map --config fixtures/nginx/multi-vhost.conf --strict --format html -o report.html
 ```
 
 </div>
 
-قد يتطلب البناء تنزيل اعتماديات Rust؛ تعمل الأداة المثبتة وتقارير HTML دون اتصال.
-يستمر التطوير على `main`، بينما يبقى الوسم `v0.1.0` ثابتًا.
+افتح `report.html` مباشرة في المتصفح. يستخدم المثال ملفات اختبار اصطناعية ويصدر
+ملاحظتين معلوماتيتين لأنماط تضمين اختيارية فارغة. تأكد من وجود مجلد أدوات Cargo
+في `PATH`. جرى التحقق من البناء باستخدام Rust 1.99.1 على معماريتَي Linux؛
+لم يُتحقق من إصدارات Rust الأقدم أو الأنظمة الأخرى. قد يتطلب البناء تنزيل
+الاعتماديات، بينما تعمل الأداة المثبتة دون اتصال.
 
-## التثبيت على Linux
-
-**الحزم التنفيذية قيد المراجعة ولم تُنشر للعامة بعد.** استخدم خطوات البناء من
-المصدر أعلاه حتى يوافق المشرف على النشر. تحتوي صفحة الإصدار حاليًا على ملفات
-المصدر فقط. راجع [التوزيع والتحقق](docs/DISTRIBUTION.md) لأدلة التوافق.
-
-1. **الخيار الموصى به بعد النشر: أرشيف تنفيذي جاهز، دون Rust.** نزّل أرشيف
-   معمارية جهازك وملف `SHA256SUMS-binaries` من
-   [صفحة الإصدار](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
-   الأوامر التالية أمثلة جاهزة للاستخدام بعد إتاحة الملفات:
-
-   ```sh
-   # x86_64; use linux-aarch64 for a validated ARM64 release instead
-   sha256sum --ignore-missing --check SHA256SUMS-binaries
-   tar -xzf nasj-v0.1.0-linux-x86_64.tar.gz
-   install -Dm755 nasj-v0.1.0-linux-x86_64/nasj "$HOME/.local/bin/nasj"
-   "$HOME/.local/bin/nasj" --version
-   ```
-
-   تأكد من ظهور `OK` بجانب الأرشيف المطلوب، وأضف `~/.local/bin` إلى `PATH`.
-   احتفظ بإشعارات التراخيص المرفقة مع أي نسخ تعيد توزيعها.
-
-2. **Debian / Ubuntu / Linux Mint بعد النشر.** نزّل الحزمة الموافقة لنتيجة
-   `dpkg --print-architecture` وملف تحقق الحزم التنفيذية من صفحة الإصدار نفسها.
-   مثال لمعمارية amd64:
-
-   ```sh
-   sha256sum --ignore-missing --check SHA256SUMS-binaries
-   sudo apt install ./nasj_0.1.0_amd64.deb
-   nasj --version
-   # Remove when needed: sudo apt remove nasj
-   ```
-
-   استخدم `nasj_0.1.0_arm64.deb` فقط بعد تأكيد اجتياز اختبارات ARM64 الأصلية
-   ونشرها. يلزم إصدار متوافق من glibc وlibgcc؛ تتحقق إدارة الحزم من الاعتماديات
-   المستنتجة من الملف التنفيذي. يحتاج Linux Mint نفسه إلى تحقق مستقل.
-
-3. **البناء من المصدر متاح الآن.** اتبع خطوات Cargo أعلاه: `main` للتطوير،
-   والوسم الثابت `v0.1.0` لهذا الإصدار. يتطلب البناء Rust وأداة ربط، بينما
-   لا يحتاج تشغيل الملف التنفيذي المثبت إلى Rust.
+للتطوير استخدم `--branch main` بدلًا من ذلك. يبقى `main` الفرع الافتراضي للتطوير،
+ويبقى الوسم `v0.1.0` ثابتًا عند
+`b60cb2e045fc9476034bffba7967b8674825fa18`.
 
 ## استكشاف الإعدادات
 
@@ -163,7 +177,7 @@ nasj map --config ./nginx.conf --format html -o report.html
 | [التقارير](docs/REPORTS.md) | الصيغ والتفاعل والأمان واختبارات المتصفح |
 | [ملفات الهوية الرسمية](assets/logos/README.md) | الأصول المعتمدة ونسخ العرض ومصدرها |
 | [جاهزية الإصدار](docs/RELEASE_READINESS.md) و[قائمته](docs/RELEASE_CHECKLIST.md) | أدلة الدمج والنشر والتحقق |
-| [ملاحظات v0.1.0](docs/RELEASE_NOTES_v0.1.0.md) و[التوزيع](docs/DISTRIBUTION.md) | الإصدار المنشور والتحقق من المصدر |
+| [ملاحظات v0.1.0](docs/RELEASE_NOTES_v0.1.0.md) و[التوزيع](docs/DISTRIBUTION.md) | حزم Linux والمصدر والتحقق |
 | [المواصفات](docs/SPEC.md) و[خطة التنفيذ](docs/IMPLEMENTATION_PLAN.md) | المتطلبات وسجل التنفيذ |
 
 ## الخطة والمساهمة

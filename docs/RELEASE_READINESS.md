@@ -3,7 +3,14 @@
 [NASJ v0.1.0 is published](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0),
 2026-10-27 at 03:27:17 UTC, after explicit maintainer authorization. The immutable
 annotated tag points to `b60cb2e045fc9476034bffba7967b8674825fa18`. Main remains
-the default development branch. Post-release maintenance changes documentation only.
+the default development branch; later tooling and documentation do not change
+the release source identity.
+
+Linux x86_64 and ARM64 archives and Debian packages were subsequently added
+after maintainer approval. See the [binary validation report](BINARY_VALIDATION_v0.1.0.md)
+for preparation/publication runs, public checksums and native Ubuntu 22.04/Debian 12
+runtime evidence. The sections below retain the original source-release review
+record; their original source-only scope is historical.
 
 ## Merged implementation
 
