@@ -2,7 +2,12 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+mod analyze;
+pub mod config;
+pub mod redact;
 pub mod syntax;
+
+pub use config::{analyze_file, AnalysisOptions};
 
 pub const SCHEMA_VERSION: &str = "0.1";
 
@@ -33,6 +38,27 @@ pub enum EdgeKind {
     BackedBy,
 }
 
+/// Evidence is separate from graph connectivity. Static analysis never emits
+/// runtime `confirmed` relationships.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Evidence {
+    #[default]
+    Configured,
+    Synthetic,
+    Inferred,
+    Confirmed,
+    Unresolved,
+}
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AnalysisKind {
+    #[default]
+    Configuration,
+    Synthetic,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SourceLocation {
     pub path: String,
@@ -54,6 +80,8 @@ pub struct Edge {
     pub to: String,
     pub kind: EdgeKind,
     pub source: Option<SourceLocation>,
+    #[serde(default)]
+    pub evidence: Evidence,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Warning {
@@ -64,6 +92,10 @@ pub struct Warning {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Topology {
     pub schema_version: String,
+    #[serde(default)]
+    pub analysis: AnalysisKind,
+    #[serde(default)]
+    pub sources: Vec<String>,
     pub nodes: Vec<Node>,
     pub edges: Vec<Edge>,
     pub warnings: Vec<Warning>,
@@ -72,6 +104,8 @@ impl Default for Topology {
     fn default() -> Self {
         Self {
             schema_version: SCHEMA_VERSION.to_owned(),
+            analysis: AnalysisKind::Configuration,
+            sources: Vec::new(),
             nodes: Vec::new(),
             edges: Vec::new(),
             warnings: Vec::new(),

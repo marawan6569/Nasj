@@ -31,3 +31,14 @@ behavior, maintenance/licensing and alternatives. Implemented a bounded generic
 syntax parser with source locations and no production dependencies; added
 sanitized syntax and malformed-input fixtures. Include resolution remains the
 next focused PR. Neither parser research nor mapping is marked merged/completed.
+
+## P1b — real configuration mapping
+
+PR #8 CI passed at `e7851e8` (Actions run 40393921731). Implemented bounded,
+read-only includes with prefix confinement, explicit external-include opt-in,
+globbing, cycles and original provenance. Added conservative HTTP semantics,
+configured/synthetic evidence, source metadata, URL redaction, and functional
+`map` JSON/DOT. Output creation refuses overwrites; strict mode rejects warnings.
+Fixtures cover recursive/glob includes, IPv6/TLS, virtual hosts, locations,
+upstreams, redirects, static paths, conditional/variable routes and failures.
+See ANALYSIS.md for conservative exclusions and limits. Discovery remains absent.
