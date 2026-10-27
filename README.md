@@ -4,7 +4,7 @@
 
 NASJ is a Rust-first, CLI-first project for mapping Nginx configurations into understandable infrastructure topology. It is designed for safe, offline analysis and portable reports.
 
-> **Status: early development, unmerged preview.** Read-only Nginx analysis and JSON/DOT export work on the feature branch. HTML and SVG are not implemented yet. No release is available.
+> **Status: early development, unmerged preview.** Read-only Nginx analysis and JSON/DOT/SVG/offline HTML export work on the feature branch. No release is available.
 
 ## Roadmap
 
@@ -35,7 +35,7 @@ cargo run -p nasj-cli -- map --config ./nginx.conf --format dot -o topology.dot
 
 Includes are confined to the configuration directory by default. See the
 [analysis contract](docs/ANALYSIS.md) for prefix options, warnings and limitations.
-Output refuses to overwrite existing files. These report commands are planned:
+Output refuses to overwrite existing files. Portable reports:
 
 ```sh
 nasj map --config /etc/nginx/nginx.conf --format html -o report.html

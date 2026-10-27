@@ -1,7 +1,7 @@
 # Static analysis contract
 
 `nasj map --config nginx.conf --format json` reads a complete root configuration
-and its declared includes. JSON and DOT are currently available. It does not run
+and its declared includes. JSON, DOT, SVG and offline HTML are available. It does not run
 Nginx or validate module availability. Use Nginx's own validation separately in
 an environment you control; NASJ never invokes it.
 
