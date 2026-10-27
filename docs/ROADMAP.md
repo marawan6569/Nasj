@@ -1,8 +1,9 @@
 # Roadmap and current status
 
 The complete v0.1 implementation stack (#1, #8–#19) is merged into main.
-Public v0.1.0 publication remains pending maintainer approval. The product scope
-is frozen; release preparation adds documentation and distribution instructions.
+[v0.1.0 was officially published](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0)
+on 2026-10-27. Main is the default development branch; the immutable release tag
+remains fixed at `b60cb2e045fc9476034bffba7967b8674825fa18`.
 
 | Milestone | Main status | Implementation history |
 | --- | --- | --- |
@@ -13,14 +14,14 @@ is frozen; release preparation adds documentation and distribution instructions.
 | JSON/DOT/SVG/offline HTML | Implemented | #10, #16 |
 | Connected search and mobile navigation | Implemented | #18 |
 | Official NASJ branding and both READMEs | Integrated | #19; issue #6 criteria satisfied |
-| Release documentation | Prepared; publication approval pending | #11 and release-preparation PR |
+| Release documentation | Published release and source verification | #11, #20 and post-release maintenance |
 | Branch protection | Explicitly deferred repository hardening | No settings changed; not a release blocker |
 
-## v0.1.0 — source-first publication gate
+## v0.1.0 — published source-first release
 
 43 workspace tests, the isolated parser comparison, offline Chromium and the
-required Cargo/CSP/branding gates pass on post-stack main. Validate again on the
-final documentation merge; its PR records the exact final main SHA/Actions.
+required Cargo/CSP/branding gates passed on the published commit. Both public
+source assets and the tag installation were independently verified.
 See [readiness](RELEASE_READINESS.md), [checklist](RELEASE_CHECKLIST.md),
 [release notes](RELEASE_NOTES_v0.1.0.md) and [distribution](DISTRIBUTION.md).
 Schema 0.2 is experimental and distinct from product 0.1.0. Linux x86_64 with

@@ -1,9 +1,10 @@
 # NASJ v0.1.0 release checklist
 
-The stack merge and focused release preparation are authorized. Public tag/release
-publication is not. Evidence below describes post-stack main; repeat all commands
-on the final release-docs merge and record the exact SHA/Actions/archive checksum
-in that PR's final validation comment. See [readiness](RELEASE_READINESS.md).
+[v0.1.0 was published](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0) on
+2026-10-27 at 03:27:17 UTC after maintainer authorization. The release commit is
+`b60cb2e045fc9476034bffba7967b8674825fa18`; its checks and Actions passed.
+This checklist records completion and retains the verification commands.
+See [readiness](RELEASE_READINESS.md).
 
 ## Completed preparation
 
@@ -29,9 +30,10 @@ in that PR's final validation comment. See [readiness](RELEASE_READINESS.md).
 - [x] Record branch protection as deferred repository hardening. Do not change
   settings or treat unprotected main as a blocker for these authorized merges.
 
-## Final commit verification
+## Commit verification
 
-Run from an up-to-date clean main checkout; save the actual outputs and SHA:
+The commands below passed on the published commit. For future changes, run them
+on the reviewed commit and record its SHA; never move the existing v0.1.0 tag:
 
 ```sh
 git status --short --branch
@@ -64,14 +66,18 @@ license inclusion and SHA-256 verification. GitHub Actions must pass for the fin
 main SHA, not only the PR head. The release-preparation PR's final validation
 comment is the authoritative record for these final checks and its merge SHA.
 
-## Public publication: explicit approval still required
+## Publication completed
 
-- [ ] Maintainer approves the exact final main SHA, source-first v0.1.0 notes,
-  experimental schema 0.2, notices and documented security/platform/browser limits.
-- [ ] After that approval only: create/push annotated v0.1.0 tag, publish the GitHub
-  Release and optionally upload the verified source archive/SHA256SUMS.
-- [ ] Record the actual release date/publication URL; no public release date is
-  asserted in the prepared changelog.
+- [x] Maintainer authorized the exact release SHA, source-first notes and documented limits.
+- [x] Annotated v0.1.0 tag created, pushed and verified at the approved commit.
+- [x] Public GitHub Release published, with exactly source archive and SHA256SUMS.
+- [x] Public API/page, release-note links and unauthenticated asset downloads verified.
+- [x] Downloaded archive checksum and all 119 files verified against the release tree.
+- [x] Published-tag source installation and strict synthetic HTML verified.
+- [x] Publication date/time recorded above; post-release documentation uses a focused PR.
+
+The existing tag and assets are fixed. New versions require separate review and
+publication authorization; never recreate or replace v0.1.0.
 
 Do not publish crates/binaries, configure branch protection, delete historical
 branches or close unrelated/future issues. Planned v0.2 discovery and v0.3 server

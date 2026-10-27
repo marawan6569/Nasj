@@ -1,10 +1,11 @@
 # Field-validation follow-up plan
 
-Current status (2026-10-27): the complete #1/#8–#19 stack is merged into main.
-Public v0.1.0 publication awaits separate approval; branch protection is explicitly
-deferred. The earlier sections below are historical records of their stated
-commits, test counts and permissions, superseded by the release-preparation entry
-and [current readiness](RELEASE_READINESS.md).
+Current status (2026-10-27): [NASJ v0.1.0 is officially released](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0)
+at `b60cb2e045fc9476034bffba7967b8674825fa18`. Main is the default development
+branch; the release tag is immutable. Branch protection remains explicitly deferred.
+The earlier sections below preserve historical commits, test counts, permissions
+and former blockers; current publication evidence is in the final execution-log
+entry and [release readiness](RELEASE_READINESS.md).
 
 Baseline: cumulative `fix/analysis-uncertainty-hardening` at `e035f6b`.
 Inspected all local/remote branches and PRs #1/#8–#13; all heads have green CI.

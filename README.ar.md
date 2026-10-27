@@ -14,8 +14,8 @@
 
 <div dir="rtl">
 
-> **التحضير للإصدار v0.1.0.** دُمج التنفيذ في `main`، والنشر العام بانتظار
-> موافقة المشرف. لم يُنشر إصدار بعد، ولا تتوفر ملفات تنفيذية منشورة أو حزمة على crates.io.
+> **صدر NASJ v0.1.0 رسميًا.** [ملاحظات الإصدار وتنزيل المصدر](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
+> يوزَّع الإصدار من المصدر مع بصمات SHA-256؛ لا تتوفر ملفات تنفيذية أو حزمة على crates.io.
 
 قد تتوزع قواعد Nginx بين مضيفين افتراضيين ومسارات متداخلة وملفات تضمين متعددة.
 يجمعها نسج في خريطة واحدة: تتبّع النطاق إلى الخادم ووجهة الوكيل العكسي، وافحص
@@ -34,12 +34,12 @@
 ## البدء السريع
 
 ثبّت [أدوات Rust المستقرة](https://rustup.rs) وأداة الربط الخاصة بنظامك.
-ثم ابنِ الأداة من الفرع الافتراضي للمستودع الرسمي:
+ثم ابنِ الأداة من `main`، الفرع الرسمي الافتراضي للتطوير:
 
 <div dir="ltr">
 
 ```sh
-git clone https://github.com/marawan6569/Nasj.git
+git clone --branch main https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 nasj --help
@@ -53,6 +53,22 @@ nasj map --config fixtures/nginx/multi-vhost.conf --strict --format html -o repo
 تأكد من وجود مجلد أدوات Cargo في `PATH`. جرى التحقق على Linux x86_64 باستخدام
 Rust 1.99.1؛ لم يُتحقق بعد من إصدارات Rust الأقدم أو الأنظمة الأخرى.
 لا يحتاج التشغيل إلى Graphviz أو Python أو Node.js أو اتصال بالإنترنت أو Nginx يعمل فعليًا.
+
+لتثبيت هذا الإصدار المحدد، استخدم الوسم الثابت `v0.1.0` بدلًا من فرع التطوير:
+
+<div dir="ltr">
+
+```sh
+git clone --branch v0.1.0 https://github.com/marawan6569/Nasj.git Nasj-v0.1.0
+cd Nasj-v0.1.0
+cargo install --locked --path crates/nasj-cli
+nasj --version
+```
+
+</div>
+
+قد يتطلب البناء تنزيل اعتماديات Rust؛ تعمل الأداة المثبتة وتقارير HTML دون اتصال.
+يستمر التطوير على `main`، بينما يبقى الوسم `v0.1.0` ثابتًا.
 
 ## استكشاف الإعدادات
 
@@ -105,13 +121,13 @@ nasj map --config ./nginx.conf --format html -o report.html
 | [مخطط JSON 0.2](docs/JSON_FORMAT.md) | البنية المرجعية والأدلة والتوافق |
 | [التقارير](docs/REPORTS.md) | الصيغ والتفاعل والأمان واختبارات المتصفح |
 | [ملفات الهوية الرسمية](assets/logos/README.md) | الأصول المعتمدة ونسخ العرض ومصدرها |
-| [جاهزية الإصدار](docs/RELEASE_READINESS.md) و[قائمته](docs/RELEASE_CHECKLIST.md) | أدلة الدمج وقرارات النشر والتحقق |
-| [ملاحظات v0.1.0](docs/RELEASE_NOTES_v0.1.0.md) و[التوزيع](docs/DISTRIBUTION.md) | الملاحظات المعدّة وتحزيم المصدر |
+| [جاهزية الإصدار](docs/RELEASE_READINESS.md) و[قائمته](docs/RELEASE_CHECKLIST.md) | أدلة الدمج والنشر والتحقق |
+| [ملاحظات v0.1.0](docs/RELEASE_NOTES_v0.1.0.md) و[التوزيع](docs/DISTRIBUTION.md) | الإصدار المنشور والتحقق من المصدر |
 | [المواصفات](docs/SPEC.md) و[خطة التنفيذ](docs/IMPLEMENTATION_PLAN.md) | المتطلبات وسجل التنفيذ |
 
 ## الخطة والمساهمة
 
-تنفّذ **v0.1** التحليل الثابت والتقارير دون إنترنت على `main`، بانتظار النشر العام.
+يوفر **v0.1.0** التحليل الثابت والتقارير دون إنترنت؛ ويستمر التطوير على `main`.
 يُخطط في **v0.2** لربط اختياري بحاويات Docker وخدمات systemd والعمليات مع حفظ الأدلة،
 وفي **v0.3** لخادم محلي اختياري. **الاكتشاف والخادم غير منفذين.** راجع [الخطة](docs/ROADMAP.md).
 

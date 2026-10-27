@@ -1,10 +1,11 @@
 # Execution log
 
-Current status (2026-10-27): the complete #1/#8–#19 stack is merged into main.
-Public v0.1.0 publication awaits separate approval; branch protection is explicitly
-deferred. The earlier sections below are historical records of their stated
-commits, test counts and permissions, superseded by the release-preparation entry
-and [current readiness](RELEASE_READINESS.md).
+Current status (2026-10-27): [NASJ v0.1.0 is officially released](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0)
+at `b60cb2e045fc9476034bffba7967b8674825fa18`. Main is the default development
+branch; the release tag is immutable. Branch protection remains explicitly deferred.
+The earlier sections below preserve historical commits, test counts, permissions
+and former blockers; current publication evidence is in the final execution-log
+entry and [release readiness](RELEASE_READINESS.md).
 
 ## P0 — bootstrap stabilization, 2026-10-26
 
@@ -377,3 +378,48 @@ records final SHA/Actions/local results/archive hash without a self-referential
 commit. Publication approval is still withheld: no tag, release, uploaded assets
 or crates.io publication. Branding issue #6 was closed as completed with linked
 merge/CI/asset evidence; unrelated and discovery/server issues remain open.
+
+
+## Official v0.1.0 publication and documentation follow-up — 2026-10-27
+
+Maintainer explicitly authorized official publication. Reconfirmed GitHub CLI
+account marawan6569 with repository admin/write permission, clean approved main
+b60cb2e045fc9476034bffba7967b8674825fa18, all 14 merged PRs and successful
+release-commit Actions 40434734182. The original archive and SHA256SUMS were intact;
+all 119 files matched Git, the approved SHA-256 matched and no source tree was
+substituted. Fresh extracted-source installation, all four formats, strict Info/
+Warning behavior, branding/CSP and targeted offline Chromium passed. The earlier
+full 43-workspace-test/parser/browser evidence remains valid for this exact SHA.
+
+Created annotated tag v0.1.0, object 70e4e2c54d7b05ef2aa6fc505eca599dc4373efc,
+annotation “NASJ v0.1.0 — First public release”; pushed without force and verified
+its local/remote peeled commit is exactly the approved SHA. Created a release draft,
+verified notes and both uploaded asset digests, then published release 425004090:
+https://github.com/marawan6569/Nasj/releases/tag/v0.1.0 at 2026-10-27T03:27:17Z.
+It is public, latest, neither draft nor prerelease. Only custom assets are
+nasj-v0.1.0-source.tar.gz and SHA256SUMS. No binaries or crates.io publication.
+
+Independently fetched public API/page/latest state and both assets without
+authentication into a separate temporary directory. The published SHA256SUMS passes;
+archive SHA-256 is bc72c99f211c7d15ec77bbe683566d63d3f42bca8a6398682ae4081da34275bc.
+Every downloaded file again matches its release Git blob. All tag-specific release
+links return HTTP 200 and the public page renders the notes and correct نسج name.
+A fresh public tag clone installed with locked dependencies, reports nasj 0.1.0
+and generates strict synthetic HTML. No GitHub automatic-archive byte-equivalence,
+new platform, signed/reproducible binary or vulnerability-audit claim is made.
+
+After public verification, docs/v0.1.0-published-status updates both READMEs with
+the official release link, main as primary Quick Start and immutable tag alternative;
+records the actual changelog date; synchronizes current release-status/schema-ID
+wording and source-verification instructions. Historical phase evidence is retained
+under an explicit published-status banner. The repository release-notes file matches
+the published body; public release metadata/body/assets stay fixed. No application,
+parser/routing/schema, logo/asset, dependency or CI change. Standard checks and
+exact-head CI are required before PR merge; its final comment records final main
+and confirms the original tag still points to the approved release commit.
+
+Post-release docs local checks passed: fmt, locked Clippy with denied warnings,
+43 workspace tests, locked build, CSP hash and branding integrity. Checked 102
+local Markdown/image paths, identical English/Arabic shell examples, main-primary
+and tag-alternative ordering, main CI badges, and the unchanged release-note body.
+The 16-file diff contains Markdown only; the tag remains at its approved commit.

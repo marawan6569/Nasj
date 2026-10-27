@@ -1,9 +1,9 @@
 # Experimental JSON topology schema
 
-The current experimental format is **schema 0.2**, independent of the upcoming
-product v0.1 release. Previous schema 0.1 data is still readable, but old consumers
-must update for the new enums and optional condition metadata. No stable release
-compatibility promise has been made. See [ADR-0004](adr/0004-ordered-conditional-returns.md).
+The current experimental format is **schema 0.2**, independent of the released
+product **v0.1.0**. Previous schema 0.1 data is still readable, but old consumers
+must update for the new enums and optional condition metadata. Product publication
+does not establish a stable schema compatibility guarantee. See [ADR-0004](adr/0004-ordered-conditional-returns.md).
 
 ```json
 {
@@ -16,7 +16,7 @@ compatibility promise has been made. See [ADR-0004](adr/0004-ordered-conditional
 }
 ```
 
-Consumers should not rely on stable node IDs until v0.1 is released.
+Node IDs are not guaranteed stable across input changes, including in v0.1.0.
 
 `analysis` is `configuration` for real static analysis, `synthetic` for `demo`,
 or `unknown` when provenance is absent (including legacy deserialized graphs).
