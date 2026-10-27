@@ -1,0 +1,17 @@
+[package]
+name = "nasj-cli"
+description = "NASJ command-line interface"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+[[bin]]
+name = "nasj"
+path = "src/main.rs"
+[dependencies]
+nasj-core = { path = "../nasj-core" }
+nasj-export = { path = "../nasj-export" }
+clap.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

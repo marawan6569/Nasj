@@ -1,0 +1,14 @@
+{
+  "schema_version": "0.1",
+  "nodes": [
+    {
+      "id": "id\"; evil -> target; //",
+      "kind": "domain",
+      "label": "say \"hi\"\n\\N\r\t\u0000<svg onload=alert(1)> نسج",
+      "source": null,
+      "attributes": {}
+    }
+  ],
+  "edges": [],
+  "warnings": []
+}
