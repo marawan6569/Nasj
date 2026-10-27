@@ -90,3 +90,40 @@ fn report_output_is_private_by_default() {
         0o600
     );
 }
+
+#[test]
+fn strict_accepts_optional_include_info_but_rejects_missing_required_files() {
+    let config = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../fixtures/nginx/optional-includes.conf");
+    let output = nasj(&["map", "--config", config.to_str().unwrap(), "--strict"]);
+    assert!(output.status.success(), "{:?}", output.stderr);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("info:"));
+    assert!(stderr.contains("optional-private-example-*.conf"));
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(!stdout.contains("optional-private-example-*.conf"));
+    let graph: nasj_core::Topology = serde_json::from_slice(&output.stdout).unwrap();
+    assert!(graph
+        .warnings
+        .iter()
+        .all(|d| d.severity == nasj_core::Severity::Info));
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("required.conf");
+    std::fs::write(&path, "http { include required.conf.missing; }").unwrap();
+    let output = nasj(&["map", "--config", path.to_str().unwrap()]);
+    assert!(!output.status.success());
+    assert!(output.stdout.is_empty());
+}
+
+#[test]
+fn local_glob_context_escapes_controls_and_redacts_url_credentials() {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("safe.conf");
+    std::fs::write(&path,"include \"optional-\\n*.conf\"; include https://user:fixture-password@example.test/*.conf?token=fixture-token; http { server { listen 80; return 204; } }").unwrap();
+    let output = nasj(&["map", "--config", path.to_str().unwrap(), "--strict"]);
+    assert!(output.status.success(), "{:?}", output.stderr);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains(r"optional-\n*.conf"));
+    assert!(!stderr.contains("fixture-password"));
+    assert!(!stderr.contains("fixture-token"));
+}

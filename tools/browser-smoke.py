@@ -113,6 +113,14 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     expect(page.locator("#node-fields")).to_contain_text('https://$host$request_uri')
     expect(page.locator("#relationships")).to_contain_text('when true')
 
+    info_report = temporary / "info.html"
+    generate(repo / "fixtures/nginx/optional-includes.conf", info_report, "html")
+    page.goto(info_report.as_uri())
+    expect(page.locator("#review-warnings")).to_contain_text('0 analysis warnings · 2 info')
+    expect(page.locator("#warnings .info")).to_have_count(2)
+    expect(page.locator("#warnings .warning")).to_have_count(0)
+    assert 'optional-private-example-*.conf' not in info_report.read_text()
+
     hostile = temporary / "hostile.html"
     generate(repo / "fixtures/nginx/hostile.conf", hostile, "html")
     page.goto(hostile.as_uri())

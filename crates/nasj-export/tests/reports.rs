@@ -138,3 +138,19 @@ fn conditional_control_flow_has_shared_json_dot_svg_goldens_and_html_metadata() 
     assert!(html.contains("https://$host$request_uri"));
     assert!(html.contains("Symbolic condition"));
 }
+
+#[test]
+fn diagnostic_severity_survives_reports_but_private_glob_context_never_does() {
+    let path =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures/nginx/optional-includes.conf");
+    let graph = analyze_file(&path, &AnalysisOptions::default()).unwrap();
+    for format in [Format::Json, Format::Dot, Format::Svg, Format::Html] {
+        let output = render(&graph, format).unwrap();
+        assert!(output.contains("info"));
+        assert!(output.contains("include.empty"));
+        assert!(!output.contains("optional-private-example-*.conf"));
+        assert!(!output.contains("local_context"));
+    }
+    let legacy: Topology = serde_json::from_str(include_str!("fixtures/graph.json")).unwrap();
+    assert_eq!(legacy.warnings[0].severity, nasj_core::Severity::Warning);
+}

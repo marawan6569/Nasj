@@ -3,8 +3,8 @@ use crate::{
     control::{self, Action, Step},
     redact,
     syntax::Directive,
-    AnalysisKind, Comparison, Edge, EdgeKind, Evidence, Node, NodeKind, SourceLocation, Topology,
-    Warning,
+    AnalysisKind, Comparison, Edge, EdgeKind, Evidence, Node, NodeKind, Severity, SourceLocation,
+    Topology, Warning,
 };
 use std::collections::BTreeMap;
 
@@ -53,6 +53,8 @@ impl Analyzer {
             code: code.into(),
             message: message.into(),
             source: Some(source.clone()),
+            severity: Severity::Warning,
+            local_context: None,
         });
     }
 
@@ -812,6 +814,8 @@ pub(crate) fn analyze(tree: &[Directive]) -> Topology {
             code: "analysis.no_http".into(),
             message: "no http block found; select a complete nginx.conf".into(),
             source: None,
+            severity: Severity::Warning,
+            local_context: None,
         });
     }
     analyzer.graph

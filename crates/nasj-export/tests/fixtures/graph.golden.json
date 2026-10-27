@@ -67,7 +67,8 @@
       "source": {
         "path": "fixtures/nginx.conf",
         "line": 6
-      }
+      },
+      "severity": "warning"
     }
   ]
 }

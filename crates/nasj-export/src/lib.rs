@@ -97,7 +97,7 @@ fn render_dot(topology: &Topology) -> String {
         let warnings = topology
             .warnings
             .iter()
-            .map(|w| format!("{}: {}", w.code, w.message))
+            .map(|w| format!("{}: {}: {}", w.severity.as_str(), w.code, w.message))
             .collect::<Vec<_>>()
             .join("\n");
         output.push_str(&format!(

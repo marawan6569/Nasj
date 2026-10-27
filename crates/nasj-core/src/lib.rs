@@ -112,10 +112,40 @@ pub struct Edge {
     pub evidence: Evidence,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Warning {
+pub struct Diagnostic {
     pub code: String,
     pub message: String,
     pub source: Option<SourceLocation>,
+    #[serde(default)]
+    pub severity: Severity,
+    /// Private operator context; excluded from every report serialization.
+    #[serde(skip)]
+    pub local_context: Option<String>,
+}
+
+/// Compatibility name. The serialized `warnings` collection holds all severities.
+pub type Warning = Diagnostic;
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Severity {
+    Info,
+    #[default]
+    Warning,
+    Error,
+}
+
+impl Severity {
+    pub fn blocks_strict(self) -> bool {
+        self != Self::Info
+    }
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Info => "info",
+            Self::Warning => "warning",
+            Self::Error => "error",
+        }
+    }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Topology {

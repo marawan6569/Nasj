@@ -36,6 +36,11 @@ impl fmt::Display for ParseError {
     }
 }
 impl Error for ParseError {}
+impl ParseError {
+    pub fn severity(&self) -> crate::Severity {
+        crate::Severity::Error
+    }
+}
 
 #[derive(Debug, PartialEq, Eq)]
 enum Kind {
