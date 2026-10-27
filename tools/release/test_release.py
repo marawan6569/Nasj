@@ -136,6 +136,7 @@ class ReleaseTests(unittest.TestCase):
                 "release.run", return_value=str(base)
             ):
                 release.notices({"packages": [package]}, base / "bundle", "fixture")
+                release.verify_notices(base / "bundle")
                 self.assertEqual(
                     (base / "bundle/unicode-ident@1.0.27/LICENSE-UNICODE").read_bytes(),
                     unicode_file.read_bytes(),
@@ -144,6 +145,10 @@ class ReleaseTests(unittest.TestCase):
                     "MIT AND Unicode-3.0",
                     (base / "bundle/unicode-ident@1.0.27/ATTRIBUTION.txt").read_text(),
                 )
+                bundled = base / "bundle/unicode-ident@1.0.27/LICENSE-UNICODE"
+                bundled.write_text("truncated")
+                with self.assertRaisesRegex(ValueError, "bundled notice mismatch"):
+                    release.verify_notices(base / "bundle")
                 unicode_file.unlink()
                 with self.assertRaisesRegex(ValueError, "notice inventory changed"):
                     release.notices(

@@ -212,6 +212,31 @@ def smoke(binary, output, version):
             )
 
 
+def verify_notices(directory):
+    """Check the physical distribution without Cargo or a Rust sysroot."""
+    policy = json.loads((HERE / "license-policy.json").read_text())
+    inventory = json.loads((directory / "inventory.json").read_text())
+    require(
+        {p["package"] for p in inventory} == policy["packages"].keys(),
+        "bundled notice coverage mismatch",
+    )
+    for key, approved in policy["packages"].items():
+        require(
+            (directory / key / "ATTRIBUTION.txt").is_file(),
+            f"missing attribution: {key}",
+        )
+        for name, digest in approved["files"].items():
+            require(
+                sha(directory / key / name) == digest,
+                f"bundled notice mismatch: {key}/{name}",
+            )
+    for name, digest in policy["rust_notices"].items():
+        require(
+            sha(directory / "rust" / name) == digest,
+            f"bundled Rust notice mismatch: {name}",
+        )
+
+
 def inspect(binary, arch):
     _, _, machine, interpreter = TARGETS[arch]
     header = run("readelf", "-h", str(binary))
@@ -404,6 +429,7 @@ def prepare(args):
         (debroot / "DEBIAN").mkdir()
         doc = debroot / "usr/share/doc/nasj"
         shutil.copytree(tree, doc, ignore=shutil.ignore_patterns("nasj"))
+        verify_notices(doc / "third-party")
         (doc / "LICENSE").rename(doc / "copyright")
         (doc / "copyright").write_text(
             (doc / "copyright").read_text()
@@ -475,6 +501,7 @@ def prepare(args):
             safe_members(archive, top)
             archive.extractall(work / "extract")
         smoke(work / "extract" / top / "nasj", work / "archive-smoke", version)
+        verify_notices(work / "extract" / top / "third-party")
         subprocess.run(
             ["dpkg-deb", "--info", str(output / artifact_names[1])], check=True
         )

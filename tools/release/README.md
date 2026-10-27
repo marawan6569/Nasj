@@ -56,6 +56,9 @@ python3 tools/release/release.py collect --directory /tmp/nasj-distributions \
 Local smoke tests restrict PATH to system utilities. Clean native containers
 prove the no-Rust installation case. **Never run `runtime-test.sh` on a developer
 host**: it installs/removes packages and is only for disposable containers/VMs.
+It also requires the explicit `NASJ_DISPOSABLE_RUNTIME=1` guard. Minimal official
+container images exclude documentation by default; the test opts NASJ's docs
+back in to verify every installed notice without changing runtime libraries.
 Do not access a development Docker socket. The license policy is a reviewed
 closed inventory, not an automatically accepted generated file; follow
 [dependency review](../../docs/DEPENDENCY_LICENSES.md#binary-notice-review).

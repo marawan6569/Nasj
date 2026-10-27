@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Run only in a disposable, native runtime container/VM. Never on a developer host.
 set -euo pipefail
+if [[ ${NASJ_DISPOSABLE_RUNTIME:-} != 1 ]]; then
+  echo 'Requires NASJ_DISPOSABLE_RUNTIME=1 in a disposable container/VM' >&2
+  exit 1
+fi
 : "${RELEASE_ARCH:?}" "${RELEASE_TAG:?}"
 [[ $RELEASE_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
 case "$RELEASE_ARCH" in
@@ -35,6 +39,7 @@ tree = pathlib.Path('extracted') / sys.argv[1]
 assert (tree / 'nasj').stat().st_mode & 0o111
 assert (tree / 'LICENSE').is_file()
 assert (tree / 'third-party/unicode-ident@1.0.27/LICENSE-UNICODE').is_file()
+release.verify_notices(tree / 'third-party')
 PY
 python3 tools/release/release.py smoke --binary "extracted/$top/nasj" --output archive-output --version "${RELEASE_TAG#v}"
 deb="dist/nasj_${RELEASE_TAG#v}_${debarch}.deb"
@@ -45,10 +50,20 @@ dpkg-deb --info "$deb"
 dpkg-deb --contents "$deb"
 dpkg-deb --ctrl-tarfile "$deb" | tar -tf - > control-files.txt
 ! grep -E '(preinst|postinst|prerm|postrm|triggers|conffiles)$' control-files.txt
+# Minimal official images exclude documentation by default. Retain this package's
+# notices so the installed distribution can be audited; leave runtime libs alone.
+printf '%s\n' 'path-include=/usr/share/doc/nasj' 'path-include=/usr/share/doc/nasj/*' \
+  'path-include=/usr/share/man/man1/nasj.1.gz' > /etc/dpkg/dpkg.cfg.d/zz-nasj-docs
 apt-get install -y --no-install-recommends "./$deb"
 test -f /usr/share/doc/nasj/third-party/unicode-ident@1.0.27/LICENSE-UNICODE
 test -f /usr/share/doc/nasj/copyright
 test -f /usr/share/doc/nasj/BUILD-METADATA.json
+python3 - <<'PY'
+import pathlib, sys
+sys.path.insert(0, 'tools/release')
+import release
+release.verify_notices(pathlib.Path('/usr/share/doc/nasj/third-party'))
+PY
 python3 tools/release/release.py smoke --binary /usr/bin/nasj --output installed-output --version "${RELEASE_TAG#v}"
 dpkg-query -W -f='${Package} ${Version} ${Architecture} ${Depends}\n' nasj libc6 libgcc-s1
 dpkg --purge nasj
