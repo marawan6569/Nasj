@@ -17,5 +17,17 @@
 - v0.2 adds opt-in Docker/systemd/process correlation and confidence/provenance.
 - v0.3 adds an optional localhost web dashboard.
 
-## Initial implementation
-Current bootstrap only contains canonical graph, JSON/DOT exporters, and a **synthetic** `nasj demo`. Real parsing and interactive visualization are upcoming milestones.
+## Implementation status (unreleased preview)
+
+The feature PR stack now contains bounded generic syntax parsing, recursive/glob
+include resolution, conservative HTTP topology analysis, versioned JSON/DOT,
+native SVG and standalone interactive HTML. A separate `demo` remains synthetic.
+Workspace gates, fixtures/goldens and Chromium offline checks validate the preview.
+This does not assert that any PR is merged or that v0.1 has been released.
+
+See [ANALYSIS.md](ANALYSIS.md) for supported semantics, read scope and resource
+limits; [REPORTS.md](REPORTS.md) for report behavior; and
+[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for outstanding release decisions.
+The parser is not a replacement for `nginx -t`. Embedded languages, full request
+matching and arbitrary variable/secret evaluation are unsupported. Unsupported
+routing remains unresolved. The schema remains experimental until reviewed.
