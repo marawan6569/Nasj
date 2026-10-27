@@ -73,6 +73,10 @@ exact explicit approval phrase. Scripts do not change environment settings or
 branch protections. Keep the same tooling SHA on main between build and publish;
 otherwise prepare again on the new SHA.
 
+The publisher reads the environment configuration and fails closed unless it
+has required reviewers and exactly one custom deployment branch rule: `main`
+(type branch). An automatically created, unprotected environment cannot publish.
+
 After approving the concrete files, dispatch `release-publish.yml` on main with
 the successful preparation run ID, tag, approved source SHA and the phrase
 `publish <tag> from run <run_id>`. Approve the protected environment deployment.

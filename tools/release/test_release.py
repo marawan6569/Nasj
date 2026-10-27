@@ -199,6 +199,28 @@ class ReleaseTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     publish.validate(root, "v0.1.0", release.APPROVED_V010, "tooling")
 
+    def test_publication_requires_reviewers_and_only_main_environment_policy(self):
+        protected = {
+            "protection_rules": [
+                {"type": "required_reviewers", "reviewers": [{"type": "User"}]}
+            ],
+            "deployment_branch_policy": {
+                "custom_branch_policies": True,
+                "protected_branches": False,
+            },
+        }
+        main = {"branch_policies": [{"name": "main", "type": "branch"}]}
+        with patch("publish.api", side_effect=[protected, main]):
+            publish.protected_environment("fixture/repo")
+        with patch("publish.api", return_value={"protection_rules": []}):
+            with self.assertRaisesRegex(ValueError, "required maintainer reviewers"):
+                publish.protected_environment("fixture/repo")
+        with patch(
+            "publish.api", side_effect=[protected, {"branch_policies": [{"name": "*"}]}]
+        ):
+            with self.assertRaisesRegex(ValueError, "only the main branch"):
+                publish.protected_environment("fixture/repo")
+
 
 if __name__ == "__main__":
     unittest.main()

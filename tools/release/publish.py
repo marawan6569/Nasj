@@ -13,6 +13,31 @@ def api(repo, endpoint):
     return json.loads(run("gh", "api", f"repos/{repo}/{endpoint}"))
 
 
+def protected_environment(repo):
+    environment = api(repo, "environments/release-binaries")
+    require(
+        any(
+            rule.get("type") == "required_reviewers" and rule.get("reviewers")
+            for rule in environment.get("protection_rules", [])
+        ),
+        "release-binaries must have required maintainer reviewers",
+    )
+    policy = environment.get("deployment_branch_policy") or {}
+    require(
+        policy.get("custom_branch_policies") and not policy.get("protected_branches"),
+        "release-binaries must use a main-only custom branch policy",
+    )
+    branches = api(repo, "environments/release-binaries/deployment-branch-policies")[
+        "branch_policies"
+    ]
+    require(
+        len(branches) == 1
+        and branches[0]["name"] == "main"
+        and branches[0].get("type", "branch") == "branch",
+        "release-binaries must allow only the main branch",
+    )
+
+
 def validate(directory, tag, commit, tooling_sha):
     entries = checksums(directory)
     metas = sorted(directory.glob("build-*.json"))
@@ -64,6 +89,7 @@ def main():
         == f"publish {args.tag} from run {args.run_id}",
         "explicit approval phrase mismatch",
     )
+    protected_environment(repo)
     identity(Path(args.source), args.tag, args.commit)
     build = api(repo, f"actions/runs/{args.run_id}")
     require(
