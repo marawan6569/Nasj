@@ -1,0 +1,152 @@
+{
+  "archive": "NASJ_Logos_Corrected_v2.zip",
+  "archive_sha256": "ee6dd170b2ca1069d0a1d477d5615178f022caece62a211a649ed5b4117b4d73",
+  "source_prefix": "nasj_logo_assets/",
+  "generator": "Pillow 13.0.0; LANCZOS; PNG optimize=True",
+  "inventory": [
+    {
+      "name": "logo_app_icon_color.png",
+      "sha256": "986df1b3421b0a8b9c17a89183708ddb1bd209e399b7b5ba22bee8fdc1a66376",
+      "bytes": 1369885,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "alpha_range": null,
+      "retained": true
+    },
+    {
+      "name": "logo_app_icon_monochrome.png",
+      "sha256": "7e28593abb1561d755c422790270631df355a57fe035d43cd051d2a896f46345",
+      "bytes": 1192885,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "alpha_range": null,
+      "retained": false
+    },
+    {
+      "name": "logo_icon_only_transparent.png",
+      "sha256": "2cda7ead2e8e371e8fb4a288f9ea8de51d32b0f6c185745505d99c59cb20b97d",
+      "bytes": 411809,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "retained": true
+    },
+    {
+      "name": "logo_primary_full_color.png",
+      "sha256": "a9346cdd2e106f5baf2168bb1aa619b528db2a6374de8066674a0c676ddaa503",
+      "bytes": 761008,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "alpha_range": null,
+      "retained": false
+    },
+    {
+      "name": "logo_primary_monochrome_dark.png",
+      "sha256": "341124faa3dad9ffac59aaa81829b38cf5587a7eed5b8f18861a5a8297d839fa",
+      "bytes": 758426,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB",
+      "alpha_range": null,
+      "retained": false
+    },
+    {
+      "name": "logo_primary_monochrome_light_transparent.png",
+      "sha256": "c1ae247d3657c2f14f956eff6be2b5e0a21ad6ec9182b9f458618706311a5164",
+      "bytes": 243130,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "retained": true
+    },
+    {
+      "name": "logo_primary_transparent.png",
+      "sha256": "3e31e0d6c50563687d4844ddc346ec73fbbbc28a06aeae1c670a726d0968a7d8",
+      "bytes": 263716,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "alpha_range": [
+        0,
+        255
+      ],
+      "retained": true
+    }
+  ],
+  "display": [
+    {
+      "path": "display/logo_primary_light.png",
+      "source": "originals/logo_primary_transparent.png",
+      "crop": [
+        0,
+        330,
+        1254,
+        980
+      ],
+      "width": 640,
+      "height": 332,
+      "sha256": "8472f1cc29a20296392fd140a790f532decc264111aa57e36d19d945a6712d69"
+    },
+    {
+      "path": "display/logo_primary_dark.png",
+      "source": "originals/logo_primary_monochrome_light_transparent.png",
+      "crop": [
+        0,
+        330,
+        1254,
+        980
+      ],
+      "width": 640,
+      "height": 332,
+      "sha256": "0cd7c9d630cf102aa0082a8f6d98e52bfa2b15b9407667003d4051581f0564a0"
+    },
+    {
+      "path": "display/logo_app_icon_64.png",
+      "source": "originals/logo_app_icon_color.png",
+      "crop": null,
+      "width": 64,
+      "height": 64,
+      "embedding": "brand-icon.data-uri",
+      "sha256": "92a4f4e35219d8500d792841711fd82b1cbcd24875989e3438f2808025eebe38"
+    },
+    {
+      "path": "display/logo_report_light.png",
+      "source": "originals/logo_primary_transparent.png",
+      "crop": [
+        0,
+        330,
+        1254,
+        980
+      ],
+      "width": 320,
+      "height": 166,
+      "embedding": "brand-primary-light.data-uri",
+      "sha256": "90f5eda8046e85c53ab9b452e9a348a37ec508d91cbad77b7f995af8791b747d"
+    },
+    {
+      "path": "display/logo_report_dark.png",
+      "source": "originals/logo_primary_monochrome_light_transparent.png",
+      "crop": [
+        0,
+        330,
+        1254,
+        980
+      ],
+      "width": 320,
+      "height": 166,
+      "embedding": "brand-primary-dark.data-uri",
+      "sha256": "622768e8e20c59e68635c07cbd9aeca5ded3b5150d7f69557be75dabc5147460"
+    }
+  ]
+}

@@ -9,3 +9,6 @@
 *.key
 
 __pycache__/
+
+# Maintainer-supplied transport archive; selected originals live in assets/logos.
+/NASJ_Logos_Corrected_v2.zip

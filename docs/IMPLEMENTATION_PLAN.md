@@ -15,10 +15,11 @@ Implemented: experimental schema 0.1, JSON/DOT rendering, synthetic demo, CLI
 placeholder for map. Missing: actual parsing, include resolution, semantic
 mapping, SVG/HTML, redaction, confidence/evidence and meaningful regression tests.
 The bootstrap does not pass formatting; PR #1's only CI run failed at fmt and
-skipped all later checks. The initial server has no Rust or GitHub CLI. GitHub
+skipped all later checks. The initial server had no Rust or GitHub CLI. GitHub
 connector authentication and SSH repository read access work. Install Rust in
 the user account, use authenticated Git/connector operations, and record the
-GitHub CLI limitation. Approved branding PNGs are absent.
+GitHub CLI limitation. Branding was unavailable in this initial assessment; the official branding
+follow-up below resolves that earlier blocker.
 
 Technical debt: no Cargo.lock for the executable workspace; very sparse tests;
 stdout uses a panic-prone print macro; CI excludes stacked PR bases; DOT escaping
@@ -132,7 +133,7 @@ start runtime discovery to compensate for incomplete static analysis.
 ## Phase reports and blockers
 
 Each phase report lists changes, verification evidence, commits/PRs, limitations,
-risks and the next task. Initial blockers: missing corrected branding assets;
+risks and the next task. Initial blockers (historical): unavailable corrected branding assets;
 GitHub CLI unavailable (connector and SSH Git are alternatives). Repository branch
 protection requires an API/settings capability and appropriate plan/permissions;
 record actual status and do not imply required checks are enforced without proof.
@@ -153,8 +154,8 @@ not merged/released. See [EXECUTION_LOG.md](EXECUTION_LOG.md) for checks and ris
 | Final uncertainty/provenance/safety audit | #13 | `b9c3d16` |
 
 The current preview has 26 workspace tests plus the isolated parser comparison
-and offline Chromium suite. Corrected branding remains blocked on approved
-assets. Repository required-check enforcement remains unverified. v0.2/v0.3 code
+and offline Chromium suite. Branding was still pending at that phase; approved originals are now
+integrated by the official branding follow-up. Repository required-check enforcement remains unverified. v0.2/v0.3 code
 is intentionally deferred; final schema/release decisions require review.
 
 
@@ -167,3 +168,14 @@ and mobile gesture/inspector polish. Parser/model/schema 0.2 stay unchanged.
 See [VALIDATION_PLAN.md](VALIDATION_PLAN.md) for execution and
 [RELEASE_READINESS.md](RELEASE_READINESS.md) for Ready/Needs Review/Blocked gates,
 merge order, licensing, packaging and maintainer verification commands.
+
+
+## Official branding follow-up
+
+The maintainer archive is now available and inspected. On `docs/official-branding`
+(base #18), selected originals, documented display copies, themed offline PNGs,
+English/Arabic landing pages and a normalized synthetic screenshot resolve the
+missing-assets implementation blocker. Check asset provenance with
+`python3 tools/branding.py --check`; see assets/logos/README.md and the current
+release readiness report. Issue #6 still requires review/merge, and repository
+protection/schema/packaging/release approval remain maintainer decisions.

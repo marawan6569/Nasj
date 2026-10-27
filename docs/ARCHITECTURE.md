@@ -75,8 +75,8 @@ See [ADR-0004](adr/0004-ordered-conditional-returns.md) for schema 0.2 and exclu
 
 JSON documents the experimental versioned model, sources and diagnostics. DOT quotes
 all IDs/labels. SVG uses native vhost lanes, mean-order layering and XML escaping.
-HTML embeds the SVG, redacted model and local assets. Its viewer uses DOM text
-creation, a script hash CSP and no network permissions. See
+HTML embeds the SVG, redacted model, local assets and approved PNG branding. Its viewer uses DOM text
+creation, a script hash CSP, trusted PNG data URIs and no network permissions. See
 [REPORTS.md](REPORTS.md) for interaction and browser validation details.
 
 The HTML viewer starts at readable scale for one selected virtual host and offers

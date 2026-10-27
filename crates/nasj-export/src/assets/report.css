@@ -13,3 +13,7 @@ body{height:100vh;display:flex;flex-direction:column}header,.toolbar,footer{flex
 .node.selected .node-card{stroke-width:5;stroke-dasharray:none}
 #search-limit{color:var(--ink);font-weight:650}#show-selection{margin-right:6px}
 @media(max-width:900px){.toolbar>*{max-width:100%}.search{min-width:0;flex-basis:100%}.view-picker{width:auto;flex:1 1 100%}.graph-tools{padding:8px 12px}.graph-tools button{min-height:44px}.graph-footer{padding:8px 12px}.workspace aside{max-height:none;overflow:visible}aside section{padding:16px}button,input,select{min-height:44px}.graph-container{height:440px}.check{min-height:44px;padding-bottom:0}.check input{min-height:0}}
+
+/* Approved raster artwork retains its aspect ratio; no CSS color filters. */
+.brand{min-width:0}.brand-art{flex:none;display:block;width:128px}.brand-logo{display:block;width:100%;height:auto}.brand-dark{display:none}:root[data-theme=dark] .brand-light{display:none}:root[data-theme=dark] .brand-dark{display:block}
+@media(max-width:600px){header .brand{gap:10px;flex:1}header .brand-art{width:84px}header h1{font-size:14px}header .badge{max-width:144px;flex-shrink:0}header .subtle{font-size:11px}}

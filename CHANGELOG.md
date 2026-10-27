@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- Official maintainer-supplied NASJ identity with verified one-dot نسج wordmark,
+  themed embedded report logos/favicon, polished English/Arabic READMEs and a
+  public-safe synthetic report preview; original checksums and branding tests.
 - Graph-aware global search retains real routing paths, highlights matches/context
   separately and reports bounded results; useful configured host selection, readable
   framing, touch pinch/pan and graph/inspector navigation for the provisional viewer.
@@ -15,4 +18,5 @@
 - English/Arabic usage, architecture, implementation plan and release checklist.
 
 These changes are in unmerged development PRs, not a published release. Discovery
-(v0.2), an embedded server (v0.3) and approved corrected logo assets remain pending.
+(v0.2) and an embedded server (v0.3) remain planned; branding is integrated and
+awaits review/merge.

@@ -90,3 +90,35 @@ WebKit launch was unavailable due to missing ordinary libraries; main protection
 is absent, and branding/packaging/schema/distribution decisions need maintainer
 review. See RELEASE_READINESS.md and EXECUTION_LOG.md; final exact-head Actions
 and review-response evidence are attached to the follow-up PR.
+
+## Official branding and README pass
+
+Baseline verified: #18 / `fix/report-search-context` at `fd1de75`, green Actions.
+Supplied archive: `NASJ_Logos_Corrected_v2.zip` in the project root. Its complete
+entry list passed bounded ZIP path/type/encryption checks before temporary
+extraction; seven 1254×1254 PNGs were decoded and visually reviewed. Wordmark
+variants read نسج with one dot above ن. No vector files were supplied.
+
+One focused branch/PR on #18:
+
+1. Preserve selected source PNGs byte-for-byte with archive/source checksums and
+   a full variant inventory. Create small proportional display copies with only
+   documented outer-canvas cropping/resizing; no color/letterform changes.
+2. Embed trusted PNG data URIs in the offline report (light/dark/fav icon), with
+   only `img-src data:` added to image permissions. Keep every other CSP directive,
+   graph interaction, schema/parser, and CLI structured output unchanged.
+3. Rewrite concise, consistent English/Arabic READMEs: official hero, verified CI
+   badge, source-only preview quick start, actual features, synthetic screenshot,
+   limitations, documentation, contribution/license and planned-only v0.2/v0.3.
+4. Verify asset integrity/embedding, alt text and no-JS/moved-file branding, themes,
+   desktop/mobile, hostile input/CSP, existing browser/goldens/parser regressions,
+   all locked Rust gates and fresh source installation. Refresh branding/release
+   status and logs without closing #6, merging, tagging or publishing.
+
+
+Branding execution: selected originals/display assets, both READMEs, trusted
+embedded PNGs, synthetic preview and current release references are implemented.
+All 43 workspace tests, parser/export/golden checks, CSP/asset integrity and expanded
+offline Chromium tests pass locally; fresh source installation passed. #6 stays
+open pending acceptance/merge. No runtime dependency, CLI banner, schema/parser
+change, merge or release. Exact-head CI evidence is recorded in the branding PR.
