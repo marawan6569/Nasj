@@ -1,7 +1,8 @@
 # Architecture
 
-NASJ is a synchronous, CLI-first static analyzer. The preview remains unmerged
-and unreleased. The CLI and offline reports work independently of any web server.
+NASJ is a synchronous, CLI-first static analyzer. The v0.1.0 implementation is
+merged into main and awaits public release approval. The CLI and offline reports
+work independently of any web server.
 
 ```text
 explicit nginx.conf

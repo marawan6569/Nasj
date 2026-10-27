@@ -1,5 +1,11 @@
 # NASJ implementation plan
 
+Current status (2026-10-27): the complete #1/#8–#19 stack is merged into main.
+Public v0.1.0 publication awaits separate approval; branch protection is explicitly
+deferred. The earlier sections below are historical records of their stated
+commits, test counts and permissions, superseded by the release-preparation entry
+and [current readiness](RELEASE_READINESS.md).
+
 Assessed 2026-10-26 against bootstrap `de99e0b`, draft PR #1 and issues #2–#7.
 This is an execution plan, not a claim that the milestones have shipped. Issues
 remain open until their acceptance criteria are met and the work is merged.

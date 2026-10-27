@@ -1,120 +1,84 @@
-# v0.1 release review
+# NASJ v0.1.0 release readiness
 
-Assessment updated 2026-10-27, branding branch `docs/official-branding`, stacked on
-#18 (`fd1de75`). This is a review handoff, not merge, tag or publication approval.
-The provisional visualization is accepted as the v0.1 direction; no replacement
-framework, parser, topology schema or discovery feature is introduced here.
+Assessment: 2026-10-27. The maintainer authorized the stack merges and focused
+release preparation. Public tag/release publication remains a separate approval.
+The product scope is frozen. No feature or runtime change is part of preparation.
 
-## Status
+## Merged implementation
 
-| Item | Classification | Evidence / remaining action |
-| --- | --- | --- |
-| Workspace and CLI | Ready | Rust/Cargo 1.99.1 on Linux x86_64; locked fmt/Clippy/test/build, 43 workspace tests and isolated parser comparison pass. Fresh optimized `cargo install --locked --path crates/nasj-cli` succeeded; help, synthetic demo and strict multi-vhost HTML mapping work. |
-| Routing and diagnostics | Ready | Existing conditional/inheritance/unsupported-handler/include tests pass unchanged. Schema stays 0.2; configured and synthetic evidence and strict Info/Warning/Error behavior remain intact. |
-| Offline viewer UX | Ready | Backend/domain/static/conditional context, useful host ranking, readable framing, keyboard selection, phone/tablet controls, real Chromium touch pan/pinch/cancel/tap and graph/inspector navigation pass. |
-| Export/security regressions | Ready | Existing JSON/DOT/SVG goldens, XML, malicious input/redaction and CSP hash pass. Chromium opened file reports offline with zero external requests, JS/CSP errors or dialogs. Read-only input and safe output policies are unchanged. |
-| Actions | Needs Review | The base #18 and all prior heads passed. The branding PR description records the exact pushed SHA/run; require its `test` job, including offline browser checks, before approval. Never infer final success from an older run. |
-| Public schema 0.2 | Needs Review | ADR-0004 and JSON_FORMAT.md describe compatibility and new guard/action kinds. No UX schema change. Maintainer must accept the experimental compatibility/ID policy for v0.1.0. |
-| PR stack | Needs Review | All work is open/unmerged; #1 remains draft. Maintainer reviews and retargets bases in the sequence below, rerunning checks on the eventual release commit. |
-| Main branch protection | Blocked | Read-only GitHub API inspection returned `protected: false`, required checks enforcement `off`, and no rulesets. Maintainer must enable PR review, the `test` check, no force pushes/deletion and direct-main restrictions, then verify settings. No settings were changed. |
-| MIT and dependencies | Needs Review | NASJ source/crates declare MIT. Locked metadata has no missing license declarations; see DEPENDENCY_LICENSES.md. Prepare/approve exact third-party notices, including Unicode-3.0, for the chosen artifacts. No legal or current vulnerability-audit claim. |
-| Documentation/install | Needs Review | English/Arabic instructions point to the cumulative branding preview branch and installed help was checked. Replace preview refs with the approved release ref only after approval; update changelog/date then. |
-| Platform/browser coverage | Needs Review | Chromium passes at 1440×900, 390×844 and 768×1024 with synthetic 40/602-node graphs. Firefox/WebKit binaries downloaded but launch is blocked locally by missing GTK/Pango/multimedia libraries. No Firefox/WebKit/Safari or physical-device pass is claimed. Older Rust, non-Linux targets and cross-compilation are unverified. |
-| Packaging/distribution | Needs Review | Recommend source-first v0.1.0; a Linux x86_64 GNU binary is optional after clean-host validation, license notices and checksums. No release artifacts have been published. See options below. |
-| Approved branding | Ready | Seven supplied variants visually inspected; four original PNGs retained byte-for-byte with hashes. The correct one-dot نسج wordmark, themed offline logos/favicon, English/Arabic heroes and synthetic screenshot are integrated and tested. Issue #6 remains open pending acceptance/merge; no artwork generation/recoloring. |
-| Merge/tag/publication | Blocked pending approval | Maintainer authorization is required. No merge, tag, release, direct main push or issue closure was performed. |
+All 13 PRs were merged into main in dependency order with GitHub merge commits.
+PR #1 was reviewed and marked ready first. Each later PR was retargeted to main;
+its binary diff was identical to its original reviewed incremental diff. Exact
+head Actions runs passed before merging, and mergeability was confirmed after
+GitHub recalculated it. No conflicts, force pushes, rebases, squashes or direct
+main pushes occurred. No shared branch was rewritten or deleted.
 
-## Synthetic before / after evidence
+| PR | Merge commit SHA |
+| --- | --- |
+| [#1](https://github.com/marawan6569/Nasj/pull/1) | `790cb722521863a36f052d98b50bf9775a6a87ca` |
+| [#8](https://github.com/marawan6569/Nasj/pull/8) | `6e8931b34a2f1ad8c03ec8c206aafc1948c496f6` |
+| [#9](https://github.com/marawan6569/Nasj/pull/9) | `9b79b9b9c33221db832c108f002125518fe3c09c` |
+| [#10](https://github.com/marawan6569/Nasj/pull/10) | `f103478379e49442cd127e6c5e786943f3721e93` |
+| [#11](https://github.com/marawan6569/Nasj/pull/11) | `9b0ea88e48b6235413134a6a06e9b2da33d5873d` |
+| [#12](https://github.com/marawan6569/Nasj/pull/12) | `7804c8262ddff58ea488b1be2cecfc124877636c` |
+| [#13](https://github.com/marawan6569/Nasj/pull/13) | `7f3d8e1ef0c9f084aa617a299a16035258b7ff11` |
+| [#14](https://github.com/marawan6569/Nasj/pull/14) | `6f3562ee6147879773c19b547310fc495b13d330` |
+| [#15](https://github.com/marawan6569/Nasj/pull/15) | `f3e30e97ed477ec1643601f3aeb4511e4eb19059` |
+| [#16](https://github.com/marawan6569/Nasj/pull/16) | `50fe1d06bd6ceb11f2fdbe53877f17c13f3ac7f6` |
+| [#17](https://github.com/marawan6569/Nasj/pull/17) | `436f1d8252dbeb2ff49af103fdca12e1878e6a93` |
+| [#18](https://github.com/marawan6569/Nasj/pull/18) | `e8c4cc9daafc5ea920597f2e7486e1aa3aaacded` |
+| [#19](https://github.com/marawan6569/Nasj/pull/19) | `a7d7e3897dc9e35d6689439aa6a5c8e4588895e2` |
 
-Reproduce using `fixtures/nginx/multi-vhost.conf` (40 nodes, 37 edges, two Info
-include diagnostics), exporting HTML and searching `127.0.0.1:8100`:
+Post-stack main: `a7d7e3897dc9e35d6689439aa6a5c8e4588895e2`.
+Its tree is `b8ec18b2d0aa5bc117ecedfb21d6308e301025f3`, exactly the tree of
+`ee7ed5450663937607d23cf34814521c2db112cc` (#19). All 42 original implementation
+commits are ancestors, each retained once in Git history. The retargeted diffs,
+merge parents and tree equality after every merge establish no loss/duplication.
 
-| Observation | Base #17 | Final UX branch |
-| --- | --- | --- |
-| Initial host | `api.example.test · HTTP :80` (label order) | `portal.example.test · HTTPS :443` (effective application routes) |
-| Backend search | 1 node, 0 edges | 6 nodes, 5 edges: two declared domain aliases → HTTPS server → location / → portal_app → backend |
-| Match/context | Only isolated match | One tinted direct match, five dashed context nodes; real paths retained; unrelated hosts excluded |
-| HTTP conditional host at 1440×900 | Rightmost actions could need pan | Condition and true/false outcomes fit at readable scale |
-| Phone/tablet | Basic pan and inspector below graph | Pinch/pan, 44px controls, explicit inspector/graph return, offscreen count and focused selection |
+[Post-stack main Actions passed](https://github.com/marawan6569/Nasj/actions/runs/40433761704).
+All 13 original exact-head PR runs were also checked. The focused release-docs PR
+must pass before merging. Its final validation comment records the resulting
+final main SHA, final push-triggered Actions URL, repeated checks and archive hash;
+this document cannot embed its own future merge SHA. Follow the final comment
+when choosing the publication commit.
 
-The browser suite asserts paths and absence of unrelated hosts, not just result
-counts. Shared-backend searches retain both real HTTPS callers. A 100-host/602-node
-case verifies a retained caller-to-backend path and explicit truncation at 200
-nodes/40 direct matches/24 hops/4000 edge visits. These are display limits; static
-analysis is unchanged. Large overviews/callers can still need pan, result selection
-or a narrower query. Tests use synthetic configurations only; no deployment report,
-configuration, private endpoints or screenshots were copied into the repository.
+## Verified implementation and limits
 
-## Branding verification
+| Area | Evidence / disposition |
+| --- | --- |
+| Rust workspace | All three crates are 0.1.0/MIT. Core has no exporter/UI dependencies. Linux x86_64, Rust/Cargo 1.99.1; no older-Rust MSRV or other-platform claim. |
+| Parser/routing | Recursive includes, bounded input, variable/unsupported uncertainty, inherited handlers, ordered conditional returns, severity/strict mode and source evidence covered by fixtures. Static edges remain configured, never runtime confirmed. |
+| Exports | JSON schema 0.2, DOT, native SVG and offline HTML; normal/conditional goldens, injection/redaction, XML, output refusal and private Unix output checks pass. |
+| Main checks | fmt, locked Clippy with denied warnings, 43 locked workspace tests, locked build, isolated parser fmt/1 comparison test, CSP hash and PNG integrity pass at post-stack main. Rerun on final docs merge. |
+| Browser | Full offline Chromium suite passes host/search relationships, bounded 40/602-node cases, keyboard, real touch gestures, 1440×900 desktop, 390×844 phone and 768×1024 tablet. Zero external requests, JS/CSP errors or dialogs. |
+| Branding | #19 merged: correct نسج wordmark, preserved originals/checksums, themed embedded PNG logos/favicon, both README heroes and synthetic screenshot. Theme/decode/aspect/no-JS/moved-file tests pass. |
+| Source installation | Fresh GitHub clone, locked optimized offline install using cached dependencies, installed version/help/map help, strict synthetic HTML and demo JSON pass. This does not assert an empty dependency cache or isolated clean-host binary validation. |
+| Licensing | Root MIT reviewed; all 40 external workspace entries match locked metadata, 78 external parser-spike entries have license declarations. Source-only notices prepared; no dependencies/browsers vendored. No legal/CVE audit claim. |
+| Publication | Prepared notes/checklist/source packaging only. No tag, GitHub Release, uploaded asset, crates.io publication or public binary. |
 
-The approved archive was path/type/size checked before temporary extraction.
-Source files remain byte-for-byte unchanged; the manifest records every supplied
-variant. Report/readme sizes use documented outer-canvas crops and proportional
-resizing only. Color and white logos were visually checked at desktop/mobile size.
-CSP changes only from `img-src 'none'` to `img-src data:`; script hashes, connect,
-object, base and form restrictions remain intact. PNG integrity/embedding checks
-run in CI; Chromium confirms actual decoding, themes, alt text, no-JS and copied
-single-file portability. No image-rendering dependency or CLI banner was added.
+Original review findings on #9/#10/#16 already have linked implementation replies;
+there are no inline review threads or change-request reviews outstanding. Branding
+issue #6 meets its acceptance criteria through #19 and was closed as completed. Future discovery/server issues
+remain open; unrelated issues are not bulk-closed.
 
-The [public preview](images/report-preview.png) uses only the synthetic multi-vhost
-fixture and normalized source paths. Regenerate with the development browser via
-`python tools/report-preview.py`; no deployment assets are used. Branding no longer
-requires a missing-asset deferral. Maintainer review/merge, schema acceptance,
-branch protection, notices and packaging remain separate gates.
+## Maintainer decisions at the publication gate
 
-## Review and merge sequence
+- Approve public publication of the exact final validated SHA and prepared notes.
+- Accept the experimental schema **0.2** and renumberable IDs for product **0.1.0**.
+- Accept source-first distribution, Linux x86_64/Rust 1.99.1 and Chromium-only
+  validation. Firefox/WebKit could not launch in the earlier environment because
+  ordinary system libraries were missing; no pass is claimed. Other platforms,
+  older Rust, physical devices and a clean-host binary remain unverified.
+- Accept documented static-analysis, sensitive-path/name and bounded-layout/search
+  limitations. Runtime routing is not verified; no full request simulation.
+- Branch protection is explicitly deferred by the maintainer. Main was observed
+  unprotected; no rulesets/settings/reviewer requirements were changed. This is
+  repository hardening work, not a release blocker.
+- Dependency vulnerability auditing and signed/reproducible binaries are not
+  claimed. A future binary/vendored distribution needs exact third-party notices,
+  including Unicode-3.0, and new approval/validation.
 
-#1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 → #15 → #16 → #17 → #18 → branding PR
-(base #18). Preserve review history; after each merge, retarget dependent PRs and
-validate the new cumulative head. Earlier shared branches have not been rewritten.
-Keep issues open until their own acceptance criteria are reviewed and merged.
-Discovery remains planned for v0.2, the optional server for v0.3.
-
-Recommend **v0.1.0**, matching Cargo workspace versions, only after these gates.
-A source-first release keeps the verified CLI installation path and avoids
-promising unsupported binary targets. If shipping binaries, include LICENSE,
-approved dependency notices, platform/toolchain information, README and SHA256SUMS
-in reviewed archives. Test on a clean nonprivileged host; reproducible-build and
-signing claims require separate evidence. Do not bundle Playwright/browser caches.
-Crates.io publication is a separate choice: internal dependencies currently use
-path-only declarations and need reviewed registry versions/publication ordering.
-No crates.io readiness is implied by successful local installation.
-
-## Final maintainer verification
-
-Run in a clean checkout of the exact approved cumulative commit. These commands
-perform no merge, tag or publication:
-
-```sh
-git status --short --branch
-rustc --version
-cargo fmt --all -- --check
-cargo clippy --locked --workspace --all-targets -- -D warnings
-cargo test --locked --workspace
-cargo build --locked --workspace
-cargo fmt --manifest-path tools/parser-spike/Cargo.toml -- --check
-cargo test --locked --manifest-path tools/parser-spike/Cargo.toml
-python3 tools/report-csp.py --check
-python3 tools/branding.py --check
-python3 -m venv /tmp/nasj-review-browser
-/tmp/nasj-review-browser/bin/pip install -r tools/browser-requirements.txt
-/tmp/nasj-review-browser/bin/playwright install chromium
-/tmp/nasj-review-browser/bin/python tools/browser-smoke.py
-```
-
-Where ordinary user-installed libraries permit, install Firefox/WebKit engines
-and run `tools/browser-smoke.py --browser firefox` / `--browser webkit` with the
-same Python. Do not elevate privileges to make a test pass. For source install
-and strict report inspection, use a new temporary root/output path each time:
-
-```sh
-nasj_review_root=$(mktemp -d /tmp/nasj-review-XXXXXX)
-cargo install --locked --path crates/nasj-cli --root "$nasj_review_root"
-"$nasj_review_root/bin/nasj" --help
-"$nasj_review_root/bin/nasj" map --help
-"$nasj_review_root/bin/nasj" map --config fixtures/nginx/multi-vhost.conf \
-  --strict --format html -o "$nasj_review_root/report.html"
-```
-
-Inspect exact-head Actions, branch rules, license notices, schema, branding
-review and packaging choices in the release checklist before approving release.
+See [release notes](RELEASE_NOTES_v0.1.0.md), [checklist](RELEASE_CHECKLIST.md),
+[distribution/publication commands](DISTRIBUTION.md), [analysis exclusions](ANALYSIS.md)
+and [JSON compatibility](JSON_FORMAT.md). v0.2 discovery and v0.3 local server
+remain planned, not implemented. All test/public artifacts use synthetic input.

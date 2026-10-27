@@ -1,13 +1,14 @@
 # Locked dependency license inventory
 
-Inspected from `cargo metadata --locked --format-version 1` for the workspace
-Cargo.lock during the final UX review (2026-10-26). Includes all resolved targets,
+Reverified from `cargo metadata --locked --format-version 1` for the workspace
+Cargo.lock during release preparation (2026-10-27). Includes all resolved targets,
 dev dependencies and proc macros; this is broader than the Linux runtime binary.
 No dependency was added or changed by the UX fixes. Re-run metadata if locks change.
 
 NASJ source and all three workspace crates declare MIT; see [LICENSE](../LICENSE).
-The following are upstream manifest declarations, not a completed distribution
-notice bundle or vulnerability audit. Each declaration offers an MIT option;
+The chosen source-only archive contains no vendored dependency source or binaries;
+see [distribution notices](../THIRD_PARTY_NOTICES.md). The following are upstream
+manifest declarations, not a binary notice bundle or vulnerability audit. Each declaration offers an MIT option;
 `unicode-ident` also requires Unicode-3.0. Review actual notices for the exact
 release artifacts, including build-time components, before distributing binaries.
 
@@ -56,12 +57,14 @@ release artifacts, including build-time components, before distributing binaries
 
 40 external packages; no missing license declarations in this inventory.
 
-The isolated parser spike has its own lockfile and does not enter the executable:
+The isolated parser spike has its own lockfile (78 external packages, all with
+license declarations reverified during release preparation) and does not enter the executable:
 `nginx-config 0.13.2` declares MIT/Apache-2.0, `nginx-lint-parser 0.24.0` MIT,
 and `misc-conf 0.1.2` MIT. Its full transitive inventory must be included if its
 development dependencies are redistributed. Playwright (development only) and
 downloaded browser engines are not bundled in reports or NASJ binaries.
 
 HTML embeds only NASJ-owned CSS/JavaScript and generated SVG/JSON, with no
-vendored visualization framework. Packaging/legal notice acceptance remains a
-maintainer release decision; no claim of a completed legal/CVE audit is made.
+vendored visualization framework. The source-first distribution excludes fetched
+dependencies and browser caches. Any later binary/vendored distribution needs an
+exact notice review; no claim of a completed legal/CVE audit is made.

@@ -1,29 +1,30 @@
 # Roadmap and current status
 
-No release has been published and no development PR has been merged by this work.
-Code listed below is an implemented preview awaiting maintainer review.
+The complete v0.1 implementation stack (#1, #8–#19) is merged into main.
+Public v0.1.0 publication remains pending maintainer approval. The product scope
+is frozen; release preparation adds documentation and distribution instructions.
 
-| Milestone | Preview status | Review dependency |
+| Milestone | Main status | Implementation history |
 | --- | --- | --- |
-| Workspace, synthetic demo, CI | Stabilized; local gates and Actions pass | PR #1 |
-| Parser research and syntax | Comparison spike, ADR, bounded parser and fixtures | PR #8 → #1; issue #2 |
-| Real HTTP topology | Includes, semantics, configured evidence, provenance and JSON/DOT | PR #9 → #8; issues #2/#3 |
-| Portable reports | SVG and offline interactive HTML; security/browser checks | PR #10 → #9; issue #4 |
-| Documentation and release readiness | English/Arabic usage, architecture and checklist | PR #11 → #10; issue #6 |
-| Future architecture | Discovery/evidence and optional localhost server proposals only | PR #12 → #11; issue #5 |
-| Final safety audit | Explicit alias/duplicate uncertainty, unknown provenance and private reports | PR #13 → #12 |
-| Final report UX | Connected search, useful host selection, readable framing and touch | PR #18 → #17 |
-| Approved branding assets | Integrated: originals, themed offline logo, READMEs and checks; awaiting review | Branding PR → #18; issue #6 stays open until merged |
-| Required-check/branch protection settings | Blocked: main is unprotected, no rulesets; maintainer action required | Issue #7 |
+| Workspace, CLI, synthetic demo, CI | Implemented | #1 |
+| Parser research, syntax and includes | Implemented | #8, #9 |
+| HTTP topology and routing uncertainty | Implemented, conservative analysis | #9, #13, #14, #17 |
+| Conditional returns and diagnostic severity | Implemented | #14, #15 |
+| JSON/DOT/SVG/offline HTML | Implemented | #10, #16 |
+| Connected search and mobile navigation | Implemented | #18 |
+| Official NASJ branding and both READMEs | Integrated | #19; issue #6 criteria satisfied |
+| Release documentation | Prepared; publication approval pending | #11 and release-preparation PR |
+| Branch protection | Explicitly deferred repository hardening | No settings changed; not a release blocker |
 
-## v0.1 — validate and release static mapping
+## v0.1.0 — source-first publication gate
 
-Review the PR stack, experimental JSON schema, parser/semantic limitations and
-fixture coverage. Validate reports in additional browsers and representative
-sanitized deployment snapshots; assess layout on larger graphs. Complete the
-[release checklist](RELEASE_CHECKLIST.md) and obtain maintainer approval. Keep
-unresolved routes honest and the CLI independent. Passing tests are not release
-approval. Issues stay open until accepted work is merged.
+43 workspace tests, the isolated parser comparison, offline Chromium and the
+required Cargo/CSP/branding gates pass on post-stack main. Validate again on the
+final documentation merge; its PR records the exact final main SHA/Actions.
+See [readiness](RELEASE_READINESS.md), [checklist](RELEASE_CHECKLIST.md),
+[release notes](RELEASE_NOTES_v0.1.0.md) and [distribution](DISTRIBUTION.md).
+Schema 0.2 is experimental and distinct from product 0.1.0. Linux x86_64 with
+Rust 1.99.1 and Chromium are validated; other platforms/browsers remain unverified.
 
 ## v0.2 — optional infrastructure discovery (planned)
 
@@ -31,9 +32,8 @@ Correlate static targets with explicit Docker published-port snapshots, systemd
 service observations and local TCP/process listeners. Retain source/time,
 network namespace, permission gaps and confirmed/inferred/unresolved evidence.
 No automatic root access, Docker socket use or default discovery in `map`.
-Begin implementation only after v0.1 is sufficiently validated.
-See [ADR-0002](adr/0002-optional-discovery-evidence.md) for the observation model,
-adapter order, matching rules, permission gaps and test gates.
+No discovery implementation is included in v0.1.0. Issue #5 remains open.
+See [ADR-0002](adr/0002-optional-discovery-evidence.md) for the proposed model.
 
 ## v0.3 — optional local web server (planned)
 
@@ -41,5 +41,4 @@ Reuse core analysis/export APIs with an optional local dashboard. Default bind
 127.0.0.1; retain offline CLI/report workflows and explicit filesystem scope.
 Authentication, request/path isolation and bounded concurrent work must be designed
 before exposing a network endpoint. No server/runtime is implemented now.
-See [ADR-0003](adr/0003-optional-local-server.md) for the proposed data boundary,
-token/origin policy, immutable snapshots and offline-CSP separation.
+See [ADR-0003](adr/0003-optional-local-server.md) for the proposal.

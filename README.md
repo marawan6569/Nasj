@@ -8,13 +8,13 @@
 <p align="center"><strong>Weave your infrastructure into clarity.</strong></p>
 <p align="center">Turn Nginx configuration into an explorable infrastructure topology, with file and line evidence.</p>
 <p align="center">
-  <a href="https://github.com/marawan6569/Nasj/actions/workflows/ci.yml"><img src="https://github.com/marawan6569/Nasj/actions/workflows/ci.yml/badge.svg?branch=docs%2Fofficial-branding&amp;event=pull_request" alt="Rust CI · development preview"></a>
+  <a href="https://github.com/marawan6569/Nasj/actions/workflows/ci.yml"><img src="https://github.com/marawan6569/Nasj/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="Rust CI · main"></a>
 </p>
 <p align="center">Rust · MIT · Linux validated · <a href="README.ar.md">اقرأ بالعربية</a></p>
 
-> **Unreleased development preview.** Implementation is awaiting review in the
-> [stacked PRs](docs/RELEASE_READINESS.md#review-and-merge-sequence). No stable
-> release, downloadable binaries or crates.io package has been published.
+> **v0.1.0 preparation.** The implementation is merged into `main`; public
+> publication awaits maintainer approval. No release, downloadable binaries or
+> crates.io package has been published.
 
 Nginx routes can span virtual hosts, nested locations and included files. NASJ
 brings those declarations into one map: follow a domain to its server and proxy
@@ -36,11 +36,11 @@ back to its configuration source. Unresolved routing stays visible as uncertaint
 
 ## Quick start
 
-Install a stable [Rust toolchain](https://rustup.rs) and native linker. Until the
-PR stack is merged, use the cumulative preview branch:
+Install a stable [Rust toolchain](https://rustup.rs) and native linker, then build
+from the official default branch:
 
 ```sh
-git clone --branch docs/official-branding https://github.com/marawan6569/Nasj.git
+git clone https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 nasj --help
@@ -101,12 +101,13 @@ restrictive CSP and makes no external requests. Read the [security policy](SECUR
 | [JSON schema 0.2](docs/JSON_FORMAT.md) | Canonical structures, evidence and compatibility |
 | [Reports](docs/REPORTS.md) | Formats, interaction, offline security and browser tests |
 | [Official assets](assets/logos/README.md) | Approved originals, display variants and provenance |
-| [Release readiness](docs/RELEASE_READINESS.md) · [checklist](docs/RELEASE_CHECKLIST.md) | Review stack, outstanding decisions and verification |
+| [Release readiness](docs/RELEASE_READINESS.md) · [checklist](docs/RELEASE_CHECKLIST.md) | Merge evidence, publication decisions and verification |
+| [v0.1.0 release notes](docs/RELEASE_NOTES_v0.1.0.md) · [distribution](docs/DISTRIBUTION.md) | Prepared notes and source packaging |
 | [Specification](docs/SPEC.md) · [implementation plan](docs/IMPLEMENTATION_PLAN.md) | Requirements and implementation history |
 
 ## Roadmap and contributing
 
-**v0.1** implements static mapping and offline reports in this unmerged preview.
+**v0.1** implements static mapping and offline reports on `main`, pending publication.
 **v0.2** plans optional Docker/systemd/process correlation with evidence;
 **v0.3** plans an optional local server. Discovery and the server are **not implemented**.
 See the [roadmap](docs/ROADMAP.md) for scope.

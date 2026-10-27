@@ -8,15 +8,14 @@
 <p align="center" dir="rtl"><strong>انسج بنيتك التحتية في صورة واضحة.</strong></p>
 <p align="center" dir="rtl">حوّل إعدادات Nginx إلى خريطة تفاعلية للبنية التحتية، مع توثيق الملف ورقم السطر لكل علاقة.</p>
 <p align="center">
-  <a href="https://github.com/marawan6569/Nasj/actions/workflows/ci.yml"><img src="https://github.com/marawan6569/Nasj/actions/workflows/ci.yml/badge.svg?branch=docs%2Fofficial-branding&amp;event=pull_request" alt="فحوص Rust · نسخة التطوير"></a>
+  <a href="https://github.com/marawan6569/Nasj/actions/workflows/ci.yml"><img src="https://github.com/marawan6569/Nasj/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="فحوص Rust · main"></a>
 </p>
 <p align="center" dir="rtl">Rust · ترخيص MIT · جرى التحقق على Linux · <a href="README.md">English</a></p>
 
 <div dir="rtl">
 
-> **نسخة تطوير غير منشورة.** التنفيذ بانتظار مراجعة
-> [طلبات الدمج المتتابعة](docs/RELEASE_READINESS.md#review-and-merge-sequence).
-> لم يصدر بعد إصدار مستقر، ولا تتوفر ملفات تنفيذية منشورة أو حزمة على crates.io.
+> **التحضير للإصدار v0.1.0.** دُمج التنفيذ في `main`، والنشر العام بانتظار
+> موافقة المشرف. لم يُنشر إصدار بعد، ولا تتوفر ملفات تنفيذية منشورة أو حزمة على crates.io.
 
 قد تتوزع قواعد Nginx بين مضيفين افتراضيين ومسارات متداخلة وملفات تضمين متعددة.
 يجمعها نسج في خريطة واحدة: تتبّع النطاق إلى الخادم ووجهة الوكيل العكسي، وافحص
@@ -35,12 +34,12 @@
 ## البدء السريع
 
 ثبّت [أدوات Rust المستقرة](https://rustup.rs) وأداة الربط الخاصة بنظامك.
-استخدم فرع المعاينة التراكمي ما دامت طلبات الدمج قيد المراجعة:
+ثم ابنِ الأداة من الفرع الافتراضي للمستودع الرسمي:
 
 <div dir="ltr">
 
 ```sh
-git clone --branch docs/official-branding https://github.com/marawan6569/Nasj.git
+git clone https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 nasj --help
@@ -106,12 +105,13 @@ nasj map --config ./nginx.conf --format html -o report.html
 | [مخطط JSON 0.2](docs/JSON_FORMAT.md) | البنية المرجعية والأدلة والتوافق |
 | [التقارير](docs/REPORTS.md) | الصيغ والتفاعل والأمان واختبارات المتصفح |
 | [ملفات الهوية الرسمية](assets/logos/README.md) | الأصول المعتمدة ونسخ العرض ومصدرها |
-| [جاهزية الإصدار](docs/RELEASE_READINESS.md) و[قائمته](docs/RELEASE_CHECKLIST.md) | ترتيب المراجعة والقرارات المتبقية والتحقق |
+| [جاهزية الإصدار](docs/RELEASE_READINESS.md) و[قائمته](docs/RELEASE_CHECKLIST.md) | أدلة الدمج وقرارات النشر والتحقق |
+| [ملاحظات v0.1.0](docs/RELEASE_NOTES_v0.1.0.md) و[التوزيع](docs/DISTRIBUTION.md) | الملاحظات المعدّة وتحزيم المصدر |
 | [المواصفات](docs/SPEC.md) و[خطة التنفيذ](docs/IMPLEMENTATION_PLAN.md) | المتطلبات وسجل التنفيذ |
 
 ## الخطة والمساهمة
 
-تنفّذ معاينة **v0.1** التحليل الثابت والتقارير دون إنترنت، ولم تُدمج أو تُنشر بعد.
+تنفّذ **v0.1** التحليل الثابت والتقارير دون إنترنت على `main`، بانتظار النشر العام.
 يُخطط في **v0.2** لربط اختياري بحاويات Docker وخدمات systemd والعمليات مع حفظ الأدلة،
 وفي **v0.3** لخادم محلي اختياري. **الاكتشاف والخادم غير منفذين.** راجع [الخطة](docs/ROADMAP.md).
 

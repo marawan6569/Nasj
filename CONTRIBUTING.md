@@ -8,8 +8,8 @@ Thanks for helping build NASJ!
 4. Run `cargo fmt --all -- --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace` and `cargo build --workspace`.
 5. Add tests for behavior changes and documentation for visible features.
 
-Keep one focused task per branch and use stacked PRs against the preceding branch
-while PR #1 awaits review. Link relevant issues without closing them before work
+Keep one focused task per branch and open PRs against main. For dependent work,
+document any stacked PR bases explicitly. Link relevant issues without closing them before work
 is accepted and merged. Never push directly to main, force-push a shared branch,
 merge or release without maintainer approval. Check Actions on the exact pushed
 commit and fix failures before requesting review.

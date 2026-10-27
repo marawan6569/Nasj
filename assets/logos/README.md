@@ -68,5 +68,6 @@ visual review and a manifest checksum update; the check deliberately rejects
 silent replacements. Browser tests also decode images, check aspect ratio and
 alt text, test themes/no-JS/moved-file behavior and reject injected images.
 
-Branding implementation is ready for review. [Issue #6](https://github.com/marawan6569/Nasj/issues/6)
-remains open until acceptance and merge; nothing here publishes a release.
+Branding is integrated on main through [PR #19](https://github.com/marawan6569/Nasj/pull/19),
+satisfying the asset criteria in [issue #6](https://github.com/marawan6569/Nasj/issues/6).
+Public release publication remains a separate maintainer decision.

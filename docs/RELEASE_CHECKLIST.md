@@ -1,61 +1,79 @@
-# First release checklist
+# NASJ v0.1.0 release checklist
 
-No release/merge has been approved. Checked branding items describe verified
-implementation, not merge or release approval. Other boxes remain final-release
-tasks. See [RELEASE_READINESS.md](RELEASE_READINESS.md), EXECUTION_LOG.md and PR
-descriptions for actual test evidence.
+The stack merge and focused release preparation are authorized. Public tag/release
+publication is not. Evidence below describes post-stack main; repeat all commands
+on the final release-docs merge and record the exact SHA/Actions/archive checksum
+in that PR's final validation comment. See [readiness](RELEASE_READINESS.md).
 
-## Review and repository policy
+## Completed preparation
 
-- [ ] Maintainer reviews/merges the dependency stack in order:
-  #1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 → #15 → #16 → #17 → #18 → the branding PR (base #18);
-  retarget bases as needed.
-- [ ] Resolve review comments and inspect Actions for the exact approved commits.
-- [ ] Configure and verify required `test` CI check and restrictions on direct main
-  pushes using repository settings. The final UX review read `protected: false`
-  on main and an empty ruleset list; enforcement is currently absent.
-- [ ] Keep issues #2–#7 open until their own criteria are satisfied and merged.
-  Branding and discovery issues cannot be closed from the static preview alone.
+- [x] Audit authentication/admin permissions, clean tree, all open PRs, descriptions,
+  reviews, CI and cumulative diff; verify #19 contains its predecessors.
+- [x] Mark #1 ready, then merge #1 → #8 → #9 → #10 → #11 → #12 → #13 → #14 →
+  #15 → #16 → #17 → #18 → #19 using GitHub merge commits, retargeting each to main.
+- [x] Verify unchanged incremental diffs, merge parents and tree equality after
+  every merge; retain review history and all original commits without conflicts.
+- [x] Verify post-stack main's Actions and required local Cargo/browser checks.
+- [x] Review conservative routing, includes/escaping, conditional guards/termination,
+  diagnostic severity/strict mode and experimental JSON schema 0.2.
+- [x] Verify all four exports, normal/conditional goldens, XML, CSP, redaction,
+  safe output files and offline portability. Chromium themes/search/navigation/
+  mobile/touch/hostile and 40/602-node checks pass without external requests/errors.
+- [x] Integrate approved branding, validate PNG CRC/dimensions/checksums/embedding,
+  correct نسج spelling, both READMEs and synthetic screenshot.
+- [x] Verify a fresh GitHub source clone installs; installed version/help and strict
+  synthetic mapping pass on Linux x86_64/Rust 1.99.1 with cached dependencies.
+- [x] Review MIT, exact locked dependency inventory and source-only notices.
+- [x] Prepare changelog, English/Arabic main installation/badge references, release
+  notes and source packaging/publication instructions via a focused PR.
+- [x] Record branch protection as deferred repository hardening. Do not change
+  settings or treat unprotected main as a blocker for these authorized merges.
 
-## Correctness and security
+## Final commit verification
 
-- [ ] Run fmt, Clippy with warnings denied, workspace tests and build on the final
-  release commit with Cargo.lock; verify a clean checkout and source installation.
-- [ ] Rerun the isolated parser comparison and review ADR-0001/known exclusions.
-- [ ] Review experimental schema 0.2 (independent of product version), typed
-  condition/branch semantics, diagnostic severity and compatibility/ID policy.
-- [ ] Validate representative sanitized deployment snapshots and resource limits.
-- [ ] Check inherited/conditional/dynamic routing and warnings with no invented edges.
-- [ ] Verify no inherited static destination beside proxy/unsupported handlers;
-  review normal nested location handler boundaries and ordered conditional returns.
-- [ ] Inspect redaction, include scope/symlinks, nonregular files and output refusal.
-- [ ] Review the [locked dependency license inventory](DEPENDENCY_LICENSES.md),
-  prepare required third-party notices for the chosen distribution, and check
-  dependency vulnerabilities for the exact lockfiles at
-  release time; no current dependency-audit claim is made by this checklist.
+Run from an up-to-date clean main checkout; save the actual outputs and SHA:
 
-## Reports and documentation
+```sh
+git status --short --branch
+git rev-parse HEAD
+rustc --version
+cargo --version
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo test --locked --workspace
+cargo build --locked --workspace
+cargo fmt --manifest-path tools/parser-spike/Cargo.toml -- --check
+cargo test --locked --manifest-path tools/parser-spike/Cargo.toml
+python3 tools/report-csp.py --check
+python3 tools/branding.py --check
+python3 -m venv /tmp/nasj-release-browser
+/tmp/nasj-release-browser/bin/pip install -r tools/browser-requirements.txt
+/tmp/nasj-release-browser/bin/playwright install chromium
+/tmp/nasj-release-browser/bin/python tools/browser-smoke.py
+```
 
-- [ ] Validate JSON/DOT/SVG goldens, XML and independent Graphviz parsing.
-- [ ] Pass CSP hash and offline browser suite on final assets; manually inspect
-  layout/readability and keyboard use in Chromium, Firefox and Safari/WebKit.
-- [ ] Exercise larger graphs and document practical layout/performance limits.
-- [ ] Review initial readable vhost focus and full overview on representative
-  synthetic laptop/mobile reports; check same-domain HTTP/HTTPS/source identity.
-- [ ] Review reports for accidental infrastructure disclosure before publishing examples.
-- [ ] Confirm English/Arabic docs and help match the released executable.
-- [ ] Replace preview-branch installation references with the approved release ref.
-- [x] Integrate supplied approved `نسج` originals, verify the one-dot ن visually,
-  record dimensions/alpha/checksums, and add themed offline report/README assets.
-- [x] Validate embedded PNGs, CSP image restriction, no-JS/moved-file portability
-  and a public-safe synthetic README screenshot.
-- [ ] Maintainer accepts and merges the branding PR before considering issue #6
-  complete. No logo regeneration or letterform edits were made.
+Ordinary user-installed browser libraries/fonts may be needed. Do not elevate
+privileges or skip failed checks to obtain a pass. Firefox/WebKit remain outside
+validated coverage. Inspect branded light/dark desktop/mobile captures when
+reviewing visual changes. Independently parse normal/hostile/conditional DOT with
+Graphviz if available; it is not a runtime dependency. Verify Markdown/image links
+and matching English/Arabic examples against CLI help.
 
-## Packaging and approval
+Follow [DISTRIBUTION.md](DISTRIBUTION.md) for clean source/archive installation,
+license inclusion and SHA-256 verification. GitHub Actions must pass for the final
+main SHA, not only the PR head. The release-preparation PR's final validation
+comment is the authoritative record for these final checks and its merge SHA.
 
-- [ ] Decide binary targets/distribution and supported Rust/platform versions; only
-  Linux Rust 1.99.1 has been locally validated so far.
-- [ ] Prepare final changelog/version, reproducible artifacts and checksums.
-- [ ] Maintainer explicitly approves tag/publication. Never release automatically.
-- [ ] Keep v0.2 discovery optional/planned and v0.3 server deferred in release notes.
+## Public publication: explicit approval still required
+
+- [ ] Maintainer approves the exact final main SHA, source-first v0.1.0 notes,
+  experimental schema 0.2, notices and documented security/platform/browser limits.
+- [ ] After that approval only: create/push annotated v0.1.0 tag, publish the GitHub
+  Release and optionally upload the verified source archive/SHA256SUMS.
+- [ ] Record the actual release date/publication URL; no public release date is
+  asserted in the prepared changelog.
+
+Do not publish crates/binaries, configure branch protection, delete historical
+branches or close unrelated/future issues. Planned v0.2 discovery and v0.3 server
+must not appear as delivered features. A binary release, reproducible-build claim,
+signing or vulnerability-audit claim requires additional evidence and approval.
