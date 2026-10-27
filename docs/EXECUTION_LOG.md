@@ -128,3 +128,15 @@ unmerged. Missing branding assets, unverified repository protections, experiment
 schema/renumbering IDs, conservative semantic exclusions, simple graph layout and
 Chromium-only browser coverage are the remaining release concerns. The next task
 is maintainer review and release-checklist validation, not runtime discovery.
+
+## Field validation — routing correctness follow-up
+
+Reviewed all PR #9/#10 discussions against `e035f6b`; both effective-destination
+findings remained reproducible. Handler precedence now suppresses inherited root
+edges for proxies and unsupported handlers while retaining root source metadata.
+Source review also corrected ordinary nested pass inheritance and its old test.
+Added typed symbolic decisions/ordered true-false return actions under experimental
+schema 0.2, source provenance, no variable substitution, explicit unresolved
+fallthrough and conservative unsupported cases. ADR-0004 records scope and
+compatibility. All four exporters and conditional JSON/DOT/SVG goldens updated.
+Only synthetic fixtures are used; no real deployment data/configuration was read.

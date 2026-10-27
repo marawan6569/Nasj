@@ -58,10 +58,16 @@ deterministic. IDs are stable across identical runs, but edits can renumber node
 Every emitted static edge has `configured` evidence and original source. Demo
 data uses `synthetic`. Runtime `confirmed`/`inferred` classifications are reserved
 in the model; no runtime discovery is implemented. Variables, duplicate upstream
-names and conditional/unsupported routing contexts produce diagnostics and omit
+names and unsupported routing contexts produce diagnostics and omit
 invented proxy edges. A graph is not a request simulator, DNS lookup, Nginx validity
 check or runtime reachability assertion. Semantic limitations remain warnings;
 the CLI's `--strict` option rejects any warning.
+
+Narrow server rewrite programs use symbolic condition nodes and ordered true/false
+edges to redirect/response actions; variables are not evaluated. Content-handler
+selection precedes effective-destination edges, with inherited root kept as
+metadata when proxying. Ordinary nested locations do not inherit pass handlers.
+See [ADR-0004](adr/0004-ordered-conditional-returns.md) for schema 0.2 and exclusions.
 
 ## Reports and security
 

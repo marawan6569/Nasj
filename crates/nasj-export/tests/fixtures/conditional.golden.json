@@ -1,0 +1,148 @@
+{
+  "schema_version": "0.2",
+  "analysis": "configuration",
+  "sources": [
+    "fixtures/conditional.conf"
+  ],
+  "nodes": [
+    {
+      "id": "n000001",
+      "kind": "server",
+      "label": "server",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 2
+      },
+      "attributes": {
+        "routing": "conditional",
+        "state": "configured"
+      }
+    },
+    {
+      "id": "n000002",
+      "kind": "listener",
+      "label": "80",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 3
+      },
+      "attributes": {
+        "address": "*",
+        "parameters": "",
+        "port": "80",
+        "protocol": "http"
+      }
+    },
+    {
+      "id": "n000003",
+      "kind": "domain",
+      "label": "example.test",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 4
+      },
+      "attributes": {
+        "match": "exact"
+      }
+    },
+    {
+      "id": "n000004",
+      "kind": "condition",
+      "label": "$host = \"example.test\"",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 5
+      },
+      "attributes": {
+        "phase": "server_rewrite"
+      },
+      "condition": {
+        "variable": "$host",
+        "operator": "equal",
+        "value": "example.test",
+        "value_redacted": false
+      }
+    },
+    {
+      "id": "n000005",
+      "kind": "redirect",
+      "label": "301 → https://$host$request_uri",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 6
+      },
+      "attributes": {
+        "destination_resolution": "dynamic",
+        "routing": "unresolved",
+        "status": "301",
+        "target_expression": "https://$host$request_uri"
+      }
+    },
+    {
+      "id": "n000006",
+      "kind": "response",
+      "label": "return 404",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 8
+      },
+      "attributes": {
+        "response": "body omitted",
+        "status": "404"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "n000001",
+      "to": "n000002",
+      "kind": "listens_on",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 3
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000003",
+      "to": "n000001",
+      "kind": "routes_to",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 4
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000001",
+      "to": "n000004",
+      "kind": "evaluates",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 5
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000004",
+      "to": "n000005",
+      "kind": "when_true",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 5
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000004",
+      "to": "n000006",
+      "kind": "when_false",
+      "source": {
+        "path": "fixtures/conditional.conf",
+        "line": 5
+      },
+      "evidence": "configured"
+    }
+  ],
+  "warnings": []
+}

@@ -30,8 +30,11 @@ return responses/redirects and document roots/aliases. Bare IP/name listeners
 use the configured default port 80; a server without a supported explicit listen
 directive warns instead of inventing a privilege-dependent listener.
 
-Root and location proxy_pass inheritance are represented; local alias overrides
-an inherited root. Alias inheritance into nested locations is not resolved and
+Root inheritance is represented; local alias overrides an inherited root. A local
+proxy handler suppresses static destination edges even when root is configured.
+Root is retained as `configured_root`, `root_origin` and `root_source` inspection
+metadata. Ordinary nested prefix/named locations select their own pass handler;
+they do not inherit the parent's proxy_pass. Alias inheritance is not resolved and
 emits `alias.inheritance` with an unresolved owner. Duplicate routing directives
 or conflicting root/alias declarations also mark the context unresolved and omit
 effective destination edges, propagating uncertainty to empty child locations.
@@ -41,9 +44,21 @@ request simulation are not implemented. A variable anywhere in proxy_pass is
 conservatively unresolved, even if its authority looks static. Duplicate upstream
 names are unresolved, matching names case-insensitively.
 
-Contexts with `if`, rewrite, try_files, error_page, mirror, limit_except or known
+Simple server-level conditional returns are recorded in directive order: literal
+`$variable = value` / `!=` tests, with one return in each if body. True edges lead
+to return actions; false edges lead to the next decision or fallback return. The
+first unconditional return stops this sequence. Redirect variables stay symbolic;
+response bodies remain omitted. A missing fallback reaches an unresolved location
+selection step. This is a control-flow description, not a request outcome or
+variable substitution. See [ADR-0004](adr/0004-ordered-conditional-returns.md).
+
+Other contexts with `if`, set, rewrite, try_files, error_page, mirror, limit_except or known
 embedded handlers are unresolved and do not get effective proxy edges. Ancestor
-uncertainty propagates into nested locations. Known non-HTTP proxy handlers warn.
+uncertainty propagates into nested locations. Inherited error_page also prevents
+terminal-response inference. Unsupported FastCGI/uWSGI/SCGI/gRPC handlers warn and
+suppress effective static/proxy destinations before edges are emitted. Their
+ordinary nested locations still select their own handlers and may serve static
+content. These warnings describe analysis limits, not invalid Nginx configuration.
 Stream/mail and unknown nested contexts warn and are not traversed as HTTP
 routes. Embedded-language blocks fail syntax parsing. Unknown ordinary directives
 are retained in the internal AST but are not otherwise exported or evaluated.

@@ -1,0 +1,14 @@
+digraph nasj {
+  rankdir=LR;
+  "n000001" [label="server"];
+  "n000002" [label="80"];
+  "n000003" [label="example.test"];
+  "n000004" [label="$host = \"example.test\""];
+  "n000005" [label="301 → https://$host$request_uri"];
+  "n000006" [label="return 404"];
+  "n000001" -> "n000002" [label="listens on (configured)"];
+  "n000003" -> "n000001" [label="routes to (configured)"];
+  "n000001" -> "n000004" [label="evaluates (configured)"];
+  "n000004" -> "n000005" [label="true (configured)"];
+  "n000004" -> "n000006" [label="false / otherwise (configured)"];
+}

@@ -75,6 +75,7 @@ fn demo_graph() -> Topology {
             label: label.into(),
             source: None,
             attributes: BTreeMap::new(),
+            condition: None,
         });
     }
     graph.edges.push(Edge {
