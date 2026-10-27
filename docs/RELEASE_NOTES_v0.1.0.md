@@ -1,7 +1,5 @@
 # NASJ v0.1.0
 
-Prepared for publication after maintainer approval; no tag or release exists yet.
-
 NASJ (نسج) turns Nginx configuration into an explorable infrastructure map.
 This first release is source-first, with Linux x86_64 and Rust 1.99.1 validated.
 
@@ -17,11 +15,9 @@ This first release is source-first, with Linux x86_64 and Rust 1.99.1 validated.
 
 The product version is **0.1.0**. The experimental topology JSON schema is **0.2**;
 IDs can change when inputs change, and exhaustive consumers must support the
-condition/action kinds. See [JSON_FORMAT.md](JSON_FORMAT.md).
+condition/action kinds. See [JSON_FORMAT.md](https://github.com/marawan6569/Nasj/blob/v0.1.0/docs/JSON_FORMAT.md).
 
 ## Install from source
-
-After the v0.1.0 tag is published:
 
 ```sh
 git clone --branch v0.1.0 https://github.com/marawan6569/Nasj.git
@@ -31,7 +27,6 @@ nasj --version
 nasj map --config fixtures/nginx/multi-vhost.conf --strict --format html -o report.html
 ```
 
-Until publication, use the default-branch instructions in [README.md](../README.md).
 A Rust toolchain and native linker are required. Dependencies must be fetched
 during building unless already cached; installed mapping and reports work offline.
 No binaries or crates.io package are included in this distribution.
@@ -46,7 +41,7 @@ No binaries or crates.io package are included in this distribution.
 - Variable proxy destinations, unsupported conditions, rewrite/internal-redirect
   programs, FastCGI/uWSGI/SCGI/gRPC handlers and other excluded constructs remain
   unresolved. Conditional support is limited to server-level literal comparisons
-  with a single return per condition. See [ANALYSIS.md](ANALYSIS.md).
+  with a single return per condition. See [ANALYSIS.md](https://github.com/marawan6569/Nasj/blob/v0.1.0/docs/ANALYSIS.md).
 - Configuration paths, infrastructure names and endpoints may be sensitive.
   Known-field redaction does not guarantee all secrets are removed; review reports
   before sharing. Use trusted snapshots for concurrently mutable untrusted trees.
@@ -60,4 +55,4 @@ No binaries or crates.io package are included in this distribution.
 **v0.2:** optional Docker/systemd/process discovery with explicit evidence.
 **v0.3:** an optional local web server. Neither is part of v0.1.0.
 
-Licensed under [MIT](../LICENSE). See [distribution and notices](DISTRIBUTION.md).
+Licensed under [MIT](https://github.com/marawan6569/Nasj/blob/v0.1.0/LICENSE). See [source distribution notices](https://github.com/marawan6569/Nasj/blob/v0.1.0/THIRD_PARTY_NOTICES.md).

@@ -2,9 +2,12 @@
 
 ## Unreleased
 
-No changes beyond the v0.1.0 candidate are scheduled for this release.
+Post-release documentation tracks the published release and the main development branch.
 
-## 0.1.0 — prepared, not yet published
+## [0.1.0](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0) — 2026-10-27
+
+First official source-first release, published at 03:27:17 UTC from
+`b60cb2e045fc9476034bffba7967b8674825fa18` under the immutable `v0.1.0` tag.
 
 - Rust CLI with bounded Nginx parsing, recursive/glob includes and source-file/line evidence.
 - HTTP/HTTPS virtual hosts, locations, upstreams, reverse proxies and static paths.
@@ -17,6 +20,5 @@ No changes beyond the v0.1.0 candidate are scheduled for this release.
 - Official NASJ (نسج) branding, English/Arabic READMEs and synthetic report preview.
 - Parser/include/routing/security fixtures, exporter goldens and offline Chromium CI.
 
-The implementation is merged into main. No release date or public publication is
-claimed. See the [prepared release notes](docs/RELEASE_NOTES_v0.1.0.md) for scope
-and limitations. Optional discovery (v0.2) and a local server (v0.3) remain planned.
+See the [published release notes](docs/RELEASE_NOTES_v0.1.0.md) for scope and
+limitations. Optional discovery (v0.2) and a local server (v0.3) remain planned.

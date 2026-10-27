@@ -1,10 +1,11 @@
 # NASJ implementation plan
 
-Current status (2026-10-27): the complete #1/#8–#19 stack is merged into main.
-Public v0.1.0 publication awaits separate approval; branch protection is explicitly
-deferred. The earlier sections below are historical records of their stated
-commits, test counts and permissions, superseded by the release-preparation entry
-and [current readiness](RELEASE_READINESS.md).
+Current status (2026-10-27): [NASJ v0.1.0 is officially released](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0)
+at `b60cb2e045fc9476034bffba7967b8674825fa18`. Main is the default development
+branch; the release tag is immutable. Branch protection remains explicitly deferred.
+The earlier sections below preserve historical commits, test counts, permissions
+and former blockers; current publication evidence is in the final execution-log
+entry and [release readiness](RELEASE_READINESS.md).
 
 Assessed 2026-10-26 against bootstrap `de99e0b`, draft PR #1 and issues #2–#7.
 This is an execution plan, not a claim that the milestones have shipped. Issues

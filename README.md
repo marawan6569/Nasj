@@ -12,9 +12,9 @@
 </p>
 <p align="center">Rust · MIT · Linux validated · <a href="README.ar.md">اقرأ بالعربية</a></p>
 
-> **v0.1.0 preparation.** The implementation is merged into `main`; public
-> publication awaits maintainer approval. No release, downloadable binaries or
-> crates.io package has been published.
+> **NASJ v0.1.0 is officially released.** [Release notes and source downloads](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
+> This is a source-first release with SHA-256 checksums; binaries and a crates.io
+> package are not distributed.
 
 Nginx routes can span virtual hosts, nested locations and included files. NASJ
 brings those declarations into one map: follow a domain to its server and proxy
@@ -37,10 +37,10 @@ back to its configuration source. Unresolved routing stays visible as uncertaint
 ## Quick start
 
 Install a stable [Rust toolchain](https://rustup.rs) and native linker, then build
-from the official default branch:
+from `main`, the official default development branch:
 
 ```sh
-git clone https://github.com/marawan6569/Nasj.git
+git clone --branch main https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 nasj --help
@@ -52,6 +52,18 @@ fixtures and emits two informational notices for optional empty includes.
 Make sure Cargo's bin directory is on `PATH`. Linux x86_64 with Rust 1.99.1 is
 validated; older Rust versions and other platforms are not yet verified. Runtime
 mapping needs no Graphviz, Python, Node.js, network connection or running Nginx.
+
+For the specific released version, use the immutable `v0.1.0` tag instead:
+
+```sh
+git clone --branch v0.1.0 https://github.com/marawan6569/Nasj.git Nasj-v0.1.0
+cd Nasj-v0.1.0
+cargo install --locked --path crates/nasj-cli
+nasj --version
+```
+
+Building may fetch Rust dependencies; the installed mapping CLI and HTML reports
+work offline. `main` continues development while `v0.1.0` remains fixed.
 
 ## Explore a configuration
 
@@ -76,7 +88,7 @@ explicitly indicate incomplete context; Fit view and Readable scale remain avail
 
 [![Synthetic report: backend search retains domains, virtual host, location and upstream](docs/images/report-preview.png)](docs/images/report-preview.png)
 
-*Preview generated from repository fixtures. Source paths are normalized for this
+*Screenshot generated from repository fixtures. Source paths are normalized for this
 public screenshot; no production configuration or report was used.*
 
 ## Scope and safety
@@ -101,13 +113,13 @@ restrictive CSP and makes no external requests. Read the [security policy](SECUR
 | [JSON schema 0.2](docs/JSON_FORMAT.md) | Canonical structures, evidence and compatibility |
 | [Reports](docs/REPORTS.md) | Formats, interaction, offline security and browser tests |
 | [Official assets](assets/logos/README.md) | Approved originals, display variants and provenance |
-| [Release readiness](docs/RELEASE_READINESS.md) · [checklist](docs/RELEASE_CHECKLIST.md) | Merge evidence, publication decisions and verification |
-| [v0.1.0 release notes](docs/RELEASE_NOTES_v0.1.0.md) · [distribution](docs/DISTRIBUTION.md) | Prepared notes and source packaging |
+| [Release readiness](docs/RELEASE_READINESS.md) · [checklist](docs/RELEASE_CHECKLIST.md) | Merge, publication and verification evidence |
+| [v0.1.0 release notes](docs/RELEASE_NOTES_v0.1.0.md) · [distribution](docs/DISTRIBUTION.md) | Published release and source verification |
 | [Specification](docs/SPEC.md) · [implementation plan](docs/IMPLEMENTATION_PLAN.md) | Requirements and implementation history |
 
 ## Roadmap and contributing
 
-**v0.1** implements static mapping and offline reports on `main`, pending publication.
+**v0.1.0** delivers static mapping and offline reports; `main` is the development branch.
 **v0.2** plans optional Docker/systemd/process correlation with evidence;
 **v0.3** plans an optional local server. Discovery and the server are **not implemented**.
 See the [roadmap](docs/ROADMAP.md) for scope.

@@ -17,17 +17,17 @@
 - v0.2 adds opt-in Docker/systemd/process correlation and confidence/provenance.
 - v0.3 adds an optional localhost web dashboard.
 
-## Implementation status (v0.1.0 preparation)
+## Implementation status (v0.1.0)
 
 Main now contains bounded generic syntax parsing, recursive/glob
 include resolution, conservative HTTP topology analysis, versioned JSON/DOT,
 native SVG and standalone interactive HTML. A separate `demo` remains synthetic.
 Workspace gates, fixtures/goldens and Chromium offline checks validate the implementation.
-The complete PR stack is merged; public v0.1.0 publication remains unapproved.
+The complete PR stack is merged; [v0.1.0 is published](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
 
 See [ANALYSIS.md](ANALYSIS.md) for supported semantics, read scope and resource
 limits; [REPORTS.md](REPORTS.md) for report behavior; and
-[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for outstanding release decisions.
+[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for release verification evidence.
 The parser is not a replacement for `nginx -t`. Embedded languages, full request
 matching and arbitrary variable/secret evaluation are unsupported. Unsupported
 routing remains unresolved. The schema remains experimental until reviewed.

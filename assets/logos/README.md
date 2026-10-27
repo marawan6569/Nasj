@@ -27,7 +27,7 @@ The transport ZIP is retained locally and ignored by Git; it is not distributed.
 | [logo_app_icon_color.png](originals/logo_app_icon_color.png) | 1254×1254, RGB, opaque | Navy rounded-square app icon with light outer canvas; source for report favicon | Yes |
 | `logo_primary_full_color.png` | 1254×1254, RGB, opaque | Color wordmark on light canvas; redundant for current display uses | Archive only |
 | `logo_primary_monochrome_dark.png` | 1254×1254, RGB, opaque | Dark wordmark on light canvas; optional print variant | Archive only |
-| `logo_app_icon_monochrome.png` | 1254×1254, RGB, opaque | White mark on navy app icon; alternate not used by this preview | Archive only |
+| `logo_app_icon_monochrome.png` | 1254×1254, RGB, opaque | White mark on navy app icon; alternate not used by v0.1.0 | Archive only |
 
 The unused opaque alternatives were not copied into Git. App-icon availability
 is branding material, not a claim that a desktop app or server is implemented.
@@ -70,4 +70,4 @@ alt text, test themes/no-JS/moved-file behavior and reject injected images.
 
 Branding is integrated on main through [PR #19](https://github.com/marawan6569/Nasj/pull/19),
 satisfying the asset criteria in [issue #6](https://github.com/marawan6569/Nasj/issues/6).
-Public release publication remains a separate maintainer decision.
+The approved assets are included in the published [v0.1.0 source release](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).

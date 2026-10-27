@@ -1,7 +1,7 @@
 # Architecture
 
-NASJ is a synchronous, CLI-first static analyzer. The v0.1.0 implementation is
-merged into main and awaits public release approval. The CLI and offline reports
+NASJ is a synchronous, CLI-first static analyzer. [v0.1.0](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0)
+is published; main is the default development branch. The CLI and offline reports
 work independently of any web server.
 
 ```text

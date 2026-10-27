@@ -1,35 +1,48 @@
-# v0.1.0 source distribution and publication
+# v0.1.0 source distribution
 
-The chosen distribution is source-first: tracked NASJ files, including LICENSE,
-[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md), lockfiles and the dependency
-inventory. No binary, vendored dependencies, reports from deployments, source-logo
-transport ZIP, browser caches or Python environment is included. GitHub also
-provides automatic source archives once a release tag is approved and pushed.
+[NASJ v0.1.0](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0) was published
+on 2026-10-27 at 03:27:17 UTC. The annotated tag is fixed at
+`b60cb2e045fc9476034bffba7967b8674825fa18`. Main is the default development
+branch; the READMEs use main for Quick Start and offer this tag as the pinned alternative.
 
-All three workspace packages are version 0.1.0 and declare MIT. The isolated
-parser spike is a development tool at 0.0.0, covered by the repository license;
-it is not a release package. Path-only internal dependencies are appropriate for
-source installation; they have not been prepared for crates.io publication.
+The source-first distribution contains tracked NASJ files, including LICENSE,
+[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md), lockfiles, approved branding,
+English/Arabic documentation and synthetic fixtures. It includes no compiled
+executable, vendored dependencies, deployment reports, branding transport ZIP,
+browser cache or Python environment. Exactly two custom assets were published:
 
-Linux x86_64 with Rust/Cargo 1.99.1 is validated. `rust-toolchain.toml` follows
-stable; no minimum supported Rust version has been established. For the tested
-toolchain explicitly use `cargo +1.99.1`. No non-Linux, cross-compiled or portable
-binary claim is made. Native linking tools and build-time dependency access or a
-populated Cargo cache are required. Running the installed CLI needs no Nginx,
-Graphviz, Python, network or server.
+| Asset | Purpose |
+| --- | --- |
+| [nasj-v0.1.0-source.tar.gz](https://github.com/marawan6569/Nasj/releases/download/v0.1.0/nasj-v0.1.0-source.tar.gz) | Verified 119-file source archive |
+| [SHA256SUMS](https://github.com/marawan6569/Nasj/releases/download/v0.1.0/SHA256SUMS) | SHA-256 for that custom archive |
 
-## Validate a clean source checkout
+Archive SHA-256:
+`bc72c99f211c7d15ec77bbe683566d63d3f42bca8a6398682ae4081da34275bc`.
+Both files were downloaded without authentication after publication. The checksum
+passed and every archived file matched the approved Git tree. GitHub's automatic
+source archives are separate downloads; byte equality with our custom archive
+has not been asserted. Release archives preserve the original commit's documents;
+current project-status updates live on main without altering the published tag.
 
-Use the exact final main SHA from the release-preparation PR's final validation
-comment, rather than assuming the current branch tip is still that candidate:
+All three workspace packages are version 0.1.0/MIT. The isolated parser spike is
+a development tool at 0.0.0, covered by the repository license, and is not a release
+package. Internal dependencies use local paths and are not prepared for crates.io.
+Linux x86_64 with Rust/Cargo 1.99.1 is validated. The toolchain file follows stable;
+no older-Rust MSRV, non-Linux or portable-binary claim is made. Building requires
+a native linker and may fetch dependencies; installed mapping and HTML work offline.
+
+## Download and verify the published source
+
+Use a new temporary directory:
 
 ```sh
-git clone https://github.com/marawan6569/Nasj.git nasj-release-check
-cd nasj-release-check
-git checkout --detach APPROVED_MAIN_SHA
-git status --porcelain
-rustc --version
-cargo --version
+nasj_download_dir=$(mktemp -d /tmp/nasj-download-XXXXXX)
+cd "$nasj_download_dir"
+curl -fLO https://github.com/marawan6569/Nasj/releases/download/v0.1.0/nasj-v0.1.0-source.tar.gz
+curl -fLO https://github.com/marawan6569/Nasj/releases/download/v0.1.0/SHA256SUMS
+sha256sum --check SHA256SUMS
+tar -xzf nasj-v0.1.0-source.tar.gz
+cd nasj-v0.1.0
 nasj_install_root=$(mktemp -d /tmp/nasj-install-XXXXXX)
 cargo install --locked --path crates/nasj-cli --root "$nasj_install_root"
 "$nasj_install_root/bin/nasj" --version
@@ -38,55 +51,33 @@ cargo install --locked --path crates/nasj-cli --root "$nasj_install_root"
   --strict --format html -o "$nasj_install_root/report.html"
 ```
 
-Run the complete [release checklist](RELEASE_CHECKLIST.md) on that commit too.
-All published examples/evidence must remain synthetic. The CLI creates private
-reports on Unix and refuses existing outputs; those are not release assets.
+The installed version is `nasj 0.1.0`. The synthetic fixture emits two Info notices,
+which strict mode permits. Reports are not release assets. A checksum validates
+bytes, not authorship or binary build reproducibility; no signing claim is made.
 
-## Prepare an archive locally (no tag or upload)
-
-Set `nasj_release_sha` to the verified final main SHA. In a clean checkout:
+## Verify the immutable tag checkout
 
 ```sh
-nasj_release_sha=APPROVED_MAIN_SHA
-test -z "$(git status --porcelain)"
-nasj_dist_dir=$(mktemp -d /tmp/nasj-v0.1.0-dist-XXXXXX)
-git archive --format=tar.gz --prefix=nasj-v0.1.0/ \
-  -o "$nasj_dist_dir/nasj-v0.1.0-source.tar.gz" "$nasj_release_sha"
-tar -tzf "$nasj_dist_dir/nasj-v0.1.0-source.tar.gz"
-(cd "$nasj_dist_dir" && sha256sum nasj-v0.1.0-source.tar.gz > SHA256SUMS)
-(cd "$nasj_dist_dir" && sha256sum --check SHA256SUMS)
+git clone --branch v0.1.0 https://github.com/marawan6569/Nasj.git nasj-release-check
+cd nasj-release-check
+git rev-parse HEAD
+cargo install --locked --path crates/nasj-cli
+nasj --version
 ```
 
-Verify the extracted archive installs with the same locked source command and
-contains the licensing files. Preserve the SHA, toolchain and checksums alongside
-the local archive. A checksum verifies bytes, not authorship or build reproducibility.
-No signing or reproducible binary claim is made. Binary archives need a separate
-notice bundle and platform validation before they can be considered for publication.
+HEAD must equal `b60cb2e045fc9476034bffba7967b8674825fa18`. An annotated-tag
+clone checks out detached HEAD; main remains the development branch. Fresh source
+installation from the archive and public tag, help/version, strict mode and all
+four formats were verified with synthetic input. The release SHA's full Cargo,
+parser, CSP, branding and offline Chromium results are linked in
+[release readiness](RELEASE_READINESS.md).
 
-## Final maintainer approval, then publication
+## Future distribution changes
 
-**Do not run this section until the maintainer explicitly approves public
-publication of the exact final SHA.** Review [release notes](RELEASE_NOTES_v0.1.0.md),
-schema 0.2, platform/security limitations and final Actions first. Branch protection
-configuration is explicitly deferred and is not a publication prerequisite.
-
-With GitHub CLI authenticated, from the approved checkout, replace both values:
-
-```sh
-nasj_release_sha=APPROVED_MAIN_SHA
-nasj_dist_dir=VERIFIED_LOCAL_ARCHIVE_DIRECTORY
-git fetch origin
-git cat-file -e "$nasj_release_sha^{commit}"
-git tag -a v0.1.0 "$nasj_release_sha" -m "NASJ v0.1.0"
-git push origin refs/tags/v0.1.0
-gh release create v0.1.0 --repo marawan6569/Nasj --verify-tag \
-  --title "NASJ v0.1.0" --notes-file docs/RELEASE_NOTES_v0.1.0.md \
-  "$nasj_dist_dir/nasj-v0.1.0-source.tar.gz" "$nasj_dist_dir/SHA256SUMS"
-```
-
-Remove the preparation-only opening sentence from the notes file used for actual
-publication. Alternatively, after approving/pushing that tag, use GitHub → Releases
-→ Draft a new release, select existing `v0.1.0`, paste the prepared notes, attach
-the verified source archive/checksums and review before selecting **Publish release**.
-Do not publish crates or binaries. Do not reuse a moved tag or silently substitute
-a newer main commit; revalidate changed candidates.
+Never move, replace or recreate the v0.1.0 tag or its verified assets. Main may
+advance through reviewed PRs. New product versions require separate maintainer
+approval and exact-commit validation. Binary or vendored distributions additionally
+need target validation and full dependency notices, including Unicode-3.0; no
+binary, reproducible-build, signing or vulnerability-audit certification is claimed.
+Branch protection remains a deferred repository-hardening task. Discovery (v0.2)
+and a local server (v0.3) are planned and absent from v0.1.0.
