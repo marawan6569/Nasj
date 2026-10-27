@@ -12,9 +12,9 @@
 </p>
 <p align="center">Rust · MIT · Linux validated · <a href="README.ar.md">اقرأ بالعربية</a></p>
 
-> **NASJ v0.1.0 is officially released.** [Release notes and source downloads](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
-> This is a source-first release with SHA-256 checksums; binaries and a crates.io
-> package are not distributed.
+> **NASJ v0.1.0 is officially released.** [Release notes and downloads](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
+> Precompiled Linux x86_64 and ARM64 archives, Debian packages and source downloads
+> are available with SHA-256 checksums. No crates.io package is distributed.
 
 Nginx routes can span virtual hosts, nested locations and included files. NASJ
 brings those declarations into one map: follow a domain to its server and proxy
@@ -34,78 +34,86 @@ back to its configuration source. Unresolved routing stays visible as uncertaint
 - **Read-only operation:** no configuration changes, Nginx reloads, privilege
   escalation, telemetry or automatic network discovery.
 
-## Quick start
+## Quick start: Linux binary (recommended)
 
-Install a stable [Rust toolchain](https://rustup.rs) and native linker, then build
-from `main`, the official default development branch:
+Precompiled **x86_64 and ARM64 (aarch64)** archives and Debian packages are
+[available for v0.1.0](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
+No Rust toolchain is needed. Both architectures passed native runtime checks on
+**Ubuntu 22.04 and Debian 12**. These are dynamically linked GNU/Linux binaries;
+Linux Mint and other distributions need separate validation. See
+[distribution and checksums](docs/DISTRIBUTION.md) for exact runtime requirements.
+
+Download and install the archive matching your machine into your user account:
 
 ```sh
-git clone --branch main https://github.com/marawan6569/Nasj.git
-cd Nasj
-cargo install --locked --path crates/nasj-cli
-nasj --help
-nasj map --config fixtures/nginx/multi-vhost.conf --strict --format html -o report.html
+case "$(uname -m)" in
+  x86_64) nasj_arch=x86_64 ;;
+  aarch64|arm64) nasj_arch=aarch64 ;;
+  *) echo "Unsupported architecture" >&2; exit 1 ;;
+esac
+nasj_download_dir=$(mktemp -d /tmp/nasj-download-XXXXXX)
+cd "$nasj_download_dir"
+nasj_release_url=https://github.com/marawan6569/Nasj/releases/download/v0.1.0
+curl -fLO "$nasj_release_url/nasj-v0.1.0-linux-$nasj_arch.tar.gz"
+curl -fLO "$nasj_release_url/SHA256SUMS-binaries"
+sha256sum --ignore-missing --check SHA256SUMS-binaries
+tar -xzf "nasj-v0.1.0-linux-$nasj_arch.tar.gz"
+install -Dm755 "nasj-v0.1.0-linux-$nasj_arch/nasj" "$HOME/.local/bin/nasj"
+"$HOME/.local/bin/nasj" --version
+"$HOME/.local/bin/nasj" --help
 ```
 
-Open `report.html` directly in your browser. This example uses only synthetic
-fixtures and emits two informational notices for optional empty includes.
-Make sure Cargo's bin directory is on `PATH`. Linux x86_64 with Rust 1.99.1 is
-validated; older Rust versions and other platforms are not yet verified. Runtime
-mapping needs no Graphviz, Python, Node.js, network connection or running Nginx.
+Run each step only if the previous one succeeds; the intended archive must report
+`OK`. Add `~/.local/bin` to `PATH` to run `nasj` directly. Keep the bundled notices
+with any redistributed copies. Mapping and HTML reports work offline; runtime
+mapping needs no Graphviz, Python, Node.js or running Nginx.
 
-For the specific released version, use the immutable `v0.1.0` tag instead:
+### Debian / Ubuntu package
+
+Use a fresh directory and select the package matching `dpkg --print-architecture`:
+
+```sh
+nasj_deb_arch=$(dpkg --print-architecture)
+case "$nasj_deb_arch" in amd64|arm64) ;; *) echo "Unsupported architecture" >&2; exit 1 ;; esac
+nasj_download_dir=$(mktemp -d /tmp/nasj-deb-XXXXXX)
+cd "$nasj_download_dir"
+nasj_release_url=https://github.com/marawan6569/Nasj/releases/download/v0.1.0
+curl -fLO "$nasj_release_url/nasj_0.1.0_$nasj_deb_arch.deb"
+curl -fLO "$nasj_release_url/SHA256SUMS-binaries"
+sha256sum --ignore-missing --check SHA256SUMS-binaries
+sudo apt install "./nasj_0.1.0_$nasj_deb_arch.deb"
+nasj --version
+# Remove when needed: sudo apt remove nasj
+```
+
+The package version is `0.1.0-1`; the CLI reports `nasj 0.1.0`. Dependencies are
+`libc6 (>= 2.34)` and `libgcc-s1 (>= 4.2)`. The lowest tested glibc is 2.35 on
+Ubuntu 22.04; symbol requirements alone do not prove compatibility elsewhere.
+Package installation/removal requires administrator privileges; ordinary mapping
+does not. Checksums verify bytes, not signing or reproducible builds.
+
+### Install from source
+
+Install a stable [Rust toolchain](https://rustup.rs) and native linker. For the
+immutable release:
 
 ```sh
 git clone --branch v0.1.0 https://github.com/marawan6569/Nasj.git Nasj-v0.1.0
 cd Nasj-v0.1.0
 cargo install --locked --path crates/nasj-cli
 nasj --version
+nasj map --config fixtures/nginx/multi-vhost.conf --strict --format html -o report.html
 ```
 
-Building may fetch Rust dependencies; the installed mapping CLI and HTML reports
-work offline. `main` continues development while `v0.1.0` remains fixed.
+Open `report.html` directly in your browser. This uses synthetic fixtures and
+emits two informational notices for optional empty includes. Make sure Cargo's
+bin directory is on `PATH`. Source builds were validated with Rust 1.99.1 on both
+Linux architectures; older Rust versions and non-Linux platforms remain unverified.
+Building may fetch dependencies; installed mapping works offline.
 
-## Linux installation
-
-**Binary downloads are staged for review and are not public yet.** Keep using
-the working source quick start above until a maintainer approves publication.
-The release page currently provides source assets only. See
-[distribution and validation](docs/DISTRIBUTION.md) for compatibility evidence.
-
-1. **Recommended after publication: precompiled archive (no Rust).** Download
-   the archive for your architecture and `SHA256SUMS-binaries` from the
-   [release page](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0).
-   The following commands are staged examples for those future downloads:
-
-   ```sh
-   # x86_64; use linux-aarch64 for a validated ARM64 release instead
-   sha256sum --ignore-missing --check SHA256SUMS-binaries
-   tar -xzf nasj-v0.1.0-linux-x86_64.tar.gz
-   install -Dm755 nasj-v0.1.0-linux-x86_64/nasj "$HOME/.local/bin/nasj"
-   "$HOME/.local/bin/nasj" --version
-   ```
-
-   Check that the intended archive was reported `OK`; put `~/.local/bin` on
-   `PATH`. Keep the bundled notices with any redistributed copies.
-
-2. **Debian / Ubuntu / Linux Mint, after publication.** Download the package
-   matching your system architecture (`dpkg --print-architecture`) and the
-   binary checksum file from the same release page. For amd64:
-
-   ```sh
-   sha256sum --ignore-missing --check SHA256SUMS-binaries
-   sudo apt install ./nasj_0.1.0_amd64.deb
-   nasj --version
-   # Remove when needed: sudo apt remove nasj
-   ```
-
-   Use `nasj_0.1.0_arm64.deb` only when its native validation and publication
-   are confirmed. A compatible glibc and libgcc are required; package management
-   checks the derived dependencies. Linux Mint itself requires separate validation.
-
-3. **Build from source, available now.** Use the Cargo-based quick start above
-   (`main` for development, immutable `v0.1.0` for that release). Building needs
-   Rust and a linker; running an installed binary does not.
+For development, clone `--branch main` instead. `main` remains the default
+development branch; `v0.1.0` stays fixed at
+`b60cb2e045fc9476034bffba7967b8674825fa18`.
 
 ## Explore a configuration
 
@@ -156,7 +164,7 @@ restrictive CSP and makes no external requests. Read the [security policy](SECUR
 | [Reports](docs/REPORTS.md) | Formats, interaction, offline security and browser tests |
 | [Official assets](assets/logos/README.md) | Approved originals, display variants and provenance |
 | [Release readiness](docs/RELEASE_READINESS.md) · [checklist](docs/RELEASE_CHECKLIST.md) | Merge, publication and verification evidence |
-| [v0.1.0 release notes](docs/RELEASE_NOTES_v0.1.0.md) · [distribution](docs/DISTRIBUTION.md) | Published release and source verification |
+| [v0.1.0 release notes](docs/RELEASE_NOTES_v0.1.0.md) · [distribution](docs/DISTRIBUTION.md) | Linux packages, source and verification |
 | [Specification](docs/SPEC.md) · [implementation plan](docs/IMPLEMENTATION_PLAN.md) | Requirements and implementation history |
 
 ## Roadmap and contributing

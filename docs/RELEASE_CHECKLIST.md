@@ -1,22 +1,24 @@
 # NASJ v0.1.0 release checklist
 
-## Binary backfill preparation (separate from completed source release)
+## Completed Linux binary publication
 
-Binary assets are not yet public. Use the
+Both architectures are public and independently verified. Use the
 [tooling procedure](../tools/release/README.md) and
 [validation report](BINARY_VALIDATION_v0.1.0.md).
 
 - [x] Annotated tag and approved SHA verified; all packages match release version.
 - [x] Native x86_64 locked tests/build, ELF/GLIBC inspection, archive and Debian package pass.
-- [x] Native ARM64 equivalent checks pass, or ARM64 is explicitly deferred.
+- [x] Native ARM64 equivalent checks pass.
 - [x] Full locked dependency and Rust library notices reviewed and physically bundled.
 - [x] lintian passes; clean native Ubuntu/Debian archive/install/four exports/removal pass.
 - [x] Checksums verified after packaging and transfer; provenance/size/hash report reviewed.
-- [x] Existing main CI stays green; bilingual pending installation instructions agree.
-- [ ] Maintainer reviews and merges tooling PR; dispatch preparation on approved main tooling SHA.
-- [ ] Configure protected `release-binaries` environment and approve concrete selected assets.
-- [ ] Separately dispatch/approve additive publication; never replace original assets, tags or notes.
-- [ ] Download public binaries and verify; then update availability docs in both languages.
+- [x] Existing main CI stays green; bilingual published installation instructions agree.
+- [x] Maintainer merged tooling PR #22; approved main preparation 40490972772 passed.
+- [x] Protected `release-binaries` requires maintainer reviewers and main-only deployment.
+- [x] Separately approved additive publication 40493732081 passed; no original asset or tag changed.
+- [x] All nine public downloads match expected bytes; no unexpected assets or release changes.
+- [x] Release description announces availability, preserving original features and limitations.
+- [x] Availability documentation updated in both languages; source installation retained.
 
 ## Completed source release
 
@@ -86,7 +88,7 @@ license inclusion and SHA-256 verification. GitHub Actions must pass for the fin
 main SHA, not only the PR head. The release-preparation PR's final validation
 comment is the authoritative record for these final checks and its merge SHA.
 
-## Publication completed
+## Original source publication completed
 
 - [x] Maintainer authorized the exact release SHA, source-first notes and documented limits.
 - [x] Annotated v0.1.0 tag created, pushed and verified at the approved commit.
@@ -99,7 +101,7 @@ comment is the authoritative record for these final checks and its merge SHA.
 The existing tag and assets are fixed. New versions require separate review and
 publication authorization; never recreate or replace v0.1.0.
 
-Do not publish crates/binaries, configure branch protection, delete historical
-branches or close unrelated/future issues. Planned v0.2 discovery and v0.3 server
-must not appear as delivered features. A binary release, reproducible-build claim,
-signing or vulnerability-audit claim requires additional evidence and approval.
+Do not publish additional assets/versions without approval, configure branch
+protection, delete historical branches or close unrelated/future issues. Planned
+v0.2 discovery and v0.3 server must not appear as delivered features. Reproducible
+builds, signing and vulnerability-audit claims require separate evidence and approval.

@@ -1,20 +1,53 @@
 # v0.1.0 distribution
 
-**The published release remains source-only. Linux binaries are staged for
-review; no binary download links are live.** See the
-[binary validation report](BINARY_VALIDATION_v0.1.0.md) for actual results and
-[release tooling](../tools/release/README.md) for build/backfill procedures.
+**Precompiled Linux x86_64 and ARM64 archives and Debian packages are published.**
+They are the recommended installation option; Rust is needed only for source builds.
+Both architectures passed native Ubuntu 22.04 and Debian 12 runtime validation.
+See the [binary validation report](BINARY_VALIDATION_v0.1.0.md) for public hashes,
+provenance and limits, and [release tooling](../tools/release/README.md) for procedures.
 
 [NASJ v0.1.0](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0) was published
 on 2026-10-27 at 03:27:17 UTC. The annotated tag is fixed at
 `b60cb2e045fc9476034bffba7967b8674825fa18`. Main is the default development
-branch; the READMEs use main for Quick Start and offer this tag as the pinned alternative.
+branch. The READMEs recommend Linux downloads and retain source installation
+from the immutable tag, with main as the development option.
 
-The source-first distribution contains tracked NASJ files, including LICENSE,
+## Recommended Linux downloads
+
+The maintainer-approved [publication run 40493732081](https://github.com/marawan6569/Nasj/actions/runs/40493732081)
+added exactly seven assets on 2026-10-27 at 11:13:41 UTC, using
+[preparation run 40490972772](https://github.com/marawan6569/Nasj/actions/runs/40490972772)
+and tooling commit `dd28da2d7a2320832f76b8d8519344157a338dc4`.
+
+| Architecture | Archive | Debian package |
+| --- | --- | --- |
+| x86_64 / amd64 | [nasj-v0.1.0-linux-x86_64.tar.gz](https://github.com/marawan6569/Nasj/releases/download/v0.1.0/nasj-v0.1.0-linux-x86_64.tar.gz) | [nasj_0.1.0_amd64.deb](https://github.com/marawan6569/Nasj/releases/download/v0.1.0/nasj_0.1.0_amd64.deb) |
+| ARM64 / aarch64 | [nasj-v0.1.0-linux-aarch64.tar.gz](https://github.com/marawan6569/Nasj/releases/download/v0.1.0/nasj-v0.1.0-linux-aarch64.tar.gz) | [nasj_0.1.0_arm64.deb](https://github.com/marawan6569/Nasj/releases/download/v0.1.0/nasj_0.1.0_arm64.deb) |
+
+Download [SHA256SUMS-binaries](https://github.com/marawan6569/Nasj/releases/download/v0.1.0/SHA256SUMS-binaries)
+into a fresh directory with the chosen package. Run
+`sha256sum --ignore-missing --check SHA256SUMS-binaries` and require `OK` for the
+intended file before extraction or installation. The manifest also covers
+[build-x86_64.json](https://github.com/marawan6569/Nasj/releases/download/v0.1.0/build-x86_64.json)
+and [build-aarch64.json](https://github.com/marawan6569/Nasj/releases/download/v0.1.0/build-aarch64.json).
+For all six covered files, download both architectures and provenance files,
+then run `sha256sum --check SHA256SUMS-binaries` without ignoring missing files.
+The manifest's own hash is recorded in the validation report.
+
+Follow the tested [English installation commands](../README.md#quick-start-linux-binary-recommended)
+or [Arabic guide](../README.ar.md). Archives install under your user account;
+Debian packages use `sudo apt install ./nasj_0.1.0_amd64.deb` (or `arm64`) and
+`sudo apt remove nasj`. Package version is `0.1.0-1`; the CLI reports `nasj 0.1.0`.
+Package management needs administrator privileges; normal mapping does not.
+Keep the bundled notices with redistributed copies. There is no crates.io package.
+
+## Preserved source distribution
+
+The original source archive contains tracked NASJ files, including LICENSE,
 [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md), lockfiles, approved branding,
 English/Arabic documentation and synthetic fixtures. It includes no compiled
 executable, vendored dependencies, deployment reports, branding transport ZIP,
-browser cache or Python environment. Exactly two custom assets were published:
+browser cache or Python environment. Its two original release assets remain unchanged:
 
 | Asset | Purpose |
 | --- | --- |
@@ -32,7 +65,8 @@ current project-status updates live on main without altering the published tag.
 All three workspace packages are version 0.1.0/MIT. The isolated parser spike is
 a development tool at 0.0.0, covered by the repository license, and is not a release
 package. Internal dependencies use local paths and are not prepared for crates.io.
-Linux x86_64 with Rust/Cargo 1.99.1 is validated. The toolchain file follows stable;
+Linux x86_64 and ARM64 source builds with Rust/Cargo 1.99.1 are validated.
+The repository toolchain file follows stable;
 no older-Rust MSRV, non-Linux or portable-binary claim is made. Building requires
 a native linker and may fetch dependencies; installed mapping and HTML work offline.
 
@@ -82,12 +116,12 @@ parser, CSP, branding and offline Chromium results are linked in
 Never move, replace or recreate the v0.1.0 tag or its verified assets. Main may
 advance through reviewed PRs. New product versions require separate maintainer
 approval and exact-commit validation. Binary or vendored distributions additionally
-need target validation and full dependency notices, including Unicode-3.0; no
-binary, reproducible-build, signing or vulnerability-audit certification is claimed.
+need target validation and full dependency notices, including Unicode-3.0.
+No reproducible-build, signing or vulnerability-audit certification is claimed.
 Branch protection remains a deferred repository-hardening task. Discovery (v0.2)
 and a local server (v0.3) are planned and absent from v0.1.0.
 
-## Prepared Linux binary formats
+## Published Linux binary formats
 
 | Rust target | Native build runner | Archive | Debian package (version 0.1.0-1) |
 | --- | --- | --- | --- |
@@ -130,10 +164,19 @@ not public assets. Checksums are checked after packaging, job transfers and
 before publication; uploaded files are downloaded and checked again. A checksum
 does not establish publisher identity, signing or binary reproducibility.
 
-## After publication
+<a id="after-publication"></a>
 
-Only after approved assets have been publicly downloaded and checked, replace
-the pending wording in both READMEs with actual availability and validated
-architectures, add direct commands for existing downloads and link the successful
-run here. Keep source installation working and main as the development branch.
-This documentation follow-up needs no tag rewrite or release-note replacement.
+## Public verification and release description
+
+All nine custom public assets were independently downloaded without authentication.
+The seven new files match the selected preparation artifact byte for byte; both
+original source assets retain their IDs, sizes, digests and timestamps. The
+annotated tag object and product commit are unchanged. No unexpected assets,
+release identity changes or concurrent note changes were found. Asset upload
+advanced the release update timestamp; its original publication time is unchanged.
+
+After these checks, the release description was updated to announce Linux binary
+availability and tested installation guidance. Its original feature descriptions,
+source instructions, security limitations and roadmap were preserved. The source
+archive and tag still contain their historical documents; current availability
+instructions live on main. See the [verification record](BINARY_VALIDATION_v0.1.0.md#public-verification).
