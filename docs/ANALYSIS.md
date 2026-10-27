@@ -20,6 +20,8 @@ Budgets: 4 MiB/file, 16 MiB total reads, 1024 file expansions, 32 include levels
 64 combined syntax levels, 200,000 syntax tokens/file. Limits fail without a
 partial report. No configuration is modified. Output files use create-new and
 refuse existing files/symlinks, protecting configuration and previous reports.
+On Unix, newly created reports use mode 0600. Warnings are also printed to stderr,
+including in strict mode, with escaped source paths and fixed diagnostic text.
 
 HTTP mapping covers explicit port/address/IPv6/Unix listeners, `listen ... ssl`,
 server names, exact/prefix/preferred-prefix/regex/named locations, nested
@@ -29,7 +31,10 @@ use the configured default port 80; a server without a supported explicit listen
 directive warns instead of inventing a privilege-dependent listener.
 
 Root and location proxy_pass inheritance are represented; local alias overrides
-an inherited root. Alias inheritance into nested locations is not resolved.
+an inherited root. Alias inheritance into nested locations is not resolved and
+emits `alias.inheritance` with an unresolved owner. Duplicate routing directives
+or conflicting root/alias declarations also mark the context unresolved and omit
+effective destination edges, propagating uncertainty to empty child locations.
 Return bodies are omitted. Location precedence, rewrite execution, variable
 evaluation, DNS, socket existence, filesystem existence of document roots and
 request simulation are not implemented. A variable anywhere in proxy_pass is

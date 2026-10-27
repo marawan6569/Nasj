@@ -113,10 +113,10 @@ pub(crate) fn render(graph: &Topology) -> String {
         .unwrap_or(240);
     let height =
         graph_bottom + graph.warnings.len() * 24 + if graph.warnings.is_empty() { 0 } else { 40 };
-    let analysis = if graph.analysis == AnalysisKind::Synthetic {
-        "Synthetic demo"
-    } else {
-        "Configured topology · runtime unverified"
+    let analysis = match graph.analysis {
+        AnalysisKind::Synthetic => "Synthetic demo",
+        AnalysisKind::Configuration => "Configured topology · runtime unverified",
+        AnalysisKind::Unknown => "Topology · provenance unknown",
     };
     let mut output = format!(
         r##"<svg xmlns="http://www.w3.org/2000/svg" id="topology-graph" viewBox="0 0 {width} {height}" role="img" aria-labelledby="graph-title graph-description">
@@ -160,7 +160,7 @@ pub(crate) fn render(graph: &Topology) -> String {
                     s.line
                 )
             })
-            .unwrap_or_else(|| "synthetic / no source".into());
+            .unwrap_or_else(|| "no source metadata".into());
         let full_source = node
             .source
             .as_ref()

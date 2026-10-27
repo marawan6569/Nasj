@@ -83,3 +83,24 @@ fn exporter_redacts_sensitive_attributes_from_public_model_callers() {
         assert!(!output.contains("fixture-key-secret"));
     }
 }
+
+#[test]
+fn legacy_graphs_without_provenance_are_never_labeled_configured() {
+    let mut value = serde_json::to_value(graph()).unwrap();
+    value.as_object_mut().unwrap().remove("analysis");
+    for edge in value["edges"].as_array_mut().unwrap() {
+        edge.as_object_mut().unwrap().remove("evidence");
+    }
+    let graph: Topology = serde_json::from_value(value).unwrap();
+    assert_eq!(graph.analysis, nasj_core::AnalysisKind::Unknown);
+    assert!(graph
+        .edges
+        .iter()
+        .all(|edge| edge.evidence == Evidence::Unresolved));
+    assert!(render(&graph, Format::Html)
+        .unwrap()
+        .contains("Unknown provenance"));
+    assert!(render(&graph, Format::Svg)
+        .unwrap()
+        .contains("provenance unknown"));
+}

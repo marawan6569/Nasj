@@ -11,7 +11,8 @@ Analysis and report viewing work offline, without running Nginx or a web server.
 > review in [PR #1](https://github.com/marawan6569/Nasj/pull/1),
 > [#8](https://github.com/marawan6569/Nasj/pull/8),
 > [#9](https://github.com/marawan6569/Nasj/pull/9) and
-> [#10](https://github.com/marawan6569/Nasj/pull/10). The default branch may lag this
+> [#10](https://github.com/marawan6569/Nasj/pull/10), with the final safety audit in
+> [#13](https://github.com/marawan6569/Nasj/pull/13). The default branch may lag this
 > preview. No published binary/crates.io release is available.
 
 ## Install the preview
@@ -27,7 +28,7 @@ nasj --help
 For an explicit preview checkout before those PRs merge:
 
 ```sh
-git clone --branch feat/offline-reports https://github.com/marawan6569/Nasj.git
+git clone --branch fix/analysis-uncertainty-hardening https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 ```

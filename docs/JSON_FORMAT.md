@@ -15,7 +15,8 @@
 
 Consumers should not rely on stable node IDs until v0.1 is released.
 
-`analysis` is `configuration` for real static analysis or `synthetic` for `demo`.
+`analysis` is `configuration` for real static analysis, `synthetic` for `demo`,
+or `unknown` when provenance is absent (including legacy deserialized graphs).
 No runtime verification is performed. `sources` is the sorted, deduplicated list
 of canonical configuration file paths read. Nodes and edges preserve directive
 locations as `{ "path": "...", "line": 1 }`; inherited directives retain their
@@ -30,8 +31,9 @@ and redirect. Container/service/process are reserved for future discovery.
 Edges contain `from`, `to`, snake_case `kind`, nullable `source`, and `evidence`.
 Static analysis emits only `configured`; demo edges are `synthetic`. The model
 reserves `confirmed`, `inferred`, and `unresolved` for future evidence consumers;
-their presence in the enum does not implement discovery. Dynamic/conditional
-destinations produce warnings and an owner attribute `routing: unresolved`, with
+their presence in the enum does not implement discovery.
+Missing legacy `evidence` fields default to `unresolved`, never `configured`.
+Dynamic/conditional destinations produce warnings and an owner attribute `routing: unresolved`, with
 no invented proxy edge. Configured edges describe declarations, not successful
 requests, DNS resolution, endpoint reachability or location precedence.
 

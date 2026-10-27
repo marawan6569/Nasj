@@ -114,6 +114,19 @@ fn run() -> Result<(), String> {
                 },
             )
             .map_err(|error| error.to_string())?;
+            for warning in &graph.warnings {
+                let location = warning
+                    .source
+                    .as_ref()
+                    .map(|s| format!("{}:{}: ", s.path.escape_debug(), s.line))
+                    .unwrap_or_default();
+                let _ = writeln!(
+                    std::io::stderr().lock(),
+                    "nasj: {location}{}: {}",
+                    warning.code,
+                    warning.message
+                );
+            }
             if strict && !graph.warnings.is_empty() {
                 return Err(format!(
                     "analysis emitted {} warning(s); strict mode wrote no report",
@@ -126,16 +139,19 @@ fn run() -> Result<(), String> {
     let result = render(&graph, format.into()).map_err(|e| e.to_string())?;
     if let Some(path) = output {
         // Never overwrite an input, an include, or an existing report/symlink.
-        let mut file = std::fs::OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&path)
-            .map_err(|e| {
-                format!(
-                    "cannot write {}: {e}",
-                    path.display().to_string().escape_debug()
-                )
-            })?;
+        let mut options = std::fs::OpenOptions::new();
+        options.write(true).create_new(true);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::OpenOptionsExt;
+            options.mode(0o600);
+        }
+        let mut file = options.open(&path).map_err(|e| {
+            format!(
+                "cannot write {}: {e}",
+                path.display().to_string().escape_debug()
+            )
+        })?;
         file.write_all(result.as_bytes())
             .map_err(|e| format!("cannot write report: {e}"))
     } else {
@@ -151,7 +167,7 @@ fn main() -> ExitCode {
     match run() {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("nasj: {e}");
+            let _ = writeln!(std::io::stderr().lock(), "nasj: {e}");
             ExitCode::FAILURE
         }
     }

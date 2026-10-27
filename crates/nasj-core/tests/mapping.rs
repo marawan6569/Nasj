@@ -275,6 +275,44 @@ fn unix_proxy_socket_is_not_misread_as_a_hostname() {
     assert!(!graph.nodes.iter().any(|n| n.label == "unix"));
 }
 
+#[test]
+fn unsupported_alias_inheritance_duplicates_and_invalid_listeners_are_explicit() {
+    let graph = map(&fixture("semantic-errors.conf"));
+    assert!(!graph.nodes.iter().any(|n| n.kind == NodeKind::Listener));
+    assert_eq!(
+        graph
+            .warnings
+            .iter()
+            .filter(|w| w.code == "listen.unsupported")
+            .count(),
+        2
+    );
+    assert!(graph.warnings.iter().any(|w| w.code == "alias.inheritance"));
+    assert!(graph
+        .warnings
+        .iter()
+        .any(|w| w.code == "directive.duplicate"));
+    assert!(graph
+        .warnings
+        .iter()
+        .any(|w| w.code == "directive.conflict"));
+    for label in [
+        "location /alias/child",
+        "location /duplicate",
+        "location /duplicate/child",
+        "location /conflict",
+    ] {
+        let node = graph.nodes.iter().find(|n| n.label == label).unwrap();
+        assert_eq!(
+            node.attributes.get("routing").map(String::as_str),
+            Some("unresolved")
+        );
+        assert!(!graph.edges.iter().any(
+            |e| e.from == node.id && matches!(e.kind, EdgeKind::ProxiesTo | EdgeKind::BackedBy)
+        ));
+    }
+}
+
 #[cfg(unix)]
 #[test]
 fn unreadable_includes_and_fifo_inputs_fail_without_blocking() {

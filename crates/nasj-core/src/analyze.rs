@@ -1,13 +1,14 @@
 //! Conservative HTTP configuration semantics. This is not request simulation.
 use crate::{
-    redact, syntax::Directive, Edge, EdgeKind, Evidence, Node, NodeKind, SourceLocation, Topology,
-    Warning,
+    redact, syntax::Directive, AnalysisKind, Edge, EdgeKind, Evidence, Node, NodeKind,
+    SourceLocation, Topology, Warning,
 };
 use std::collections::BTreeMap;
 
 struct Analyzer {
     graph: Topology,
     upstreams: BTreeMap<String, String>,
+    node_index: BTreeMap<String, usize>,
 }
 
 impl Analyzer {
@@ -19,6 +20,7 @@ impl Analyzer {
         attrs: &[(&str, String)],
     ) -> String {
         let id = format!("n{:06}", self.graph.nodes.len() + 1);
+        self.node_index.insert(id.clone(), self.graph.nodes.len());
         self.graph.nodes.push(Node {
             id: id.clone(),
             kind,
@@ -50,11 +52,19 @@ impl Analyzer {
         });
     }
 
-    fn unresolved(&mut self, owner: &str, directive: &Directive, message: &str) {
-        if let Some(node) = self.graph.nodes.iter_mut().find(|node| node.id == owner) {
+    fn mark_unresolved(&mut self, owner: &str) {
+        if let Some(node) = self
+            .node_index
+            .get(owner)
+            .and_then(|&index| self.graph.nodes.get_mut(index))
+        {
             node.attributes
                 .insert("routing".into(), "unresolved".into());
         }
+    }
+
+    fn unresolved(&mut self, owner: &str, directive: &Directive, message: &str) {
+        self.mark_unresolved(owner);
         self.warn("routing.unresolved", message, &directive.source);
     }
 
@@ -221,7 +231,7 @@ impl Analyzer {
     ) {
         // Internal redirects/rewrites and extension handlers prevent a claim
         // about an effective destination. Keep containment, drop routing edges.
-        let uncertain = ancestor_uncertain
+        let mut uncertain = ancestor_uncertain
             || children.iter().any(|d| {
                 matches!(
                     d.name.as_str(),
@@ -230,16 +240,46 @@ impl Analyzer {
                     || d.name.starts_with("js_")
             });
         if uncertain {
-            if let Some(directive) = children.first() {
-                self.unresolved(owner, directive, "conditional, rewrite, or unsupported handler context; effective routes are unresolved");
+            self.mark_unresolved(owner);
+            if let Some(source) = self
+                .node_index
+                .get(owner)
+                .and_then(|&index| self.graph.nodes.get(index))
+                .and_then(|node| node.source.clone())
+            {
+                self.warn("routing.unresolved", "conditional, rewrite, or unsupported handler context; effective routes are unresolved", &source);
             }
         }
-        // Only root and proxy_pass inheritance is modeled. return and alias
-        // have context-specific rules; don't propagate them across locations.
+        let inherited_alias = inherited.iter().find(|d| d.name == "alias");
+        let local_path = children
+            .iter()
+            .any(|d| matches!(d.name.as_str(), "root" | "alias"));
+        if !local_path {
+            if let Some(alias) = inherited_alias {
+                uncertain = true;
+                self.mark_unresolved(owner);
+                self.warn("alias.inheritance", "alias inheritance into nested locations is unsupported; effective routes are unresolved", &alias.source);
+            }
+        }
+        if children.iter().any(|d| d.name == "root") {
+            if let Some(alias) = children.iter().find(|d| d.name == "alias") {
+                uncertain = true;
+                self.mark_unresolved(owner);
+                self.warn(
+                    "directive.conflict",
+                    "root and alias conflict in one context; effective routes are unresolved",
+                    &alias.source,
+                );
+            }
+        }
+        // Resolve root/proxy inheritance. Carry aliases only to diagnose their
+        // unsupported inheritance; return is never propagated as a directive.
         let mut effective = Vec::new();
         for name in ["root", "alias", "proxy_pass"] {
             let local: Vec<_> = children.iter().filter(|d| d.name == name).collect();
             if local.len() > 1 {
+                uncertain = true;
+                self.mark_unresolved(owner);
                 self.warn(
                     "directive.duplicate",
                     "duplicate routing directive; destination unresolved",
@@ -255,6 +295,10 @@ impl Analyzer {
                 }
                 if let Some(d) = inherited.iter().find(|d| d.name == name) {
                     effective.push(d.clone());
+                }
+            } else if !local_path {
+                if let Some(alias) = inherited_alias {
+                    effective.push(alias.clone());
                 }
             }
         }
@@ -371,11 +415,7 @@ impl Analyzer {
             return;
         }
         let key = authority.to_ascii_lowercase();
-        let target = self
-            .upstreams
-            .iter()
-            .find(|(name, _)| name.to_ascii_lowercase() == key)
-            .map(|(_, id)| id.clone());
+        let target = self.upstreams.get(&key).cloned();
         let target = match target {
             Some(id) if id.is_empty() => {
                 self.unresolved(owner, d, "ambiguous upstream name");
@@ -525,9 +565,10 @@ fn valid_endpoint(value: &str) -> bool {
 
 fn listener(value: &str) -> Option<(String, String)> {
     if let Some(socket) = value.strip_prefix("unix:") {
-        return Some((format!("unix:{socket}"), String::new()));
+        return valid_endpoint(value).then(|| (format!("unix:{socket}"), String::new()));
     }
-    if let Ok(port) = value.parse::<u16>() {
+    if !value.is_empty() && value.bytes().all(|ch| ch.is_ascii_digit()) {
+        let port = value.parse::<u16>().ok()?;
         return (port != 0).then(|| ("*".into(), port.to_string()));
     }
     let (host, port) = if value.starts_with('[') {
@@ -559,8 +600,12 @@ fn listener(value: &str) -> Option<(String, String)> {
 
 pub(crate) fn analyze(tree: &[Directive]) -> Topology {
     let mut analyzer = Analyzer {
-        graph: Topology::default(),
+        graph: Topology {
+            analysis: AnalysisKind::Configuration,
+            ..Topology::default()
+        },
         upstreams: BTreeMap::new(),
+        node_index: BTreeMap::new(),
     };
     let mut found = false;
     for http in tree {

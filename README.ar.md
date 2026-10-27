@@ -11,7 +11,8 @@
 > [#1](https://github.com/marawan6569/Nasj/pull/1) و
 > [#8](https://github.com/marawan6569/Nasj/pull/8) و
 > [#9](https://github.com/marawan6569/Nasj/pull/9) و
-> [#10](https://github.com/marawan6569/Nasj/pull/10).
+> [#10](https://github.com/marawan6569/Nasj/pull/10)، مع تدقيق إضافي في
+> [#13](https://github.com/marawan6569/Nasj/pull/13).
 > قد لا يحتوي الفرع الافتراضي على هذه التغييرات بعد. لا تتوفر حزمة إصدار منشورة.
 
 ## التثبيت والتجربة
@@ -27,7 +28,7 @@ nasj --help
 لتجربة فرع التنفيذ قبل دمجه:
 
 ```sh
-git clone --branch feat/offline-reports https://github.com/marawan6569/Nasj.git
+git clone --branch fix/analysis-uncertainty-hardening https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 ```
