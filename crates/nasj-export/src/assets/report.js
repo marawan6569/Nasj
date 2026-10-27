@@ -16,6 +16,10 @@
   let viewMode = 'readable';
   let geometryKey = null;
   let drag = null;
+  let pinch = null;
+  const pointers = new Map();
+  let directMatches = [];
+  let visibleIndices = [];
   let selected = null;
   const pretty = value => value.replaceAll('_', ' ');
   const source = value => value ? `${value.path}:${value.line}` : 'No source metadata';
@@ -43,7 +47,6 @@
     option.title = source(node.source);
     domains.get(domain).append(option);
   });
-  if (servers.length) hostView.value = String(servers[0][1]);
   const hostMembers = index => {
     const members = new Set([index]);
     const queue = [index];
@@ -54,6 +57,71 @@
     }
     incoming[index].forEach(([from, edge]) => { if (data.edges[edge].kind === 'routes_to' && data.nodes[from].kind === 'domain') members.add(from); });
     return members;
+  };
+  // Rank declarations, not guessed traffic/popularity. Port numbers alone do
+  // not imply TLS; only configured listener protocol and effective edges count.
+  const hostScore = index => {
+    if (data.analysis !== 'configuration' || data.nodes[index].attributes.state !== 'configured') return null;
+    const owners = new Set(), responses = new Set(), visited = new Set(), queue = [index];
+    let locations = 0, actions = 0;
+    for (let cursor = 0; cursor < queue.length; cursor++) {
+      const from = queue[cursor];
+      if (visited.has(from)) continue;
+      visited.add(from);
+      if (data.nodes[from].attributes.reachability === 'unreachable_after_return') continue;
+      if (data.nodes[from].kind === 'location') locations++;
+      outgoing[from].forEach(([to, edgeIndex]) => {
+        const edge = data.edges[edgeIndex];
+        if (edge.evidence !== 'configured') return;
+        if (['proxies_to', 'backed_by'].includes(edge.kind)) owners.add(from);
+        if (edge.kind === 'responds_with') responses.add(from);
+        if (['responds_with', 'redirects_to', 'evaluates'].includes(edge.kind)) actions++;
+        if (edge.kind === 'contains') queue.push(to);
+      });
+    }
+    const https = outgoing[index].some(([to, edgeIndex]) => data.edges[edgeIndex].kind === 'listens_on' && data.edges[edgeIndex].evidence === 'configured' && data.nodes[to].attributes.protocol === 'https');
+    return [Number(https && owners.size > 0), owners.size, responses.size, locations, actions];
+  };
+  let initialHost = servers.length ? servers[0][1] : null, bestScore = null;
+  servers.forEach(([, index]) => {
+    const score = hostScore(index);
+    if (!score) return;
+    const firstDifference = bestScore ? score.findIndex((value, i) => value !== bestScore[i]) : -1;
+    if (!bestScore || firstDifference >= 0 && score[firstDifference] > bestScore[firstDifference]) { initialHost = index; bestScore = score; }
+  });
+  if (initialHost !== null) hostView.value = String(initialHost);
+
+  // Two directed walks, never an undirected component expansion. Reverse paths
+  // find callers; forward paths start only at direct matches (and guard nodes).
+  // Thus shared destinations retain their callers without pulling in siblings
+  // through context domains/servers. Model order makes truncation predictable.
+  const SEARCH_MATCH_LIMIT = 40, SEARCH_NODE_LIMIT = 200, SEARCH_DEPTH_LIMIT = 24, SEARCH_EDGE_LIMIT = 4000;
+  const searchContext = matches => {
+    const direct = matches.slice(0, SEARCH_MATCH_LIMIT), members = new Set(direct);
+    const reverseSeen = new Set(), forwardSeen = new Set(), guards = new Set();
+    let examined = 0, limited = matches.length > direct.length;
+    const walk = (start, reverse) => {
+      const seen = reverse ? reverseSeen : forwardSeen, stack = [[start, 0]];
+      while (stack.length) {
+        const [index, depth] = stack.pop();
+        if (seen.has(index)) continue;
+        if (!members.has(index) && members.size >= SEARCH_NODE_LIMIT) { limited = true; continue; }
+        members.add(index); seen.add(index);
+        if (reverse && data.nodes[index].kind === 'condition') guards.add(index);
+        const links = reverse && data.nodes[index].kind === 'domain' ? [] : (reverse ? incoming[index] : outgoing[index]);
+        if (depth >= SEARCH_DEPTH_LIMIT) { if (links.some(([next]) => !seen.has(next))) limited = true; continue; }
+        // Reverse push order gives a stable depth-first caller-to-domain path.
+        for (let i = links.length - 1; i >= 0; i--) {
+          if (++examined > SEARCH_EDGE_LIMIT) { limited = true; return; }
+          stack.push([links[i][0], depth + 1]);
+        }
+      }
+    };
+    direct.forEach(index => { if (examined <= SEARCH_EDGE_LIMIT) walk(index, true); });
+    direct.forEach(index => { if (examined <= SEARCH_EDGE_LIMIT) walk(index, false); });
+    // Preserve the other outcomes of an ancestor guard, including false chains.
+    guards.forEach(index => { if (examined <= SEARCH_EDGE_LIMIT) walk(index, false); });
+    return { direct, members, limited, total: matches.length };
   };
   // Same native layered/mean-order strategy as the static exporter. Layouts are
   // calculated lazily and at most eight vhost layouts are retained, including
@@ -78,19 +146,50 @@
     ordered.forEach(([, column]) => column.forEach((i, r) => row.set(i, r)));
     const center = i => { const parents = incoming[i].filter(([from]) => members.has(from)); return parents.length ? parents.reduce((sum, [from]) => sum + row.get(from), 0) / parents.length : row.get(i); };
     for (let pass = 0; pass < 3; pass++) ordered.forEach(([, column]) => { column.sort((a, b) => center(a) - center(b) || a - b); column.forEach((i, r) => row.set(i, r)); });
-    const points = new Map(indices.map(i => [i, [48 + rank.get(i) * 380, 48 + row.get(i) * 136]]));
-    let width = 720, height = 240;
-    points.forEach(([x, y]) => { width = Math.max(width, x + 308); height = Math.max(height, y + 136); });
+    const points = new Map(indices.map(i => [i, [32 + rank.get(i) * 320, 32 + row.get(i) * 128]]));
+    let width = 320, height = 180;
+    points.forEach(([x, y]) => { width = Math.max(width, x + 292); height = Math.max(height, y + 120); });
     return { members, points, bounds: { x: 0, y: 0, width, height } };
   };
   let activePoints = new Map(nativePoints.map((point, i) => [i, point]));
+  const boundsOf = indices => {
+    const points = indices.map(i => activePoints.get(i)).filter(Boolean);
+    if (!points.length) return { x: 0, y: 0, width: 320, height: 180 };
+    const xs = points.map(([x]) => x), ys = points.map(([, y]) => y);
+    const x = Math.min(...xs) - 24, y = Math.min(...ys) - 24;
+    return { x, y, width: Math.max(...xs) + 284 - x, height: Math.max(...ys) + 112 - y };
+  };
+  const updateFrameNote = () => {
+    const outside = visibleIndices.filter(i => { const [x, y] = activePoints.get(i); return x < view.x || y < view.y || x + 260 > view.x + view.width || y + 88 > view.y + view.height; }).length;
+    $('frame-note').textContent = outside ? `${outside} nodes outside frame · Drag / pinch, select a result, or Fit view` : 'All visible nodes in frame';
+  };
+  const frame = (indices, anchor = null) => {
+    const rect = svg.getBoundingClientRect(), aspect = Math.max(1, rect.width) / Math.max(1, rect.height);
+    const bounds = boundsOf(indices), fitted = Math.max(bounds.width, bounds.height * aspect);
+    // At least 220 CSS px per card. Fit small routes, center larger ones without
+    // shrinking labels to overview scale. Explicit selection always stays inside.
+    const width = Math.max(320, Math.min(fitted, rect.width * 260 / 220));
+    const height = width / aspect;
+    let x = bounds.x + bounds.width / 2 - width / 2, y = bounds.y + bounds.height / 2 - height / 2;
+    if (anchor !== null && activePoints.has(anchor)) {
+      const [ax, ay] = activePoints.get(anchor);
+      x = Math.max(ax + 284 - width, Math.min(x, ax - 24));
+      y = Math.max(ay + 112 - height, Math.min(y, ay - 24));
+    }
+    view = { x, y, width, height }; setView(); updateFrameNote();
+  };
   const showReadable = () => {
     viewMode = 'readable';
-    const rect = svg.getBoundingClientRect();
-    const width = Math.max(320, Math.min(base.width, rect.width));
-    const anchor = hostView.value && !search.value.trim() ? activePoints.get(Number(hostView.value)) : null;
-    view = { x: Math.max(0, (anchor ? anchor[0] + 130 : 0) - width / 2), y: base.y, width, height: width * rect.height / Math.max(1, rect.width) };
-    setView();
+    const important = visibleIndices.filter(i => !['domain', 'listener', 'server'].includes(data.nodes[i].kind));
+    const anchor = directMatches.length ? (directMatches.includes(selected) ? selected : directMatches[0]) : selected !== null && visibleIndices.includes(selected) ? selected : null;
+    const allBounds = boundsOf(visibleIndices), rect = svg.getBoundingClientRect();
+    const canFit = Math.max(allBounds.width, allBounds.height * rect.width / Math.max(1, rect.height)) <= rect.width * 260 / 220;
+    frame(canFit || !important.length ? visibleIndices : important, anchor);
+  };
+  const focusNode = index => {
+    viewMode = 'manual';
+    const nearby = [index, ...incoming[index].map(([i]) => i), ...outgoing[index].map(([i]) => i)].filter(i => visibleIndices.includes(i));
+    frame(nearby, index);
   };
   const place = (key, layout, fullOverview) => {
     if (key === geometryKey) return;
@@ -106,21 +205,23 @@
       const label = edges[i].querySelector('text'); label.setAttribute('x', middle); label.setAttribute('y', (y1 + y2) / 2 - 8);
     });
     svg.querySelectorAll('.vhost-group').forEach(group => { if (fullOverview) group.removeAttribute('hidden'); else group.setAttribute('hidden', ''); });
-    $('view-caption').textContent = search.value.trim() ? 'Search across all virtual hosts' : fullOverview ? 'Full infrastructure overview' : data.nodes[Number(hostView.value)].label;
-    showReadable();
+    const callers = [...layout.members].filter(i => data.nodes[i].kind === 'server');
+    const callerLabels = callers.slice(0, 3).map(i => data.nodes[i].label).join(' / ');
+    $('view-caption').textContent = search.value.trim() ? `Global search${callers.length ? ` · Routes via ${callerLabels}${callers.length > 3 ? ` + ${callers.length - 3} more` : ''}` : ' · No connected virtual host in this result'}` : fullOverview ? 'Full infrastructure overview' : data.nodes[Number(hostView.value)].label;
   };
   const point = (event, matrix = svg.getScreenCTM().inverse()) => new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix);
   const zoom = (factor, anchor = { x: view.x + view.width / 2, y: view.y + view.height / 2 }) => {
     viewMode = 'manual';
     factor = Math.max(160 / view.width, Math.min(factor, base.width * 20 / view.width));
     view = { x: anchor.x - (anchor.x - view.x) * factor, y: anchor.y - (anchor.y - view.y) * factor, width: view.width * factor, height: view.height * factor };
-    setView();
+    setView(); updateFrameNote();
   };
   const clearSelection = () => {
     selected = null;
     nodes.forEach(node => node.classList.remove('selected', 'related'));
     edges.forEach(edge => edge.classList.remove('related'));
     $('selection').hidden = true;
+    $('inspect-selection').hidden = true;
   };
   const select = index => {
     clearSelection();
@@ -128,6 +229,7 @@
     selected = index;
     nodes[index].classList.add('selected');
     $('selection').hidden = false;
+    $('inspect-selection').hidden = false;
     $('node-kind').textContent = pretty(node.kind);
     $('node-title').textContent = node.label;
     const fields = $('node-fields');
@@ -152,53 +254,57 @@
       relationships.append(item);
     });
     if (!relationships.childElementCount) relationships.append(text('li', 'No resolved relationships.'));
+    focusNode(index);
   };
   const kinds = [...new Set(data.nodes.map(node => node.kind))].sort();
   kinds.forEach(kind => kindFilter.add(new Option(pretty(kind), kind)));
   const applyFilters = () => {
     const query = search.value.trim().toLocaleLowerCase();
     const fullOverview = !query && hostView.value === '';
+    const eligible = (node, i) => (!kindFilter.value || node.kind === kindFilter.value) && (!unresolved.checked || node.attributes.routing === 'unresolved') && (!query || searchable[i].includes(query));
+    const result = query ? searchContext(data.nodes.map((node, i) => eligible(node, i) ? i : -1).filter(i => i >= 0)) : null;
+    directMatches = result ? result.direct : [];
+    const directSet = new Set(directMatches);
     let layout;
-    if (query) layout = focusLayout(new Set(data.nodes.map((node, i) => searchable[i].includes(query) ? i : -1).filter(i => i >= 0)));
+    if (result) layout = focusLayout(result.members);
     else if (fullOverview) layout = { members: new Set(data.nodes.map((_, i) => i)), points: new Map(nativePoints.map((point, i) => [i, point])), bounds: overview };
     else {
       const key = hostView.value;
       if (!cache.has(key)) { cache.set(key, focusLayout(hostMembers(Number(key)))); if (cache.size > 8) cache.delete(cache.keys().next().value); }
       layout = cache.get(key);
     }
-    place(query ? `search:${query}` : `host:${hostView.value}`, layout, fullOverview);
-    const visible = data.nodes.map((node, i) => layout.members.has(i) && (!kindFilter.value || node.kind === kindFilter.value) && (!unresolved.checked || node.attributes.routing === 'unresolved'));
-    nodes.forEach((node, i) => { node.hidden = !visible[i]; node.setAttribute('aria-hidden', String(!visible[i])); if (visible[i]) node.removeAttribute('hidden'); else node.setAttribute('hidden', ''); });
+    const key = query ? `search:${query}:${kindFilter.value}:${unresolved.checked}` : `host:${hostView.value}`;
+    const changed = key !== geometryKey;
+    place(key, layout, fullOverview);
+    const visible = data.nodes.map((node, i) => layout.members.has(i) && (query || eligible(node, i)));
+    visibleIndices = data.nodes.map((_, i) => i).filter(i => visible[i]);
+    nodes.forEach((node, i) => {
+      node.classList.toggle('search-match', Boolean(query && directSet.has(i)));
+      node.classList.toggle('search-context', Boolean(query && visible[i] && !directSet.has(i)));
+      node.setAttribute('aria-label', `${data.nodes[i].label}${query && visible[i] ? directSet.has(i) ? ' · Direct search match' : ' · Routing context' : ''}`);
+      node.setAttribute('aria-hidden', String(!visible[i])); node.setAttribute('tabindex', visible[i] ? '0' : '-1');
+      if (visible[i]) node.removeAttribute('hidden'); else node.setAttribute('hidden', '');
+    });
     edges.forEach((element, i) => {
-      const edge = data.edges[i];
-      const show = visible[byId.get(edge.from)] && visible[byId.get(edge.to)];
+      const show = visible[endpoints[i][0]] && visible[endpoints[i][1]];
       if (show) element.removeAttribute('hidden'); else element.setAttribute('hidden', '');
     });
-    const matches = $('matches');
-    matches.replaceChildren();
-    let shown = 0;
-    visible.forEach((show, index) => {
-      if (!show || shown++ >= 200) return;
-      const node = data.nodes[index];
-      const button = text('button', node.label);
-      button.type = 'button';
-      button.title = source(node.source);
+    const matches = $('matches'); matches.replaceChildren();
+    const listed = query ? directMatches : visibleIndices;
+    listed.slice(0, 200).forEach(index => {
+      const node = data.nodes[index], button = text('button', node.label);
+      button.type = 'button'; button.title = source(node.source);
       button.append(text('small', `${pretty(node.kind)} · ${shortSource(node.source)}`));
-      button.addEventListener('click', () => {
-        select(index);
-        viewMode = 'manual';
-        const transform = nodes[index].transform.baseVal.consolidate().matrix;
-        const rect = svg.getBoundingClientRect(), width = Math.max(320, Math.min(660, rect.width));
-        view = { x: transform.e - 40, y: transform.f - 40, width, height: width * rect.height / Math.max(1, rect.width) };
-        setView();
-      });
-      const item = document.createElement('li');
-      item.append(button); matches.append(item);
+      button.addEventListener('click', () => { select(index); svg.scrollIntoView({ block: 'nearest' }); });
+      const item = document.createElement('li'); item.append(button); matches.append(item);
     });
-    if (!shown) matches.append(text('li', 'No matching nodes.', 'empty'));
-    $('visible-count').textContent = `${visible.filter(Boolean).length} of ${nodes.length} nodes · ${query ? 'Global search' : fullOverview ? 'Full overview' : 'Virtual host focus'}`;
-    $('matches-note').textContent = shown > 200 ? 'First 200 matches; narrow your search.' : 'Select a result to focus it on the graph.';
+    if (!listed.length) matches.append(text('li', 'No matching nodes.', 'empty'));
+    $('visible-count').textContent = `${visibleIndices.length} of ${nodes.length} nodes · ${query ? `Global search · ${directMatches.length} ${directMatches.length === 1 ? 'match' : 'matches'} + ${visibleIndices.length - directMatches.length} context` : fullOverview ? 'Full overview' : 'Virtual host focus'}`;
+    $('matches-note').textContent = result && result.limited ? `Limited search: showing ${directMatches.length} of ${result.total} matches; up to 200 nodes, 24 hops and 4000 edge visits. Context may be incomplete; narrow your search.` : query ? 'Highlighted = direct match; dashed = routing context. Filters select matches; connecting context remains.' : listed.length > 200 ? 'First 200 matches; narrow your search.' : 'Select a result to focus it on the graph.';
+    $('search-limit').hidden = !result?.limited;
+    $('search-limit').textContent = result?.limited ? 'Search context limited · Narrow the query (details in inspector)' : '';
     if (selected !== null && !visible[selected]) clearSelection();
+    if (changed) showReadable(); else updateFrameNote();
   };
   search.addEventListener('input', applyFilters);
   kindFilter.addEventListener('change', applyFilters);
@@ -208,31 +314,65 @@
   $('reset-selection').addEventListener('click', clearSelection);
   $('zoom-in').addEventListener('click', () => zoom(0.8));
   $('zoom-out').addEventListener('click', () => zoom(1.25));
-  $('fit').addEventListener('click', () => { viewMode = 'fit'; view = { ...base }; setView(); });
+  $('fit').addEventListener('click', () => { viewMode = 'fit'; view = { ...boundsOf(visibleIndices) }; setView(); updateFrameNote(); });
   $('readable').addEventListener('click', showReadable);
+  $('inspect-selection').addEventListener('click', () => { $('selection').scrollIntoView({ block: 'start' }); $('selection').focus({ preventScroll: true }); });
+  $('show-selection').addEventListener('click', () => { if (selected !== null) { focusNode(selected); svg.scrollIntoView({ block: 'center' }); nodes[selected].focus({ preventScroll: true }); } });
   new ResizeObserver(() => { if (viewMode === 'readable') showReadable(); }).observe(svg);
   svg.addEventListener('wheel', event => { event.preventDefault(); zoom(event.deltaY < 0 ? 0.88 : 1.14, point(event)); }, { passive: false });
+  const startDrag = (event, moved = false) => {
+    drag = { matrix: svg.getScreenCTM().inverse(), start: point(event), view: { ...view }, node: event.target.closest('[data-node]'), moved, x: event.clientX, y: event.clientY };
+  };
+  const midpoint = () => {
+    const [a, b] = [...pointers.values()];
+    return { clientX: (a.clientX + b.clientX) / 2, clientY: (a.clientY + b.clientY) / 2, distance: Math.max(1, Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)) };
+  };
   svg.addEventListener('pointerdown', event => {
-    if (event.button !== 0) return;
-    drag = { matrix: svg.getScreenCTM().inverse(), start: point(event), view: { ...view }, node: event.target.closest('[data-node]'), moved: false, x: event.clientX, y: event.clientY };
-    svg.setPointerCapture(event.pointerId);
+    if (event.button !== 0 || pointers.size >= 2) return;
+    pointers.set(event.pointerId, event); svg.setPointerCapture(event.pointerId);
+    if (pointers.size === 1) startDrag(event);
+    else {
+      const mid = midpoint(), matrix = svg.getScreenCTM().inverse();
+      pinch = { matrix, anchor: point(mid, matrix), distance: mid.distance, view: { ...view } }; drag = null;
+    }
   });
   svg.addEventListener('pointermove', event => {
+    if (!pointers.has(event.pointerId)) return;
+    pointers.set(event.pointerId, event);
+    if (pinch && pointers.size === 2) {
+      viewMode = 'manual';
+      const mid = midpoint(), current = point(mid, pinch.matrix), start = pinch.view;
+      const factor = Math.max(160 / start.width, Math.min(pinch.distance / mid.distance, base.width * 20 / start.width));
+      view = { x: pinch.anchor.x - (current.x - start.x) * factor, y: pinch.anchor.y - (current.y - start.y) * factor, width: start.width * factor, height: start.height * factor };
+      setView(); updateFrameNote(); return;
+    }
     if (!drag) return;
     if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) > 3) drag.moved = true;
     if (!drag.moved) return;
     viewMode = 'manual';
     const current = point(event, drag.matrix);
     view = { ...drag.view, x: drag.view.x - (current.x - drag.start.x), y: drag.view.y - (current.y - drag.start.y) };
-    setView();
+    setView(); updateFrameNote();
   });
-  svg.addEventListener('pointerup', () => {
-    if (drag && !drag.moved && drag.node) select(Number(drag.node.dataset.node));
-    drag = null;
-  });
-  svg.addEventListener('pointercancel', () => { drag = null; });
+  const endPointer = event => {
+    if (!pointers.has(event.pointerId)) return;
+    const tap = event.type === 'pointerup' && !pinch && drag && !drag.moved && drag.node;
+    const index = tap ? Number(drag.node.dataset.node) : null;
+    pointers.delete(event.pointerId); pinch = null; drag = null;
+    if (svg.hasPointerCapture(event.pointerId)) svg.releasePointerCapture(event.pointerId);
+    if (pointers.size === 1) startDrag([...pointers.values()][0], true);
+    if (index !== null) select(index);
+  };
+  svg.addEventListener('pointerup', endPointer);
+  svg.addEventListener('pointercancel', endPointer);
+  svg.addEventListener('lostpointercapture', endPointer);
   nodes.forEach((node, index) => {
     node.setAttribute('role', 'button');
+    node.addEventListener('focus', () => {
+      if (!visibleIndices.includes(index)) return;
+      const [x, y] = activePoints.get(index);
+      if (x < view.x || y < view.y || x + 260 > view.x + view.width || y + 88 > view.y + view.height) focusNode(index);
+    });
     node.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(index); } });
   });
   document.addEventListener('keydown', event => {

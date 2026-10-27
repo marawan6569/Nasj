@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- Graph-aware global search retains real routing paths, highlights matches/context
+  separately and reports bounded results; useful configured host selection, readable
+  framing, touch pinch/pan and graph/inspector navigation for the provisional viewer.
 - Stabilized three-crate Rust workspace, Cargo.lock, synthetic demo and CI for stacked PRs.
 - Parser comparison spike and ADR; bounded generic Nginx syntax with source locations.
 - Read-only HTTP configuration mapping with recursive/glob includes, cycle/scope checks,

@@ -8,11 +8,13 @@ import tempfile
 import xml.etree.ElementTree as ET
 
 from playwright.sync_api import expect, sync_playwright
+from report_ux_checks import check_search_context, check_mobile, check_large_search, check_selection_policy
 
 repo = Path(__file__).resolve().parent.parent
 binary = repo / "target/debug/nasj"
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--screenshots", type=Path, help="Optional directory for reviewed desktop/mobile screenshots")
+parser.add_argument('--browser', choices=['chromium', 'firefox', 'webkit'], default='chromium', help='Optional installed engine; no automatic install or skipping')
 arguments = parser.parse_args()
 
 
@@ -32,7 +34,7 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     root = ET.parse(svg_report).getroot()
     assert root.tag == "{http://www.w3.org/2000/svg}svg"
     assert len(root.findall(".//{http://www.w3.org/2000/svg}g[@class='node']")) > 10
-    browser = playwright.chromium.launch()
+    browser = getattr(playwright, arguments.browser).launch()
     context = browser.new_context(offline=True, service_workers="block", viewport={"width": 1440, "height": 1000})
     page = context.new_page()
     errors, requests, dialogs = [], [], []
@@ -115,6 +117,7 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     assert page.locator('.node:not([hidden]) .node-card').first.bounding_box()['width'] >= 220
     assert page.locator('.node:not([hidden])').count() < len(payload['nodes'])
     page.screenshot(path=str(screenshots / 'multi-initial.png'), full_page=True)
+    check_search_context(page, payload, screenshots)
     secure = next(i for i in host_indices if payload['nodes'][i]['attributes']['virtual_host'] == 'portal.example.test' and 'HTTPS' in payload['nodes'][i]['attributes']['listeners'])
     page.locator('#vhost-view').select_option(str(secure))
     expect(page.locator('#visible-count')).to_contain_text('Virtual host focus')
@@ -141,6 +144,8 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     assert page.locator('.node:not([hidden]) .node-card').first.bounding_box()['width'] >= 220
     page.screenshot(path=str(screenshots / 'multi-mobile.png'), full_page=True)
 
+    check_mobile(page, payload, screenshots, context, arguments.browser)
+
     # Larger synthetic input checks one DOM node per model node, lazy focus
     # navigation across many vhosts and global search outside the active host.
     large_config = temporary / 'large.conf'
@@ -155,6 +160,9 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     for value in options[::9]: page.locator('#vhost-view').select_option(value)
     page.locator('#search').fill('host99.example.test · HTTP :9099')
     expect(page.locator('#matches button')).to_have_count(1)
+    check_large_search(page, json.loads(page.locator('#topology-data').text_content()))
+
+    check_selection_policy(page, repo, temporary, generate)
 
     conditional = temporary / "conditional.html"
     generate(repo / "fixtures/nginx/conditionals/redirect.conf", conditional, "html")
@@ -222,4 +230,4 @@ with tempfile.TemporaryDirectory(prefix="nasj-browser-") as temporary, sync_play
     assert all(url.startswith("file:") for url in requests), requests
     context.close()
     browser.close()
-    print("PASS: offline file reports; XML; zoom/pan; selection; global search/filters; conditional/source/evidence inspection; severity; themes; laptop/mobile vhost layouts; 100 vhosts/602 nodes; hostile/empty data; no external requests or browser errors")
+    print(f"PASS ({arguments.browser}): offline file reports; XML; zoom/pan; selection; global search/filters; conditional/source/evidence inspection; severity; themes; laptop/mobile vhost layouts; 100 vhosts/602 nodes; hostile/empty data; no external requests or browser errors")

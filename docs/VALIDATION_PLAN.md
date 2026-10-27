@@ -53,3 +53,40 @@ is retained; nothing is merged. All 42 workspace tests and the browser suite pas
 locally; exact-head CI evidence is recorded in the PRs/log. The final audit was
 added after implementation review to keep known termination separate from
 unsupported evaluation and sanitize derived condition labels for library callers.
+
+
+## Final UX and release review follow-up
+
+Baseline reverified: `fix/routing-final-audit` at `0724bd9`; #17 is the latest
+cumulative open PR and its exact-head CI passed. Read every #16 conversation
+comment and review/thread list; the new sanitized feedback is comment 6429292719.
+Search context loss and lexical initial selection remain present. Keep the
+provisional visualization, parser, canonical schema 0.2 and security boundaries.
+
+One focused PR, stacked on #17:
+
+1. Preserve real ancestor/routing paths around global search matches, highlight
+   direct matches separately, and bound traversal/result size with visible limits.
+   Cover backend, shared upstream, domain, static path, conditional and disconnected
+   searches; filters select matches while required context remains visible.
+2. Prefer configured HTTPS hosts with effective application routes, otherwise the
+   most informative configured host, with deterministic ties. Center meaningful
+   routes at readable scale; keep Fit view/manual navigation and focus selection.
+3. Polish phone/tablet touch and inspector navigation using existing controls.
+   Test no page overflow, controls, pinch/pan and discoverable branch outcomes.
+4. Run all locked workspace/parser/export/CSP/offline browser checks, including
+   synthetic ~40/~600-node fixtures and optional Firefox/WebKit where available.
+   Record synthetic before/after evidence and release readiness (Ready, Needs
+   Review, Blocked), exact CI, licensing, branding and merge/verification steps.
+
+No production inputs, parser/schema changes, framework, merge, release or issue
+closure. Update #16 with the concrete PR and verification evidence.
+
+
+Execution: implemented the focused UX steps above; all 42 workspace tests,
+parser comparison, goldens/CSP and expanded offline Chromium suite pass locally.
+Fresh source installation and strict synthetic HTML generation passed. Firefox/
+WebKit launch was unavailable due to missing ordinary libraries; main protection
+is absent, and branding/packaging/schema/distribution decisions need maintainer
+review. See RELEASE_READINESS.md and EXECUTION_LOG.md; final exact-head Actions
+and review-response evidence are attached to the follow-up PR.

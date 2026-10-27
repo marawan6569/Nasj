@@ -28,7 +28,7 @@ nasj --help
 لتجربة فرع التنفيذ قبل دمجه:
 
 ```sh
-git clone --branch fix/routing-final-audit https://github.com/marawan6569/Nasj.git
+git clone --branch fix/report-search-context https://github.com/marawan6569/Nasj.git
 cd Nasj
 cargo install --locked --path crates/nasj-cli
 ```
