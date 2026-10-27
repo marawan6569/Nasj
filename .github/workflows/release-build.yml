@@ -1,0 +1,168 @@
+name: Linux release preparation
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing annotated release tag
+        required: true
+        default: v0.1.0
+      commit:
+        description: Approved full release source SHA (never tooling HEAD)
+        required: true
+        default: b60cb2e045fc9476034bffba7967b8674825fa18
+      architectures:
+        description: Native architectures to validate
+        type: choice
+        options: [both, x86_64]
+        default: both
+  pull_request:
+    paths:
+      - .github/workflows/release-*.yml
+      - tools/release/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-build-${{ github.ref }}-${{ github.event.inputs.tag || 'v0.1.0' }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      architectures: ${{ steps.plan.outputs.architectures }}
+      tag: ${{ steps.plan.outputs.tag }}
+      commit: ${{ steps.plan.outputs.commit }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: plan
+        env:
+          RELEASE_TAG: ${{ inputs.tag || 'v0.1.0' }}
+          RELEASE_COMMIT: ${{ inputs.commit || 'b60cb2e045fc9476034bffba7967b8674825fa18' }}
+          ARCHITECTURES: ${{ inputs.architectures || 'both' }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re, subprocess
+          tag, commit = os.environ['RELEASE_TAG'], os.environ['RELEASE_COMMIT']
+          assert re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+', tag)
+          assert re.fullmatch(r'[0-9a-f]{40}', commit)
+          assert tag != 'v0.1.0' or commit == 'b60cb2e045fc9476034bffba7967b8674825fa18'
+          def git(*a): return subprocess.check_output(['git', *a], text=True).strip()
+          assert git('cat-file', '-t', 'refs/tags/' + tag) == 'tag'
+          assert git('rev-parse', 'refs/tags/' + tag + '^{commit}') == commit
+          matrix = [{'arch':'x86_64', 'runner':'ubuntu-22.04'}]
+          if os.environ['ARCHITECTURES'] == 'both':
+              matrix.append({'arch':'aarch64', 'runner':'ubuntu-22.04-arm'})
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('matrix=' + json.dumps({'include': matrix}) + '\n')
+              f.write('architectures=' + ','.join(m['arch'] for m in matrix) + '\n')
+              f.write(f'tag={tag}\ncommit={commit}\n')
+          PY
+      - name: Test packaging trust boundaries
+        run: python3 -m unittest discover -s tools/release -p 'test_*.py' -v
+  build:
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: tooling
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.plan.outputs.commit }}
+          fetch-depth: 0
+          path: source
+          persist-credentials: false
+      - name: Install build and package inspection tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev lintian binutils file
+          rustup toolchain install 1.99.1 --profile minimal
+      - name: Test exact source and prepare distributions
+        env:
+          RELEASE_TAG: ${{ needs.plan.outputs.tag }}
+          RELEASE_COMMIT: ${{ needs.plan.outputs.commit }}
+          RELEASE_ARCH: ${{ matrix.arch }}
+        run: >-
+          python3 tooling/tools/release/release.py prepare
+          --source source --output dist --tag "$RELEASE_TAG"
+          --commit "$RELEASE_COMMIT" --arch "$RELEASE_ARCH"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: native-${{ matrix.arch }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+  runtime:
+    needs: [plan, build]
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJSON(needs.plan.outputs.matrix).include }}
+        image: ['ubuntu:22.04', 'debian:12-slim']
+    runs-on: ${{ matrix.platform.runner }}
+    container: ${{ matrix.image }}
+    timeout-minutes: 15
+    steps:
+      - name: Prepare clean runtime (no Rust or Cargo)
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 ca-certificates git
+          ! command -v rustc
+          ! command -v cargo
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: native-${{ matrix.platform.arch }}
+          path: dist
+      - name: Verify transfer, archive, install, four exports and removal
+        env:
+          RELEASE_ARCH: ${{ matrix.platform.arch }}
+          RELEASE_TAG: ${{ needs.plan.outputs.tag }}
+        run: bash tools/release/runtime-test.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: runtime-${{ matrix.platform.arch }}-${{ strategy.job-index }}
+          path: runtime-evidence.txt
+          if-no-files-found: error
+          retention-days: 14
+  collect:
+    needs: [plan, build, runtime]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: native-*
+          merge-multiple: true
+          path: dist
+      - name: Verify same-source provenance and combine checksums
+        env:
+          RELEASE_TAG: ${{ needs.plan.outputs.tag }}
+          RELEASE_COMMIT: ${{ needs.plan.outputs.commit }}
+          RELEASE_ARCHITECTURES: ${{ needs.plan.outputs.architectures }}
+        run: >-
+          python3 tools/release/release.py collect --directory dist
+          --tag "$RELEASE_TAG" --commit "$RELEASE_COMMIT"
+          --architectures "$RELEASE_ARCHITECTURES"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: reviewed-linux-binaries
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14

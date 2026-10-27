@@ -1,5 +1,25 @@
 # NASJ v0.1.0 release checklist
 
+## Binary backfill preparation (separate from completed source release)
+
+Binary assets are not yet public. Use the
+[tooling procedure](../tools/release/README.md) and
+[validation report](BINARY_VALIDATION_v0.1.0.md).
+
+- [ ] Annotated tag and approved SHA verified; all packages match release version.
+- [ ] Native x86_64 locked tests/build, ELF/GLIBC inspection, archive and Debian package pass.
+- [ ] Native ARM64 equivalent checks pass, or ARM64 is explicitly deferred.
+- [ ] Full locked dependency and Rust library notices reviewed and physically bundled.
+- [ ] lintian passes; clean native Ubuntu/Debian archive/install/four exports/removal pass.
+- [ ] Checksums verified after packaging and transfer; provenance/size/hash report reviewed.
+- [ ] Existing main CI stays green; bilingual pending installation instructions agree.
+- [ ] Maintainer reviews and merges tooling PR; dispatch preparation on approved main tooling SHA.
+- [ ] Configure protected `release-binaries` environment and approve concrete selected assets.
+- [ ] Separately dispatch/approve additive publication; never replace original assets, tags or notes.
+- [ ] Download public binaries and verify; then update availability docs in both languages.
+
+## Completed source release
+
 [v0.1.0 was published](https://github.com/marawan6569/Nasj/releases/tag/v0.1.0) on
 2026-10-27 at 03:27:17 UTC after maintainer authorization. The release commit is
 `b60cb2e045fc9476034bffba7967b8674825fa18`; its checks and Actions passed.

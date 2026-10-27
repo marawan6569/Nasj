@@ -1,0 +1,140 @@
+"""Regression checks for release trust boundaries; no network or public writes."""
+
+import io
+import json
+from pathlib import Path
+import subprocess
+import tarfile
+import tempfile
+import unittest
+from unittest.mock import patch
+
+import release
+import publish
+
+
+class ReleaseTests(unittest.TestCase):
+    def test_annotated_tag_and_clean_approved_checkout(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+
+            def git(*args):
+                return subprocess.check_output(
+                    ["git", *args], cwd=root, stderr=subprocess.DEVNULL, text=True
+                ).strip()
+
+            git("init")
+            git("config", "user.email", "test@example.invalid")
+            git("config", "user.name", "Release test")
+            (root / "source").write_text("original")
+            git("add", "source")
+            git("commit", "-m", "fixture")
+            commit = git("rev-parse", "HEAD")
+            git("tag", "-a", "v1.2.3", "-m", "fixture")
+            self.assertEqual(release.identity(root, "v1.2.3", commit), "1.2.3")
+            for tag, sha in [
+                ("--help", commit),
+                ("v0.1.0", commit),
+                ("v1.2.3", "0" * 40),
+            ]:
+                with self.assertRaises(ValueError):
+                    release.identity(root, tag, sha)
+            (root / "source").write_text("modified")
+            with self.assertRaises(ValueError):
+                release.identity(root, "v1.2.3", commit)
+            git("checkout", "--", "source")
+            git("tag", "v1.2.4")
+            with self.assertRaises(ValueError):
+                release.identity(root, "v1.2.4", commit)
+
+    def test_archive_rejects_traversal_links_devices_and_duplicates(self):
+        for name, kind in [
+            ("/absolute", tarfile.REGTYPE),
+            ("nasj/../escape", tarfile.REGTYPE),
+            ("nasj/link", tarfile.SYMTYPE),
+            ("nasj/device", tarfile.CHRTYPE),
+        ]:
+            with self.subTest(name=name):
+                data = io.BytesIO()
+                with tarfile.open(fileobj=data, mode="w") as archive:
+                    member = tarfile.TarInfo(name)
+                    member.type = kind
+                    archive.addfile(member)
+                data.seek(0)
+                with tarfile.open(fileobj=data) as archive, self.assertRaises(
+                    ValueError
+                ):
+                    release.safe_members(archive, "nasj")
+        data = io.BytesIO()
+        with tarfile.open(fileobj=data, mode="w") as archive:
+            archive.addfile(tarfile.TarInfo("nasj/bin"))
+            archive.addfile(tarfile.TarInfo("nasj/bin"))
+        data.seek(0)
+        with tarfile.open(fileobj=data) as archive, self.assertRaises(ValueError):
+            release.safe_members(archive, "nasj")
+
+    def test_checksums_reject_changes_duplicates_and_source_asset_names(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            (root / "binary.deb").write_bytes(b"fixture")
+            line = f"{release.sha(root / 'binary.deb')}  binary.deb\n"
+            manifest = root / "SHA256SUMS-binaries"
+            manifest.write_text(line)
+            self.assertIn("binary.deb", release.checksums(root))
+            for bad in [
+                line + line,
+                line.replace("binary.deb", "../binary.deb"),
+                line.replace("binary.deb", "SHA256SUMS"),
+                line.replace("binary.deb", "nasj-source.tar.gz"),
+            ]:
+                manifest.write_text(bad)
+                with self.assertRaises(ValueError):
+                    release.checksums(root)
+            manifest.write_text(line)
+            (root / "binary.deb").write_bytes(b"changed")
+            with self.assertRaises(ValueError):
+                release.checksums(root)
+
+    def test_dependency_changes_are_blocked_before_notices_are_generated(self):
+        with tempfile.TemporaryDirectory() as name:
+            with self.assertRaisesRegex(ValueError, "dependency set changed"):
+                release.notices({"packages": []}, Path(name) / "notices", "1.99.1")
+
+    def test_publication_rejects_wrong_source_and_unexpected_files(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            meta = {
+                "architecture": "x86_64",
+                "tag": "v0.1.0",
+                "commit": release.APPROVED_V010,
+                "tooling_commit": "tooling",
+                "artifacts": [
+                    "nasj-v0.1.0-linux-x86_64.tar.gz",
+                    "nasj_0.1.0_amd64.deb",
+                ],
+            }
+            release.write_json(root / "build-x86_64.json", meta)
+            expected = {"build-x86_64.json", *meta["artifacts"]}
+            with patch(
+                "publish.checksums", return_value=dict.fromkeys(expected, "digest")
+            ):
+                self.assertIn(
+                    "SHA256SUMS-binaries",
+                    publish.validate(root, "v0.1.0", release.APPROVED_V010, "tooling"),
+                )
+                with self.assertRaises(ValueError):
+                    publish.validate(root, "v0.1.0", "wrong", "tooling")
+                with self.assertRaises(ValueError):
+                    publish.validate(
+                        root, "v0.1.0", release.APPROVED_V010, "other-tooling"
+                    )
+            with patch(
+                "publish.checksums",
+                return_value=dict.fromkeys(expected | {"unexpected"}, "digest"),
+            ):
+                with self.assertRaises(ValueError):
+                    publish.validate(root, "v0.1.0", release.APPROVED_V010, "tooling")
+
+
+if __name__ == "__main__":
+    unittest.main()
