@@ -1,0 +1,61 @@
+---
+import { translator } from "../lib/copy";
+import type { Locale } from "../lib/paths";
+
+interface Props {
+    locale: Locale;
+}
+const { locale } = Astro.props;
+const t = translator(locale);
+---
+
+<aside
+    dir="ltr"
+    class="source-card"
+    aria-label={
+        locale === "ar"
+            ? "مقتطف إعدادات اصطناعية منسّق للموقع"
+            : "Website-formatted synthetic configuration excerpt"
+    }
+>
+    <div class="source-top">
+        <span>multi-vhost.conf</span>
+        <span class="tag">
+            <Fragment set:html={t("NGINX / INPUT")} />
+        </span>
+    </div>
+    <div
+        class="code"
+        lang="en"
+        is:raw
+        tabindex="0"
+        role="region"
+        aria-label="Nginx configuration excerpt"
+    ><span class="ln">20</span><span class="kw">server</span> {
+<span class="ln">21</span>  <span class="kw">listen</span> <span class="val">443 ssl</span>;
+<span class="ln">22</span>  <span class="kw">listen</span> <span class="val">[::]:443 ssl</span>;
+<span class="ln">23</span>  <span class="kw">server_name</span> <span class="val">portal.example.test</span>
+<span class="ln">  </span>    <span class="val">www.portal.example.test</span>;
+<span class="ln">24</span>  <span class="kw">location</span> / {
+<span class="ln">  </span>    <span class="kw">proxy_pass</span> <span class="val">http://portal_app</span>;
+<span class="ln">  </span>  }
+<span class="ln">  </span>  <span class="fade">…</span>
+<span class="ln">28</span>}</div>
+    <div class="source-foot">
+        <span class="mini-label">
+            <Fragment set:html={t("ONE COMMAND TO CONNECT THE DOTS")} />
+        </span>
+        <code lang="en">
+            <span class="prompt">$</span>nasj map --config ./nginx.conf \<br />{" "}
+            &nbsp;--format html -o report.html
+        </code>
+        <div class="source-result">
+            <span>
+                <Fragment set:html={t("Static analysis")} />
+            </span>
+            <span class="rail"></span>
+            <span>→</span>
+            <span class="file">report.html</span>
+        </div>
+    </div>
+</aside>

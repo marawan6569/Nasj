@@ -1,0 +1,21 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import { home } from "../lib/paths";
+---
+
+<SiteLayout locale="en" title="Page not found — NASJ" noindex>
+    <section class="not-found">
+        <p class="section-eyebrow">404</p>
+        <h1>Page not found.</h1>
+        <p>This route does not exist. Return to NASJ’s homepage.</p>
+        <a class="button primary" href={home("en")}>
+            English homepage
+        </a>
+        <div lang="ar" dir="rtl">
+            <h2>الصفحة غير موجودة.</h2>
+            <a class="button" href={home("ar")}>
+                العودة إلى الرئيسية بالعربية
+            </a>
+        </div>
+    </section>
+</SiteLayout>

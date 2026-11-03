@@ -1,0 +1,288 @@
+---
+import { translator } from "../lib/copy";
+import type { Locale } from "../lib/paths";
+import SourceCard from "./SourceCard.astro";
+import ReportPreview from "./ReportPreview.astro";
+interface Props {
+    locale: Locale;
+}
+const { locale } = Astro.props;
+const t = translator(locale);
+---
+
+<section class="hero">
+    <div>
+        <div class="release">
+            <span class="dot"></span>
+            <strong>
+                <Fragment set:html={t("v0.1.0 is here")} />
+            </strong>
+            <span class="rule"></span>
+            <Fragment set:html={t("Open source · Built with Rust")} />
+        </div>
+        <h1>
+            <Fragment
+                set:html={t(
+                    "Weave your<br>infrastructure<br><span>into clarity.</span>",
+                )}
+            />
+        </h1>
+        <p class="lead">
+            <Fragment
+                set:html={t(
+                    "Turn Nginx configuration into an explorable topology. <br>Follow every relationship back to its <strong>source file and line.</strong>",
+                )}
+            />
+        </p>
+        <div class="actions">
+            <a class="button primary" href="#demo">
+                <Fragment set:html={t("Preview report")} />{" "}
+                <span class="arrow">↗</span>
+            </a>
+            <a class="button" href="#install">
+                <svg aria-hidden="true" class="icon" viewBox="0 0 24 24">
+                    <path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4" />
+                </svg>
+                <Fragment set:html={t("Install NASJ")} />
+            </a>
+        </div>
+        <div class="hero-note">
+            <span>
+                <svg aria-hidden="true" class="icon" viewBox="0 0 24 24">
+                    <path d="m5 12 4 4L19 6" />
+                </svg>
+                <Fragment set:html={t("Read-only analysis")} />
+            </span>
+            <span>
+                <svg aria-hidden="true" class="icon" viewBox="0 0 24 24">
+                    <path d="m5 12 4 4L19 6" />
+                </svg>
+                <Fragment set:html={t("Offline reports")} />
+            </span>
+            <span>
+                <svg aria-hidden="true" class="icon" viewBox="0 0 24 24">
+                    <path d="m5 12 4 4L19 6" />
+                </svg>
+                <Fragment set:html={t("No runtime discovery")} />
+            </span>
+        </div>
+    </div>
+    <SourceCard locale={locale} />
+</section>
+<ReportPreview locale={locale} />
+<section class="workflow" id="features">
+    <div class="section-head">
+        <div>
+            <div class="section-eyebrow">
+                <Fragment set:html={t("A SMALL COMMAND. A CLEARER PICTURE.")} />
+            </div>
+            <h2>
+                <Fragment
+                    set:html={t(
+                        "From scattered files to a shared understanding.",
+                    )}
+                />
+            </h2>
+        </div>
+        <p>
+            <Fragment
+                set:html={t(
+                    "Keep your existing workflow.<br>NASJ brings the connections into view.",
+                )}
+            />
+        </p>
+    </div>
+    <div class="steps">
+        <article class="step">
+            <div class="step-number">
+                <Fragment set:html={t("01 / READ")} />
+            </div>
+            <h3>
+                <Fragment set:html={t("Start with your configuration.")} />
+            </h3>
+            <p>
+                <Fragment
+                    set:html={t(
+                        "Point NASJ at an Nginx configuration. It follows declared includes and preserves their original sources.",
+                    )}
+                />
+            </p>
+            <code class="token" dir="ltr">
+                nginx.conf <span>→</span> conf.d/*.conf
+            </code>
+        </article>
+        <article class="step">
+            <div class="step-number">
+                <Fragment set:html={t("02 / MAP")} />
+            </div>
+            <h3>
+                <Fragment set:html={t("Make the relationships visible.")} />
+            </h3>
+            <p>
+                <Fragment
+                    set:html={t(
+                        "Explore virtual hosts, locations, upstreams, and static paths. Unresolved routing stays explicitly unresolved.",
+                    )}
+                />
+            </p>
+            <code class="token" dir="ltr">
+                domain <span>→</span> location <span>→</span> upstream
+            </code>
+        </article>
+        <article class="step">
+            <div class="step-number">
+                <Fragment set:html={t("03 / UNDERSTAND")} />
+            </div>
+            <h3>
+                <Fragment set:html={t("Get back to the source.")} />
+            </h3>
+            <p>
+                <Fragment
+                    set:html={t(
+                        "Search a backend, inspect its connected context, and trace configured relationships to a file and line.",
+                    )}
+                />
+            </p>
+            <code class="token" dir="ltr">
+                configured <span>·</span> multi-vhost.conf:7
+            </code>
+        </article>
+    </div>
+</section>
+<section
+    class="formats"
+    aria-label={locale === "ar" ? "صيغ التصدير" : "Export formats"}
+>
+    <h2 class="formats-title">
+        <Fragment set:html={t("One topology. Four useful formats.")} />
+    </h2>
+    <div class="formats-list">
+        <div class="format">
+            <b>JSON</b>
+            <span>
+                <Fragment set:html={t("Structured data")} />
+            </span>
+        </div>
+        <div class="format">
+            <b>DOT</b>
+            <span>
+                <Fragment set:html={t("Graphviz workflows")} />
+            </span>
+        </div>
+        <div class="format">
+            <b>SVG</b>
+            <span>
+                <Fragment set:html={t("Standalone diagrams")} />
+            </span>
+        </div>
+        <div class="format">
+            <b>HTML</b>
+            <span>
+                <Fragment set:html={t("Offline exploration")} />
+            </span>
+        </div>
+    </div>
+</section>
+<section class="confidence">
+    <div>
+        <div class="section-eyebrow">
+            <Fragment set:html={t("CLARITY WITHOUT SIDE EFFECTS")} />
+        </div>
+        <h2>
+            <Fragment
+                set:html={t(
+                    "Understand your infrastructure.<br>Leave it running as it is.",
+                )}
+            />
+        </h2>
+        <p>
+            <Fragment
+                set:html={t(
+                    "NASJ describes configured intent. It does not simulate requests, verify live services, or replace <code>nginx -t</code>.",
+                )}
+            />
+        </p>
+    </div>
+    <div class="assurances">
+        <div class="assurance">
+            <svg aria-hidden="true" class="icon" viewBox="0 0 24 24">
+                <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z" />
+                <path d="m8 12 3 3 5-6" />
+            </svg>
+            <div>
+                <strong>
+                    <Fragment set:html={t("Read-only by design")} />
+                </strong>
+                <p>
+                    <Fragment
+                        set:html={t(
+                            "No configuration edits, Nginx reloads, or elevated privileges for mapping.",
+                        )}
+                    />
+                </p>
+            </div>
+        </div>
+        <div class="assurance">
+            <svg aria-hidden="true" class="icon" viewBox="0 0 24 24">
+                <rect x="4" y="3" width="16" height="18" rx="2" />
+                <path d="M8 8h8M8 12h8M8 16h4" />
+            </svg>
+            <div>
+                <strong>
+                    <Fragment set:html={t("A report you can take with you")} />
+                </strong>
+                <p>
+                    <Fragment
+                        set:html={t(
+                            "One self-contained HTML file. No server or internet connection required.",
+                        )}
+                    />
+                </p>
+            </div>
+        </div>
+        <div class="assurance">
+            <svg aria-hidden="true" class="icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v6m0 4h.01" />
+            </svg>
+            <div>
+                <strong>
+                    <Fragment set:html={t("Honest about uncertainty")} />
+                </strong>
+                <p>
+                    <Fragment
+                        set:html={t(
+                            "Dynamic routes stay unresolved. Review diagnostics and reports before sharing.",
+                        )}
+                    />
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="install" id="install">
+    <div>
+        <h2>
+            <Fragment set:html={t("Your configuration has a story. See it.")} />
+        </h2>
+        <p>
+            <Fragment
+                set:html={t(
+                    "Get NASJ for Linux x86_64 or ARM64. Archives, Debian packages, and source.",
+                )}
+            />
+        </p>
+    </div>
+    <div class="install-actions">
+        <a
+            class="button primary"
+            href="https://github.com/marawan6569/Nasj/releases/tag/v0.1.0"
+        >
+            <Fragment set:html={t("Install NASJ")} />{" "}
+            <span class="arrow">↗</span>
+        </a>
+        <p>
+            <Fragment set:html={t("v0.1.0 · SHA-256 checksums available")} />
+        </p>
+    </div>
+</section>
