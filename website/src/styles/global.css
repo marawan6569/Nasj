@@ -559,6 +559,9 @@ h1 span {
     line-height: 1.8;
     margin: 0;
 }
+.confidence code {
+    font-family: var(--mono);
+}
 .assurances {
     display: grid;
     gap: 18px;
