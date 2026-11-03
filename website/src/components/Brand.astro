@@ -1,0 +1,22 @@
+---
+import { asset } from "../lib/paths";
+---
+
+<picture>
+    <source
+        data-theme-source="light"
+        media="(prefers-color-scheme: light)"
+        srcset={asset("brand/logo_report_light.png")}
+    />
+    <source
+        data-theme-source="dark"
+        media="(prefers-color-scheme: dark)"
+        srcset={asset("brand/logo_report_dark.png")}
+    />
+    <img
+        src={asset("brand/logo_report_dark.png")}
+        alt="NASJ — نسج"
+        width="320"
+        height="166"
+    />
+</picture>

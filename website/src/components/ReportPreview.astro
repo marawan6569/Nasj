@@ -1,0 +1,136 @@
+---
+import { asset, type Locale } from "../lib/paths";
+interface Props {
+    locale: Locale;
+}
+const { locale } = Astro.props;
+const ar = locale === "ar";
+const alt = ar
+    ? "لقطة فعلية من تقرير نسج v0.1.0: الخادم 127.0.0.1:8100 ودليل المصدر multi-vhost.conf:7. العارض باللغة الإنجليزية."
+    : "Actual NASJ v0.1.0 report: backend 127.0.0.1:8100 and source evidence at multi-vhost.conf:7. The viewer is in English.";
+---
+
+<section id="demo" aria-labelledby="preview-title">
+    <div class="preview-heading">
+        <div>
+            <div class="section-eyebrow">
+                {ar
+                    ? "من الإعدادات إلى الصورة الواضحة"
+                    : "FROM CONFIGURATION TO CLARITY"}
+            </div>
+            <h2 id="preview-title">
+                {ar
+                    ? "اعثر على المسار. وتتبّع الدليل."
+                    : "Find the route. Follow the evidence."}
+            </h2>
+        </div>
+        <a class="text-link" href={asset("reports/report-dark-desktop.png")}>
+            {ar ? "عرض اللقطة بالحجم الكامل" : "View full-size capture"}{" "}
+            <span aria-hidden="true">↗</span>
+        </a>
+    </div>
+    <div class="report-frame">
+        <picture class="desktop-report">
+            <source
+                data-theme-source="light"
+                media="(prefers-color-scheme: light)"
+                srcset={asset("reports/report-light-desktop.png")}
+            />
+            <source
+                data-theme-source="dark"
+                media="(prefers-color-scheme: dark)"
+                srcset={asset("reports/report-dark-desktop.png")}
+            />
+            <img
+                src={asset("reports/report-dark-desktop.png")}
+                alt={alt}
+                width="2560"
+                height="1440"
+                loading="lazy"
+            />
+        </picture>
+        <div class="mobile-report">
+            <div class="report-crop-label">
+                <strong>127.0.0.1:8100</strong>
+                {ar
+                    ? "لقطات فعلية · تفاصيل الخريطة والمصدر"
+                    : "ACTUAL CAPTURES · GRAPH & SOURCE DETAILS"}
+            </div>
+            <picture>
+                <source
+                    data-theme-source="light"
+                    media="(prefers-color-scheme: light)"
+                    srcset={asset("reports/report-light-mobile-graph.png")}
+                />
+                <source
+                    data-theme-source="dark"
+                    media="(prefers-color-scheme: dark)"
+                    srcset={asset("reports/report-dark-mobile-graph.png")}
+                />
+                <img
+                    src={asset("reports/report-dark-mobile-graph.png")}
+                    alt={
+                        ar
+                            ? "تفصيل الخادم الخلفي من التقرير الفعلي"
+                            : "Backend detail cropped from the actual report"
+                    }
+                    width="684"
+                    height="480"
+                    loading="lazy"
+                />
+            </picture>
+            <picture>
+                <source
+                    data-theme-source="light"
+                    media="(prefers-color-scheme: light)"
+                    srcset={asset("reports/report-light-mobile-inspector.png")}
+                />
+                <source
+                    data-theme-source="dark"
+                    media="(prefers-color-scheme: dark)"
+                    srcset={asset("reports/report-dark-mobile-inspector.png")}
+                />
+                <img
+                    src={asset("reports/report-dark-mobile-inspector.png")}
+                    alt={alt}
+                    width="684"
+                    height="828"
+                    loading="lazy"
+                />
+            </picture>
+        </div>
+    </div>
+    <p class="report-language">
+        {ar
+            ? "معاينة ثابتة · عارض التقرير باللغة الإنجليزية. تفاصيل مقتطعة بحجم مقروء على الهاتف."
+            : "Static preview · English report viewer. Mobile details are cropped at a readable scale."}
+    </p>
+    <div class="report-caption">
+        <span>
+            {ar
+                ? "تقرير فعلي من NASJ v0.1.0 · إعدادات Nginx اصطناعية"
+                : "Actual NASJ v0.1.0 output · Synthetic Nginx fixture"}
+        </span>
+        <span>
+            {ar
+                ? "علاقات معلنة في الإعدادات. لم يُتحقّق من تشغيل الخدمات."
+                : "Configured relationships. Runtime reachability is not verified."}
+        </span>
+    </div>
+    <div class="evidence-callout">
+        <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M9 3H5v18h14V7l-4-4H9m5 0v5h5M8 12h8M8 16h5" />
+        </svg>
+        <p>
+            <strong>
+                {ar ? "لكل علاقة مصدر." : "Every connection has a source."}
+            </strong>{" "}
+            {ar
+                ? "الخادم المحدّد معرّف في السطر 7 من الملف الاصطناعي. هذا وصف نصّي للموقع، وليس جزءًا من العارض."
+                : "The selected backend is declared on line 7 of the synthetic fixture. This is a website summary, separate from the viewer capture."}
+        </p>
+        <span class="aside">
+            <bdi>multi-vhost.conf:7</bdi>
+        </span>
+    </div>
+</section>

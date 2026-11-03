@@ -1,0 +1,102 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { asset, home, type Locale } from "../lib/paths";
+import themeSource from "../scripts/theme.ts?raw";
+import { transform } from "esbuild";
+import "../styles/global.css";
+interface Props {
+    locale: Locale;
+    title?: string;
+    noindex?: boolean;
+}
+const {
+    locale,
+    title = locale === "ar"
+        ? "نسج — انسج بنيتك التحتية في صورة واضحة"
+        : "NASJ — Weave your infrastructure into clarity",
+    noindex = false,
+} = Astro.props;
+const description =
+    locale === "ar"
+        ? "أداة مفتوحة المصدر لتحليل إعدادات Nginx ورسم علاقاتها، مع أدلة من الملفات والأسطر. تقارير مستقلة دون خادم."
+        : "Map Nginx configuration into an explorable topology with source-file and line-level evidence. Open-source, CLI-first, offline reports.";
+const origin = Astro.site!;
+const canonical = new URL(home(locale), origin).href;
+const theme = (
+    await transform(themeSource, {
+        loader: "ts",
+        minify: true,
+        target: "es2022",
+    })
+).code;
+---
+
+<!doctype html>
+<html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script is:inline set:html={theme} />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="color-scheme" content="dark light" />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
+        {noindex ? (
+            <meta name="robots" content="noindex" />
+        ) : (
+            <>
+                <link rel="canonical" href={canonical} />
+                <link
+                    rel="alternate"
+                    hreflang="en"
+                    href={new URL(home("en"), origin).href}
+                />
+                <link
+                    rel="alternate"
+                    hreflang="ar"
+                    href={new URL(home("ar"), origin).href}
+                />
+                <link
+                    rel="alternate"
+                    hreflang="x-default"
+                    href={new URL(home("en"), origin).href}
+                />
+            </>
+        )}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta
+            property="og:locale"
+            content={locale === "ar" ? "ar_AR" : "en_US"}
+        />
+        <meta
+            property="og:locale:alternate"
+            content={locale === "ar" ? "en_US" : "ar_AR"}
+        />
+        {!noindex && <meta property="og:url" content={canonical} />}
+        <meta
+            property="og:image"
+            content={
+                new URL(asset("brand/logo_primary_light.png"), origin).href
+            }
+        />
+        <meta property="og:image:alt" content="NASJ — نسج" />
+        <link
+            rel="icon"
+            type="image/png"
+            href={asset("brand/logo_app_icon_64.png")}
+        />
+    </head>
+    <body>
+        <a class="skip-link" href="#main">
+            {locale === "ar" ? "انتقل إلى المحتوى" : "Skip to content"}
+        </a>
+        <Header locale={locale} />
+        <main id="main" tabindex="-1" class="wrap">
+            <slot />
+        </main>
+        <Footer locale={locale} />
+    </body>
+</html>

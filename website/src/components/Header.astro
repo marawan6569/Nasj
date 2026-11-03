@@ -1,0 +1,73 @@
+---
+import Brand from "./Brand.astro";
+import { home, documentation, repository, type Locale } from "../lib/paths";
+interface Props {
+    locale: Locale;
+}
+const { locale } = Astro.props;
+const ar = locale === "ar";
+const links = [
+    { label: ar ? "الميزات" : "Features", href: home(locale) + "#features" },
+    {
+        label: ar ? "معاينة التقرير" : "Report preview",
+        href: home(locale) + "#demo",
+    },
+    { label: ar ? "التثبيت" : "Installation", href: home(locale) + "#install" },
+    { label: ar ? "التوثيق" : "Documentation", href: documentation(locale) },
+];
+---
+
+<header>
+    <div class="wrap header-inner">
+        <a
+            class="brand"
+            href={home(locale)}
+            aria-label={ar ? "نسج — الرئيسية" : "NASJ home"}
+        >
+            <Brand />
+        </a>
+        <nav class="nav" aria-label={ar ? "التنقل الرئيسي" : "Main navigation"}>
+            {links.map((link) => (
+                <a href={link.href}>{link.label}</a>
+            ))}
+        </nav>
+        <div class="header-right">
+            <a
+                class="lang"
+                data-language
+                href={home(ar ? "en" : "ar")}
+                lang={ar ? "en" : "ar"}
+                dir={ar ? "ltr" : "rtl"}
+                hreflang={ar ? "en" : "ar"}
+            >
+                {ar ? "English" : "العربية"}
+            </a>
+            <label class="theme-control">
+                <span class="sr-only">{ar ? "المظهر" : "Theme"}</span>
+                <select data-theme-control aria-label={ar ? "المظهر" : "Theme"}>
+                    <option value="system">{ar ? "النظام" : "System"}</option>
+                    <option value="light">{ar ? "فاتح" : "Light"}</option>
+                    <option value="dark">{ar ? "داكن" : "Dark"}</option>
+                </select>
+            </label>
+            <a class="github" href={repository}>
+                GitHub ↗
+            </a>
+            <details class="mobile-menu" data-menu>
+                <summary aria-label={ar ? "القائمة" : "Menu"}>
+                    <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+                        <path d="M4 7h16M4 12h16M4 17h16" />
+                    </svg>
+                </summary>
+                <nav
+                    aria-label={ar ? "التنقل على الهاتف" : "Mobile navigation"}
+                >
+                    {links.map((link) => (
+                        <a href={link.href}>{link.label}</a>
+                    ))}
+                    <a href={repository}>GitHub ↗</a>
+                </nav>
+            </details>
+        </div>
+    </div>
+</header>

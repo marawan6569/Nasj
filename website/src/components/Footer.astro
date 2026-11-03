@@ -1,0 +1,38 @@
+---
+import Brand from "./Brand.astro";
+import { documentation, repository, type Locale } from "../lib/paths";
+interface Props {
+    locale: Locale;
+}
+const { locale } = Astro.props;
+const ar = locale === "ar";
+---
+
+<footer>
+    <div class="wrap footer-inner">
+        <div class="footer-brand">
+            <Brand />
+            <p>
+                {ar
+                    ? "انسج بنيتك التحتية في صورة واضحة."
+                    : "Weave your infrastructure into clarity."}
+                <br />
+                {ar
+                    ? "مفتوح المصدر. بترخيص MIT."
+                    : "Open source. Licensed under MIT."}
+            </p>
+        </div>
+        <div class="footer-links">
+            <a href={documentation(locale)}>
+                {ar ? "التوثيق" : "Documentation"}
+            </a>
+            <a href={`${repository}/blob/main/CONTRIBUTING.md`}>
+                {ar ? "ساهم في المشروع" : "Contribute"}
+            </a>
+            <a href={repository}>GitHub ↗</a>
+            <small>
+                {ar ? "مستقل عن F5 وNGINX." : "Independent of F5 and NGINX."}
+            </small>
+        </div>
+    </div>
+</footer>

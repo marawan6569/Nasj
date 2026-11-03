@@ -1,0 +1,92 @@
+{
+    "files": [
+        {
+            "path": "public/brand/logo_app_icon_64.png",
+            "sha256": "92a4f4e35219d8500d792841711fd82b1cbcd24875989e3438f2808025eebe38",
+            "repositorySource": "assets/logos/display/logo_app_icon_64.png"
+        },
+        {
+            "path": "public/brand/logo_primary_light.png",
+            "sha256": "8472f1cc29a20296392fd140a790f532decc264111aa57e36d19d945a6712d69",
+            "repositorySource": "assets/logos/display/logo_primary_light.png"
+        },
+        {
+            "path": "public/licenses/OFL-Inter.txt",
+            "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57"
+        },
+        {
+            "path": "public/licenses/OFL-NotoSansArabic.txt",
+            "sha256": "07fc70bfeb985cc1a87a8587d0a0c80bab11c86c9dc3fd95b6f0cb332f983e96"
+        },
+        {
+            "path": "src/assets/inter.woff2",
+            "sha256": "de39dc0db9e03f04b54d6016cdc175abc4a5d68144b3efcbf213aa7132fccc5b"
+        },
+        {
+            "path": "src/assets/noto-sans-arabic.woff2",
+            "sha256": "8b1c46d7732517cfc917fae37c69503831a46ad7c49eca881efb0bf677b20644"
+        },
+        {
+            "path": "public/reports/report-dark-desktop.png",
+            "sha256": "48fed7f5ee628fe2812c081b0729a89526271e749e06fc5aaac6dbc3139c55fc"
+        },
+        {
+            "path": "public/reports/report-dark-mobile-graph.png",
+            "sha256": "336e972df01a780efd1ff3d4446513b06eeeaee8d7c7841280087f02705905db"
+        },
+        {
+            "path": "public/reports/report-dark-mobile-inspector.png",
+            "sha256": "5072c3097658db470fd75f3943f773060fba57b65940bb20ff17eecb1df55b2a"
+        },
+        {
+            "path": "public/reports/report-light-desktop.png",
+            "sha256": "64bd20301ef2b119ddb3fe8e952442131115b2438fb07a01363a733676abb2d3"
+        },
+        {
+            "path": "public/reports/report-light-mobile-graph.png",
+            "sha256": "5b3c8a3f54e40934b7c28facb35e536f0aeb8afd34a109e7bbe5072c896857d3"
+        },
+        {
+            "path": "public/reports/report-light-mobile-inspector.png",
+            "sha256": "a10f7cf5b54e63a2b6ef1c36a8593a27c02f8bce073f7bc4e7c19931cc38f034"
+        },
+        {
+            "path": "public/brand/logo_report_dark.png",
+            "sha256": "622768e8e20c59e68635c07cbd9aeca5ded3b5150d7f69557be75dabc5147460",
+            "repositorySource": "assets/logos/display/logo_report_dark.png"
+        },
+        {
+            "path": "public/brand/logo_report_light.png",
+            "sha256": "90f5eda8046e85c53ab9b452e9a348a37ec508d91cbad77b7f995af8791b747d",
+            "repositorySource": "assets/logos/display/logo_report_light.png"
+        },
+        {
+            "path": "src/assets/dejavu-sans-mono.woff2",
+            "sha256": "5d8a35c43c4e8c5031e32f7f9aff8b1384881223c24861132b07e5882084c518"
+        },
+        {
+            "path": "public/licenses/DejaVu-LICENSE.txt",
+            "sha256": "db2d79604105bd7569a0908a0aa49302c2fcaa48a918e0361a8b3cc807921da0"
+        },
+        {
+            "path": "public/licenses/NASJ-LICENSE.txt",
+            "sha256": "54ff96bb64d79980f8bacdad057cc94706ecaac472078d4f399ed3d8d7c82ffb",
+            "repositorySource": "LICENSE"
+        },
+        {
+            "path": "public/licenses/Tailwind-LICENSE.txt",
+            "sha256": "60e0b68c0f35c078eef3a5d29419d0b03ff84ec1df9c3f9d6e39a519a5ae7985"
+        }
+    ],
+    "report": {
+        "product": "v0.1.0",
+        "commit": "b60cb2e045fc9476034bffba7967b8674825fa18",
+        "binary_sha256": "0cccbf0442c1cd6fc7124f649722fd7deb141798414416d3d749e13d4b7b4c38",
+        "fixture": "fixtures/nginx/multi-vhost.conf",
+        "fixture_sha256": "f04fb656ae02e1c6fbbe932575c7340bd027866952261b4191f53db935220c74",
+        "normalization": "Removed checkout prefix from source references only; executable script, CSS and CSP unchanged.",
+        "report_sha256": "6be241005412246fa71be658a8f6ff823f7650384c3f9892b2ae213a41151408",
+        "nodes": 40,
+        "edges": 37
+    }
+}
