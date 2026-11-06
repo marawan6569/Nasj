@@ -1,7 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { asset, home, type Locale } from "../lib/paths";
+import { asset, home, demo, type Locale } from "../lib/paths";
 import themeSource from "../scripts/theme.ts?raw";
 import { transform } from "esbuild";
 import "../styles/global.css";
@@ -9,6 +9,7 @@ interface Props {
     locale: Locale;
     title?: string;
     noindex?: boolean;
+    demoPage?: boolean;
 }
 const {
     locale,
@@ -16,13 +17,16 @@ const {
         ? "نسج — انسج بنيتك التحتية في صورة واضحة"
         : "NASJ — Weave your infrastructure into clarity",
     noindex = false,
+    demoPage = false,
 } = Astro.props;
 const description =
     locale === "ar"
         ? "أداة مفتوحة المصدر لتحليل إعدادات Nginx ورسم علاقاتها، مع أدلة من الملفات والأسطر. تقارير مستقلة دون خادم."
         : "Map Nginx configuration into an explorable topology with source-file and line-level evidence. Open-source, CLI-first, offline reports.";
 const origin = Astro.site!;
-const canonical = new URL(home(locale), origin).href;
+const route = demoPage ? demo : home;
+const canonical = new URL(route(locale), origin).href;
+Astro.csp?.insertDirective(demoPage ? "frame-src 'self'" : "frame-src 'none'");
 const theme = (
     await transform(themeSource, {
         loader: "ts",
@@ -50,17 +54,17 @@ const theme = (
                 <link
                     rel="alternate"
                     hreflang="en"
-                    href={new URL(home("en"), origin).href}
+                    href={new URL(route("en"), origin).href}
                 />
                 <link
                     rel="alternate"
                     hreflang="ar"
-                    href={new URL(home("ar"), origin).href}
+                    href={new URL(route("ar"), origin).href}
                 />
                 <link
                     rel="alternate"
                     hreflang="x-default"
-                    href={new URL(home("en"), origin).href}
+                    href={new URL(route("en"), origin).href}
                 />
             </>
         )}
@@ -93,7 +97,7 @@ const theme = (
         <a class="skip-link" href="#main">
             {locale === "ar" ? "انتقل إلى المحتوى" : "Skip to content"}
         </a>
-        <Header locale={locale} />
+        <Header locale={locale} demoPage={demoPage} />
         <main id="main" tabindex="-1" class="wrap">
             <slot />
         </main>

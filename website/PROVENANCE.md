@@ -106,3 +106,24 @@ static-preview wording, usable native controls and mobile crop correction.
 GitHub's Ubuntu 24.04 runner differs from the local Ubuntu 26.04.1 host. Local
 success does not establish hosted baseline portability. Investigate the first
 hosted comparison; do not automatically replace references to hide differences.
+
+## W2 authentic reports
+
+The [demo manifest](src/data/demos.json) records the published v0.1.0 archive,
+checksum-manifest and executable SHA-256 values; the exact three synthetic fixture
+hashes; expected diagnostics; released viewer script/style/branding hashes and
+CSP; and each normalized JSON/DOT/SVG/HTML output's hash, size and gzip size.
+These new reports are separate from the unchanged W0/W1 screenshot assets above.
+
+The CLI runs with absolute staged config/prefix paths, `--strict` for multi-vhost,
+and without `--strict` for unresolved. Source tokens and corresponding SVG titles
+are the only normalized spans. An independent semantic comparison preserves all
+source lines, nodes, edges, attributes, conditions and evidence. Protected viewer
+bytes and embedded/companion JSON are checked. Two fresh roots must produce
+identical bytes; production copies must match the manifest and source artifacts.
+
+The release pin remains v0.1.0 at commit
+`b60cb2e045fc9476034bffba7967b8674825fa18`. No binary is redistributed by the
+website; the test-only generator cache is outside the checkout. Existing NASJ
+MIT notices cover the genuine reports. No new third-party assets or dependencies
+were introduced. See [W2 handoff](reviews/W2.md) for commands and evidence.

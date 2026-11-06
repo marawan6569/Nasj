@@ -13,7 +13,10 @@ export default function earlyCsp() {
                         withFileTypes: true,
                     })) {
                         const path = `${directory}/${entry.name}`;
-                        if (entry.isDirectory()) await visit(path);
+                        // Published reports are copied byte-for-byte. Their own
+                        // released CSP and document serialization are immutable.
+                        if (entry.isDirectory() && entry.name !== "demos")
+                            await visit(path);
                         else if (entry.name.endsWith(".html")) {
                             const html = await readFile(path, "utf8");
                             const tags = html.match(

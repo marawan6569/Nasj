@@ -47,6 +47,7 @@ for (const path of [
     "LICENSE",
     ".github/workflows/website.yml",
     "fixtures/nginx/multi-vhost.conf",
+    "docs/website/WEBSITE_PLAN.md",
 ])
     sources[path] = sha256(await readFile(`../${path}`));
 const baselines = await inventory(
@@ -80,7 +81,7 @@ console.log(
                 encoding: "utf8",
             }).trim(),
             description:
-                "Uncommitted W1 remediation inputs; reviews and generated/cache directories excluded. This identity does not claim GitHub-hosted CI execution.",
+                "Uncommitted website inputs; reviews and generated/cache directories excluded. This identity does not claim GitHub-hosted CI execution.",
             digestAlgorithm: approved.digestAlgorithm,
             environment: {
                 node: process.version,

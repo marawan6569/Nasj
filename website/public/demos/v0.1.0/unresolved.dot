@@ -1,0 +1,11 @@
+digraph nasj {
+  rankdir=LR;
+  "n000001" [label="unresolved.example.test · HTTP :8080"];
+  "n000002" [label="8080"];
+  "n000003" [label="unresolved.example.test"];
+  "n000004" [label="location /dynamic/"];
+  "n000001" -> "n000002" [label="listens on (configured)"];
+  "n000003" -> "n000001" [label="routes to (configured)"];
+  "n000001" -> "n000004" [label="contains (configured)"];
+  graph [label="warning: routing.unresolved: variable proxy_pass cannot be resolved statically", labelloc=b];
+}

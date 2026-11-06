@@ -42,7 +42,6 @@ export default defineConfig({
                 "object-src 'none'",
                 "base-uri 'none'",
                 "form-action 'none'",
-                "frame-src 'none'",
                 "worker-src 'none'",
             ],
             scriptDirective: {

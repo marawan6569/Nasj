@@ -1,0 +1,134 @@
+{
+    "version": 1,
+    "generator": {
+        "version": "0.1.0",
+        "commit": "b60cb2e045fc9476034bffba7967b8674825fa18",
+        "archive": "nasj-v0.1.0-linux-x86_64.tar.gz",
+        "release_url": "https://github.com/marawan6569/Nasj/releases/download/v0.1.0/",
+        "archive_sha256": "3ec95fbd277382902f2adb91e37205e33c8e20f10053b1cc0cd14cec97ad6c02",
+        "checksums_sha256": "12591beec119bd3c2c27ad48a61c572a8d99d06030f850186a396d8be61cd0e7",
+        "executable_sha256": "0cccbf0442c1cd6fc7124f649722fd7deb141798414416d3d749e13d4b7b4c38"
+    },
+    "viewer": {
+        "csp": "default-src 'none'; script-src 'sha256-MWOn1zfa8aQAdahkgXMz0mOjlrNnDEsKrz9QYD0qUJA='; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'",
+        "script_sha256": [
+            "3163a7d737daf1a40075a864817333d263a396b3670c4b0aaf3f50603d2a5090"
+        ],
+        "style_sha256": [
+            "7ed3ece2831b147de0f514fb9d99a55a22635c1238f30daf541eb1d3e4486cab",
+            "be18c9c169991327e53711e9e5a83ea5d584745065f2a04cce54b1df5b3a7775"
+        ],
+        "branding_sha256": [
+            "f68421dc25dc69764919d97670a6b412905eaf7ea50b9e86a90873d6fc5001e7",
+            "ac98778315fc4ea3389037e445c975b83b4d833492ba2e8bca7d7520c5a3c468",
+            "d9cb46ad248cf2e84aaebdb5490d6ca041d24a7bf1b88e75ca47515a600c311a"
+        ]
+    },
+    "scenarios": [
+        {
+            "id": "multi-vhost",
+            "fixtures": [
+                {
+                    "path": "fixtures/nginx/multi-vhost.conf",
+                    "sha256": "f04fb656ae02e1c6fbbe932575c7340bd027866952261b4191f53db935220c74"
+                }
+            ],
+            "strict": true,
+            "nodes": 40,
+            "edges": 37,
+            "diagnostics": [
+                {
+                    "code": "include.empty",
+                    "severity": "info",
+                    "line": 2,
+                    "message": "optional include glob matched no files; check the pattern if configuration was expected",
+                    "path": "fixtures/nginx/multi-vhost.conf"
+                },
+                {
+                    "code": "include.empty",
+                    "severity": "info",
+                    "line": 3,
+                    "message": "optional include glob matched no files; check the pattern if configuration was expected",
+                    "path": "fixtures/nginx/multi-vhost.conf"
+                }
+            ],
+            "outputs": [
+                {
+                    "path": "demos/v0.1.0/multi-vhost.json",
+                    "sha256": "e460d4bad50b39f2822944d2a14cd0713c16104b5420f99040aee47044e7b480",
+                    "bytes": 22202,
+                    "gzip_bytes": 1904
+                },
+                {
+                    "path": "demos/v0.1.0/multi-vhost.dot",
+                    "sha256": "003fa07556ea0b5f339b998f75a5bdbd83f0fc012089729543737a1ed458ecd0",
+                    "bytes": 4108,
+                    "gzip_bytes": 793
+                },
+                {
+                    "path": "demos/v0.1.0/multi-vhost.svg",
+                    "sha256": "78634eed5cca08f9ae24ef524134c21a9b877b1bcc07400719d1e38e7617d17e",
+                    "bytes": 31436,
+                    "gzip_bytes": 3508
+                },
+                {
+                    "path": "demos/v0.1.0/multi-vhost.html",
+                    "sha256": "6be241005412246fa71be658a8f6ff823f7650384c3f9892b2ae213a41151408",
+                    "bytes": 167994,
+                    "gzip_bytes": 81425
+                }
+            ]
+        },
+        {
+            "id": "unresolved",
+            "fixtures": [
+                {
+                    "path": "website/fixtures/unresolved/nginx.conf",
+                    "sha256": "d57a25f217c0bb60cb90b4534511325a3c59dcc1800ced5c8487d01d0335c61d"
+                },
+                {
+                    "path": "website/fixtures/unresolved/routes.conf",
+                    "sha256": "7607a65fbb04fe0f701d9bd7b47567616c4b2676bf55353ea7a28ec0ea2e70ae"
+                }
+            ],
+            "strict": false,
+            "nodes": 4,
+            "edges": 3,
+            "diagnostics": [
+                {
+                    "code": "routing.unresolved",
+                    "severity": "warning",
+                    "line": 2,
+                    "message": "variable proxy_pass cannot be resolved statically",
+                    "path": "website/fixtures/unresolved/routes.conf"
+                }
+            ],
+            "outputs": [
+                {
+                    "path": "demos/v0.1.0/unresolved.json",
+                    "sha256": "f4c8a836a8415f622081e243b88ba704c87fabecfd407faa2ef4a99418e40174",
+                    "bytes": 2463,
+                    "gzip_bytes": 556
+                },
+                {
+                    "path": "demos/v0.1.0/unresolved.dot",
+                    "sha256": "d792ec677a1da468a1bb7f9ce5a095221541ad52235250f9900182a1a500ccd9",
+                    "bytes": 496,
+                    "gzip_bytes": 258
+                },
+                {
+                    "path": "demos/v0.1.0/unresolved.svg",
+                    "sha256": "5842c6e32bda3d07de938fad1aa41bd48da8780f35aecb1493d60a101efcdb69",
+                    "bytes": 4541,
+                    "gzip_bytes": 1363
+                },
+                {
+                    "path": "demos/v0.1.0/unresolved.html",
+                    "sha256": "b60e34863a5d8070e8fead4cc877edc42b3aae62577b786b2aa35a54a296528c",
+                    "bytes": 128222,
+                    "gzip_bytes": 77909
+                }
+            ]
+        }
+    ]
+}
