@@ -1,10 +1,10 @@
-# NASJ website — W1
+# NASJ website — W1 + W2
 
 Static Astro foundation for `https://marawan6569.github.io/Nasj/`. W0's Precision
-Topology design is the reference. This milestone contains the English/Arabic
-homepage, shared shell, theme control, static report captures and bilingual 404.
-It does **not** contain the interactive viewer, a download catalog, runtime
-discovery, or a deployment workflow.
+Topology design is the reference. The English/Arabic homepages retain the approved W1 treatment. W2 adds localized
+demo pages around authentic, pinned v0.1.0 reports, offline exports and accessible
+source evidence. No download catalog, runtime discovery or deployment is included.
+The exact approved [architecture](../docs/website/WEBSITE_PLAN.md) is preserved.
 
 ## Develop and verify
 
@@ -24,10 +24,14 @@ Production checks (the development server is not CSP evidence):
 npm run format:check
 npm run check
 npm run verify:dependencies
+npm run demos:ensure
+npm run test:cache
+npm run demos:verify
 npm run build
 npm run verify
 npm run test:artifacts
-npm test
+npm run test:demos
+npm test -- --update-snapshots=none
 ```
 
 `npm run preview` serves production output at `http://127.0.0.1:4321/Nasj/` with
@@ -53,28 +57,57 @@ monospace font, to reduce host-dependent rendering differences.
 - `public/brand`, `public/reports`, `src/assets`: approved identity, authentic
   report captures, licensed font subsets. See [PROVENANCE.md](PROVENANCE.md).
 - `scripts/`, `tests/`: production-output checks and Chromium/axe/screenshot gates.
-- `reviews/`: W1 handoff and screenshot review index; not copied into the build.
+- `public/demos/v0.1.0/`: eight verified JSON/DOT/SVG/HTML exports.
+- `src/data/demos.json`: generator, fixtures, diagnostics and output identities.
+- `reviews/`: milestone evidence and screenshots; not copied into the build.
 
-Only `/Nasj/`, `/Nasj/ar/`, `404.html` and `sitemap.xml` are generated. Feature and
-preview navigation uses homepage anchors. Documentation links to the existing
-localized README; installation links to the published v0.1.0 release. Full content
-routes and download metadata remain outside W1.
+The generated routes are `/`, `/ar/`, `/demo/`, `/ar/demo/`, `404.html` and
+`sitemap.xml`, under the configured base. Navigation's report link opens the
+localized demo; homepage CTAs and static captures retain their approved visual
+presentation. The homepage never requests interactive reports. Documentation and
+installation still link to the existing READMEs and published release.
 
-The W1 directory simplification is intentional: `src/lib/copy.ts` owns typed
-editorial translations, `src/lib/paths.ts` owns URL/locale helpers, root
-`assets.json` owns website-consumed media/font/license hashes, and
-`public/licenses/` contains distributed notices. Its `report` field records only
-the provenance of static W0 captures. When later milestones introduce the planned
-metadata, `release.json` will own release assets, checksums and platform evidence;
-`demos.json` will own fixture/generator/output identity and expected diagnostics;
-`assets.json` will continue to own website media provenance and references to
-official brand sources. Those future responsibilities are not implemented here.
+Localization remains in typed component copy and `src/lib/copy.ts`; URL helpers
+remain in `src/lib/paths.ts`. Root `assets.json` owns media/font/license provenance;
+its `report` field describes historical W0 captures. `src/data/demos.json` owns
+W2 generator/fixture/output provenance. The future `release.json` download catalog
+is not implemented. Notices remain under `public/licenses/`.
+
+## Pinned demo regeneration
+
+On Linux x86_64, `npm run demos:ensure` provisions missing inputs from the published v0.1.0 archive
+and checksum manifest, verifies their reviewed digests, extracts just the `nasj`
+member, verifies its independent digest/version, and caches it outside the checkout.
+`NASJ_DEMO_CACHE` can select that cache directory. Every restored archive, checksum
+manifest and executable is rehashed against independent release pins. Corrupt or
+symlinked inputs fail closed; no cached executable is run before verification.
+The executable is re-extracted from the verified archive before use. With valid
+inputs, provisioning makes no network request. `demos:fetch` explicitly forces
+online refresh for manual/candidate use. No current Rust build is used.
+
+CI restores an exact cache key containing all three release digests, without
+fallback keys. Only canonical main push jobs save this cache after verification;
+PR jobs never save it. Cache restoration is not evidence of integrity. Changed
+pins or verification code still require review before merge. GitHub's PR cache
+scope does not grant a PR's cache to main.
+
+`npm run demos:verify` uses the verified cache without network access. It stages
+only the three approved fixture files, generates JSON/DOT/SVG/HTML in two different
+fresh roots, validates exact diagnostics and source evidence, normalizes only
+allowlisted source spans, and compares all eight outputs against published website
+copies and their manifest identities. Strict unresolved generation must fail for
+all four formats without creating output. Nothing is written to the source tree.
+
+`npm run demos:generate` is the explicit maintainer operation that writes report
+copies and records their new hashes. It is never used by CI or a verification
+command; generated diffs require independent review. Report files are excluded
+from Prettier because the released HTML/SVG/JSON/DOT bytes must be preserved.
 
 ## Artifact publication policy
 
 `scripts/artifact-policy.mjs`, called by `npm run verify`, checks the entire
-production directory before CSP/link checks. W1 permits the three named HTML
-documents, sitemap, fingerprinted Astro CSS/JS, fingerprinted approved WOFF2
+production directory before CSP/link checks. W1/W2 permit the five named website HTML
+documents, eight individually hash-pinned report files, sitemap, fingerprinted Astro CSS/JS, fingerprinted approved WOFF2
 fonts, and manifest-pinned brand/report PNGs and license text. An explicitly
 pinned `manifest.json` or `manifest.webmanifest` is supported; neither is required
 or currently shipped. The existing empty `public/fonts` directory is allowed;
@@ -101,28 +134,32 @@ compiled early theme script is explicitly hashed because it is inserted with
 the charset declaration. It does not edit the policy or script/style contents.
 
 The verifier checks the **built output**, including effective `script-src-elem`
-precedence, hashes and policy ordering on all three HTML pages. Browser probes
+precedence, hashes and policy ordering on all five website HTML pages. Browser probes
 prove that an unapproved inline script and a connection request are blocked.
-Local styles, images and fonts are allowed; connections, frames, objects, workers,
-base URLs, forms and inline script/style attributes are blocked. No `unsafe-inline`
+Local styles, images and fonts are allowed; connections, objects, workers,
+base URLs, forms and inline script/style attributes are blocked. Homepages/404
+block frames; demo pages permit same-origin frames with an exact build-verified
+report URL allowlist and `sandbox="allow-scripts"`. No `unsafe-inline`
 or `unsafe-eval`, remote fonts, analytics, client API requests or runtime dependencies.
 
 This is a meta-delivered policy; it does not claim header-only protections such as
-`frame-ancestors`. W2's generated report will have its own separate CSP/security
-boundary. W1 does not ship its HTML or execute its JavaScript.
+`frame-ancestors`. The copied report retains its distinct released policy, including
+its inline-style allowance. Embedded reports cannot access parent DOM/storage,
+open popups, submit forms or navigate the parent. Direct and downloaded reports
+retain the report CSP but are outside the iframe sandbox; the wrapper explains this.
 
 ## Verification tiers
 
 Fast PR CI performs formatting, strict type checks, production build/output checks,
 dependency-source/license checks, Chromium smoke/axe checks, 12 visual comparisons,
-and a deeper-prefix smoke check. It has `contents: read` only and no deployment job.
+pinned report regeneration/mutation tests, and root/deeper-prefix browser checks. It has `contents: read` only and no deployment job.
 Existing Rust/release workflows are unchanged.
 
 Browser evidence uses `WEBSITE_TEST_RUN` labels (`project`, `deeper`, or `root`)
 under `test-results/` and `playwright-report/`. Failed tests retain traces and
 screenshots. CI attempts the deeper-prefix checks even after a project browser
 failure when production verification and browser installation succeeded, then
-uploads both directories with `if: always()`. GitHub-hosted execution remains
+uploads all three runs in both directories with `if: always()`. GitHub-hosted execution remains
 pending separate commit/push/PR authorization.
 
 Review identity records are in `reviews/baseline-provenance.json` and
@@ -135,8 +172,10 @@ file digest and the aggregate algorithm are recorded explicitly.
 
 Later release-candidate gates must include broader browser/device/assistive-tech
 coverage and deployment verification. Scheduled online release freshness/checksum
-auditing belongs with the later download catalog; it is not simulated in W1.
+auditing belongs with the later download catalog. W2 fetches the exact pinned
+generator for reproducibility, without adding a general release freshness service.
 Use `npm audit --audit-level=high` explicitly for an online dependency audit.
 
-See [W1 review](reviews/W1.md) for results, W0 deviations and remaining verification
-limits. Nothing here enables GitHub Pages.
+See [W2 review](reviews/W2.md) for current results and limitations, and
+[W1 review](reviews/W1.md) for historical W0 adaptations. Nothing here enables
+GitHub Pages.

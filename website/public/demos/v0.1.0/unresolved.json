@@ -1,0 +1,109 @@
+{
+  "schema_version": "0.2",
+  "analysis": "configuration",
+  "sources": [
+    "website/fixtures/unresolved/nginx.conf",
+    "website/fixtures/unresolved/routes.conf"
+  ],
+  "nodes": [
+    {
+      "id": "n000001",
+      "kind": "server",
+      "label": "unresolved.example.test · HTTP :8080",
+      "source": {
+        "path": "website/fixtures/unresolved/nginx.conf",
+        "line": 2
+      },
+      "attributes": {
+        "listeners": "HTTP :8080",
+        "server_names": "unresolved.example.test",
+        "state": "configured",
+        "virtual_host": "unresolved.example.test"
+      }
+    },
+    {
+      "id": "n000002",
+      "kind": "listener",
+      "label": "8080",
+      "source": {
+        "path": "website/fixtures/unresolved/nginx.conf",
+        "line": 3
+      },
+      "attributes": {
+        "address": "*",
+        "parameters": "",
+        "port": "8080",
+        "protocol": "http"
+      }
+    },
+    {
+      "id": "n000003",
+      "kind": "domain",
+      "label": "unresolved.example.test",
+      "source": {
+        "path": "website/fixtures/unresolved/nginx.conf",
+        "line": 4
+      },
+      "attributes": {
+        "match": "exact"
+      }
+    },
+    {
+      "id": "n000004",
+      "kind": "location",
+      "label": "location /dynamic/",
+      "source": {
+        "path": "website/fixtures/unresolved/routes.conf",
+        "line": 1
+      },
+      "attributes": {
+        "match": "prefix",
+        "pattern": "/dynamic/",
+        "routing": "unresolved"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "n000001",
+      "to": "n000002",
+      "kind": "listens_on",
+      "source": {
+        "path": "website/fixtures/unresolved/nginx.conf",
+        "line": 3
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000003",
+      "to": "n000001",
+      "kind": "routes_to",
+      "source": {
+        "path": "website/fixtures/unresolved/nginx.conf",
+        "line": 4
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000001",
+      "to": "n000004",
+      "kind": "contains",
+      "source": {
+        "path": "website/fixtures/unresolved/routes.conf",
+        "line": 1
+      },
+      "evidence": "configured"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "routing.unresolved",
+      "message": "variable proxy_pass cannot be resolved statically",
+      "source": {
+        "path": "website/fixtures/unresolved/routes.conf",
+        "line": 2
+      },
+      "severity": "warning"
+    }
+  ]
+}

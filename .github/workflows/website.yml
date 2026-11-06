@@ -10,6 +10,7 @@ on:
       - 'AGENTS.md'
       - '.editorconfig'
       - 'LICENSE'
+      - 'docs/website/WEBSITE_PLAN.md'
   push:
     branches: [main]
     paths:
@@ -20,6 +21,7 @@ on:
       - 'AGENTS.md'
       - '.editorconfig'
       - 'LICENSE'
+      - 'docs/website/WEBSITE_PLAN.md'
   workflow_dispatch:
 
 permissions:
@@ -33,6 +35,8 @@ jobs:
   foundation:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      NASJ_DEMO_CACHE: /tmp/nasj-website-v010
     defaults:
       run:
         working-directory: website
@@ -49,12 +53,31 @@ jobs:
       - run: npm run format:check
       - run: npm run check
       - run: npm run verify:dependencies
+      - name: Compute immutable generator cache identity
+        id: generator
+        run: node --input-type=module -e 'import { cacheKey } from "./scripts/demo-cache.mjs"; console.log("key=" + cacheKey)' >> "$GITHUB_OUTPUT"
+      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ env.NASJ_DEMO_CACHE }}
+          key: ${{ steps.generator.outputs.key }}
+      - name: Verify the pinned published generator and reproducible reports
+        run: |
+          npm run demos:ensure
+          npm run test:cache
+          npm run demos:verify
+      # PRs may restore trusted main caches, but never publish generator caches.
+      - uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'marawan6569/Nasj'
+        with:
+          path: ${{ env.NASJ_DEMO_CACHE }}
+          key: ${{ steps.generator.outputs.key }}
       - name: Verify production artifacts
         id: production
         run: |
           npm run build
           npm run verify
           npm run test:artifacts
+          npm run test:demos
       - id: browsers
         run: npx playwright install --with-deps chromium
       - name: Project-prefix browser tests
@@ -69,7 +92,16 @@ jobs:
         run: |
           npm run build
           npm run verify
-          npm test -- --grep 'real 404|theme precedence|effective production CSP|no JavaScript' --update-snapshots=none
+          npm test -- --grep 'real 404|theme precedence|effective production CSP|no JavaScript|W2' --update-snapshots=none
+      - name: Verify root hosting
+        if: ${{ !cancelled() && steps.production.outcome == 'success' && steps.browsers.outcome == 'success' }}
+        env:
+          WEBSITE_BASE: /
+          WEBSITE_TEST_RUN: root
+        run: |
+          npm run build
+          npm run verify
+          npm test -- --grep 'real 404|theme precedence|effective production CSP|no JavaScript|W2' --update-snapshots=none
       - name: Save browser evidence (no deployment)
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

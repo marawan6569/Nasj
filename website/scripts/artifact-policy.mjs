@@ -3,11 +3,13 @@ import { lstat, readdir, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { basename, dirname, extname, join, resolve } from "node:path";
 
-// W1 publication contract. New routes/resources require a reviewed policy change.
+// W1/W2 publication contract. New resources require an explicit policy change.
 // Public media/notices/manifests are allowed only when pinned in assets.json.
 const generatedDocuments = new Set([
     "index.html",
     "ar/index.html",
+    "demo/index.html",
+    "ar/demo/index.html",
     "404.html",
     "sitemap.xml",
 ]);
@@ -24,6 +26,8 @@ const textExtensions = new Set([
     ".txt",
     ".json",
     ".webmanifest",
+    ".svg",
+    ".dot",
 ]);
 const prohibitedExtensions =
     /\.(?:map|exe|dll|so|dylib|wasm|sh|bat|cmd|ps1|pem|key|env|bak|zip|tar|gz)(?:\.|$)/i;
@@ -65,10 +69,30 @@ function inspectText(bytes, path) {
     }
 }
 
-export async function verifyArtifacts({ root, manifest }) {
+export async function verifyArtifacts({ root, manifest, demos }) {
     root = resolve(root);
     const approved = new Map();
     const fonts = new Map();
+    for (const scenario of demos.scenarios) {
+        assert.ok(
+            ["multi-vhost", "unresolved"].includes(scenario.id),
+            "Unknown demo scenario",
+        );
+        assert.equal(scenario.outputs.length, 4, "Missing demo formats");
+        for (const entry of scenario.outputs) {
+            assert.ok(
+                ["json", "dot", "svg", "html"].some(
+                    (format) =>
+                        entry.path === `demos/v0.1.0/${scenario.id}.${format}`,
+                ),
+                "Unapproved demo artifact",
+            );
+            assert.match(entry.sha256, /^[a-f0-9]{64}$/, "Invalid demo digest");
+            assert.ok(!approved.has(entry.path), "Duplicate demo artifact");
+            approved.set(entry.path, entry.sha256);
+        }
+    }
+    assert.equal(approved.size, 8, "Expected both approved demos");
     for (const entry of manifest.files) {
         assert.match(entry.sha256, /^[a-f0-9]{64}$/, "Invalid asset digest");
         if (entry.path.startsWith("public/")) {
@@ -179,6 +203,18 @@ export async function verifyArtifacts({ root, manifest }) {
     }
     for (const stem of fonts.keys())
         assert.ok(seenFonts.has(stem), `Missing emitted font: ${stem}`);
+    for (const path of generatedDocuments) {
+        if (!path.endsWith(".html")) continue;
+        const document = await readFile(join(root, path), "utf8");
+        for (const [, resource] of document.matchAll(
+            /(?:href|src)="[^"]*?(_astro\/[^"/]+\.(?:css|js))"/g,
+        )) {
+            assert.ok(
+                seen.has(resource),
+                `Missing required artifact: ${resource}`,
+            );
+        }
+    }
     assert.ok(
         files.some((path) => path.endsWith(".css")),
         "Missing generated stylesheet",

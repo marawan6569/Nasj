@@ -5,13 +5,30 @@ import { gzipSync } from "node:zlib";
 import { load } from "cheerio";
 import { resolve, extname } from "node:path";
 import { verifyArtifacts } from "./artifact-policy.mjs";
+import { verifyReports } from "./demo-contract.mjs";
 const base = (process.env.WEBSITE_BASE || "/Nasj/").replace(/\/?$/, "/");
 const origin = "https://marawan6569.github.io";
 const root = resolve("dist");
 const manifest = JSON.parse(await readFile("assets.json", "utf8"));
-const files = await verifyArtifacts({ root, manifest });
-const pages = files.filter((f) => f.endsWith(".html"));
-assert.equal(pages.length, 3, "W1 ships only two homepages and a 404");
+const demos = JSON.parse(await readFile("src/data/demos.json", "utf8"));
+const files = await verifyArtifacts({ root, manifest, demos });
+const pages = files.filter(
+    (f) => f.endsWith(".html") && !f.startsWith(root + "/demos/"),
+);
+assert.equal(pages.length, 5, "Only localized home/demo routes and a 404");
+for (const scenario of demos.scenarios) {
+    const reports = {};
+    for (const output of scenario.outputs) {
+        const bytes = await readFile(resolve(root, output.path));
+        assert.deepEqual(
+            bytes,
+            await readFile(resolve("public", output.path)),
+            "Report must be copied byte-for-byte",
+        );
+        reports[extname(output.path).slice(1)] = bytes.toString("utf8");
+    }
+    verifyReports(reports, scenario, demos.viewer);
+}
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 for (const entry of manifest.files) {
     assert.equal(
@@ -32,6 +49,7 @@ assert.equal(
     "fixture must remain the pinned synthetic source",
 );
 for (const file of pages) {
+    const demoPage = file.endsWith("/demo/index.html");
     const html = await readFile(file, "utf8");
     const $ = load(html);
     const policy = $('meta[http-equiv="content-security-policy"]').attr(
@@ -54,16 +72,29 @@ for (const file of pages) {
         "object-src",
         "base-uri",
         "form-action",
-        "frame-src",
         "worker-src",
         "script-src-attr",
         "style-src-attr",
     ]) {
         assert.deepEqual(directives.get(name), ["'none'"], name);
     }
+    assert.deepEqual(directives.get("frame-src"), [
+        demoPage ? "'self'" : "'none'",
+    ]);
     for (const name of ["img-src", "font-src"])
         assert.deepEqual(directives.get(name), ["'self'"], name);
-    assert.equal($("iframe, object, embed, base, [style]").length, 0);
+    assert.equal($("object, embed, base, [style]").length, 0);
+    assert.equal($("iframe").length, demoPage ? 2 : 0);
+    $("iframe").each((i, e) => {
+        assert.equal(
+            e.attribs.src,
+            base + `demos/v0.1.0/${demos.scenarios[i].id}.html`,
+        );
+        assert.equal(e.attribs.sandbox, "allow-scripts");
+        assert.equal(e.attribs.referrerpolicy, "no-referrer");
+        assert.equal(e.attribs.loading, "lazy");
+        assert.ok(e.attribs.title);
+    });
     $("*").each((_, element) => {
         for (const attr of Object.keys(element.attribs || {}))
             assert.ok(!/^on/i.test(attr), "inline event attribute");
@@ -94,11 +125,15 @@ for (const file of pages) {
     const current =
         origin +
         base +
-        (file.endsWith("/ar/index.html")
-            ? "ar/"
-            : file.endsWith("/404.html")
-              ? "404.html"
-              : "");
+        (file.endsWith("/ar/demo/index.html")
+            ? "ar/demo/"
+            : demoPage
+              ? "demo/"
+              : file.endsWith("/ar/index.html")
+                ? "ar/"
+                : file.endsWith("/404.html")
+                  ? "404.html"
+                  : "");
     const urls = [];
     $("[src], [href], [srcset]").each((_, e) => {
         for (const attr of ["src", "href", "srcset"]) {
@@ -171,10 +206,6 @@ const inline = load(await readFile(root + "/index.html", "utf8"))("script")
     );
 assert.ok(css <= 35 * 1024, `CSS budget: ${css}`);
 assert.ok(js + inline <= 20 * 1024, `JS budget: ${js + inline}`);
-assert.ok(
-    !files.some((f) => /report.*\.html$/.test(f)),
-    "W2 viewer must not ship in W1",
-);
 console.log(
     `Budgets: CSS ${css} bytes gzip; JS ${js + inline} bytes gzip. ${manifest.files.length} provenance hashes verified.`,
 );

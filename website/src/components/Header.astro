@@ -1,16 +1,23 @@
 ---
 import Brand from "./Brand.astro";
-import { home, documentation, repository, type Locale } from "../lib/paths";
+import {
+    home,
+    demo,
+    documentation,
+    repository,
+    type Locale,
+} from "../lib/paths";
 interface Props {
     locale: Locale;
+    demoPage?: boolean;
 }
-const { locale } = Astro.props;
+const { locale, demoPage = false } = Astro.props;
 const ar = locale === "ar";
 const links = [
     { label: ar ? "الميزات" : "Features", href: home(locale) + "#features" },
     {
         label: ar ? "معاينة التقرير" : "Report preview",
-        href: home(locale) + "#demo",
+        href: demo(locale),
     },
     { label: ar ? "التثبيت" : "Installation", href: home(locale) + "#install" },
     { label: ar ? "التوثيق" : "Documentation", href: documentation(locale) },
@@ -35,7 +42,7 @@ const links = [
             <a
                 class="lang"
                 data-language
-                href={home(ar ? "en" : "ar")}
+                href={(demoPage ? demo : home)(ar ? "en" : "ar")}
                 lang={ar ? "en" : "ar"}
                 dir={ar ? "ltr" : "rtl"}
                 hreflang={ar ? "en" : "ar"}

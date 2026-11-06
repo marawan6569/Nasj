@@ -1,0 +1,149 @@
+{
+    "recordedAt": "2026-11-03T20:33:26.616Z",
+    "base": "/Nasj/",
+    "node": "v24.22.2",
+    "osRelease": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+    "playwright": "1.64.1",
+    "chromium": "156.0.8078.4",
+    "screenshotProfile": "Chromium headless, device scale 1, 900px viewport height, reduced motion; genuine sandboxed viewer with selected backend; W2 review captures, not baselines",
+    "timingProfile": "Three sequential fresh contexts, desktop 1440x900, unthrottled local production server, search + selection + two animation frames; not mobile LCP/CLS, field INP, or a launch-performance approval",
+    "captures": [
+        {
+            "path": "screenshots/en-dark-1440-intro.png",
+            "locale": "en",
+            "theme": "dark",
+            "width": 1440,
+            "height": 900,
+            "area": "intro",
+            "recordedAt": "2026-11-03T20:33:22.748Z",
+            "sha256": "8e489de77ec1b149d39dd896046f26386d5ca4f947633336754afec083ef9b50"
+        },
+        {
+            "path": "screenshots/en-dark-1440-report.png",
+            "locale": "en",
+            "theme": "dark",
+            "width": 1440,
+            "height": 900,
+            "area": "report",
+            "recordedAt": "2026-11-03T20:33:22.883Z",
+            "sha256": "3dfbd6395486fddfdcb655895aa7ea85d4e2f9fe2c9983eacf1e0b27a810eb5d"
+        },
+        {
+            "path": "screenshots/en-dark-390-intro.png",
+            "locale": "en",
+            "theme": "dark",
+            "width": 390,
+            "height": 900,
+            "area": "intro",
+            "recordedAt": "2026-11-03T20:33:23.446Z",
+            "sha256": "98f3d8dad2c2be24c236bb0a6b385c1671aed4687e4653f5cc0d0c0cc7ba4ad2"
+        },
+        {
+            "path": "screenshots/en-dark-390-report.png",
+            "locale": "en",
+            "theme": "dark",
+            "width": 390,
+            "height": 900,
+            "area": "report",
+            "recordedAt": "2026-11-03T20:33:23.514Z",
+            "sha256": "108a1d4e2c74065b5190ca6e68241b7f8034d38e2619ecf36ea07c1584ef6230"
+        },
+        {
+            "path": "screenshots/en-dark-320-intro.png",
+            "locale": "en",
+            "theme": "dark",
+            "width": 320,
+            "height": 900,
+            "area": "intro",
+            "recordedAt": "2026-11-03T20:33:24.044Z",
+            "sha256": "b501d569601ce5ca2fef05e091729bad8299f756f036475a2c94d0af58ee9cbf"
+        },
+        {
+            "path": "screenshots/en-dark-320-report.png",
+            "locale": "en",
+            "theme": "dark",
+            "width": 320,
+            "height": 900,
+            "area": "report",
+            "recordedAt": "2026-11-03T20:33:24.094Z",
+            "sha256": "db321228e0a46e1139f341d8aad2afaf7a88d80c31d244bf3cb1f59616e86528"
+        },
+        {
+            "path": "screenshots/ar-light-1440-intro.png",
+            "locale": "ar",
+            "theme": "light",
+            "width": 1440,
+            "height": 900,
+            "area": "intro",
+            "recordedAt": "2026-11-03T20:33:24.732Z",
+            "sha256": "e3b14629250c7e0a92339cc26d1c0aee287fc6eee425c827fc610662ec8493b2"
+        },
+        {
+            "path": "screenshots/ar-light-1440-report.png",
+            "locale": "ar",
+            "theme": "light",
+            "width": 1440,
+            "height": 900,
+            "area": "report",
+            "recordedAt": "2026-11-03T20:33:24.842Z",
+            "sha256": "617337a70a82df861901a333e24e0de090bb85ea00aef9c6bc5a42e2fbdad94e"
+        },
+        {
+            "path": "screenshots/ar-light-390-intro.png",
+            "locale": "ar",
+            "theme": "light",
+            "width": 390,
+            "height": 900,
+            "area": "intro",
+            "recordedAt": "2026-11-03T20:33:25.385Z",
+            "sha256": "7be6c6243aadd023bc5c0166672b0b70c53bec6606a02003aeb99e737822fffa"
+        },
+        {
+            "path": "screenshots/ar-light-390-report.png",
+            "locale": "ar",
+            "theme": "light",
+            "width": 390,
+            "height": 900,
+            "area": "report",
+            "recordedAt": "2026-11-03T20:33:25.445Z",
+            "sha256": "51d091ab0bcfc29dd64fd1501cea0ced624075696e20e0405e48fa2bc90c3a10"
+        },
+        {
+            "path": "screenshots/ar-light-320-intro.png",
+            "locale": "ar",
+            "theme": "light",
+            "width": 320,
+            "height": 900,
+            "area": "intro",
+            "recordedAt": "2026-11-03T20:33:25.979Z",
+            "sha256": "fae230dc13550b028506c4a52291088b5c7d1efa7835275d08bceab5fc66a6e5"
+        },
+        {
+            "path": "screenshots/ar-light-320-report.png",
+            "locale": "ar",
+            "theme": "light",
+            "width": 320,
+            "height": 900,
+            "area": "report",
+            "recordedAt": "2026-11-03T20:33:26.027Z",
+            "sha256": "be4df7ad8c53116752e30bdce69ddb4a67a8b5b6de783c14db16f4672bc6fbdb"
+        }
+    ],
+    "measurements": [
+        {
+            "run": 1,
+            "milliseconds": 34.5,
+            "selected": "127.0.0.1:8100"
+        },
+        {
+            "run": 2,
+            "milliseconds": 34.10000002384186,
+            "selected": "127.0.0.1:8100"
+        },
+        {
+            "run": 3,
+            "milliseconds": 34.10000002384186,
+            "selected": "127.0.0.1:8100"
+        }
+    ]
+}

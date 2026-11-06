@@ -1,0 +1,969 @@
+{
+  "schema_version": "0.2",
+  "analysis": "configuration",
+  "sources": [
+    "fixtures/nginx/multi-vhost.conf"
+  ],
+  "nodes": [
+    {
+      "id": "n000001",
+      "kind": "upstream",
+      "label": "portal_app",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 6
+      },
+      "attributes": {}
+    },
+    {
+      "id": "n000002",
+      "kind": "target",
+      "label": "127.0.0.1:8100",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 7
+      },
+      "attributes": {
+        "parameters": "",
+        "state": "configured"
+      }
+    },
+    {
+      "id": "n000003",
+      "kind": "target",
+      "label": "127.0.0.1:8101",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 8
+      },
+      "attributes": {
+        "parameters": "backup",
+        "state": "configured"
+      }
+    },
+    {
+      "id": "n000004",
+      "kind": "upstream",
+      "label": "api_app",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 10
+      },
+      "attributes": {}
+    },
+    {
+      "id": "n000005",
+      "kind": "target",
+      "label": "127.0.0.1:8200",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 11
+      },
+      "attributes": {
+        "parameters": "",
+        "state": "configured"
+      }
+    },
+    {
+      "id": "n000006",
+      "kind": "target",
+      "label": "[::1]:8201",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 12
+      },
+      "attributes": {
+        "parameters": "",
+        "state": "configured"
+      }
+    },
+    {
+      "id": "n000007",
+      "kind": "server",
+      "label": "portal.example.test · HTTP :80",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 14
+      },
+      "attributes": {
+        "configured_root": "/srv/example-default",
+        "listeners": "HTTP :80",
+        "root_origin": "inherited",
+        "root_source": "fixtures/nginx/multi-vhost.conf:5",
+        "routing": "conditional",
+        "server_names": "portal.example.test, www.portal.example.test",
+        "state": "configured",
+        "virtual_host": "portal.example.test"
+      }
+    },
+    {
+      "id": "n000008",
+      "kind": "listener",
+      "label": "80",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 15
+      },
+      "attributes": {
+        "address": "*",
+        "parameters": "",
+        "port": "80",
+        "protocol": "http"
+      }
+    },
+    {
+      "id": "n000009",
+      "kind": "domain",
+      "label": "portal.example.test",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 16
+      },
+      "attributes": {
+        "match": "exact"
+      }
+    },
+    {
+      "id": "n000010",
+      "kind": "domain",
+      "label": "www.portal.example.test",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 16
+      },
+      "attributes": {
+        "match": "exact"
+      }
+    },
+    {
+      "id": "n000011",
+      "kind": "condition",
+      "label": "$host = \"portal.example.test\"",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 17
+      },
+      "attributes": {
+        "phase": "server_rewrite"
+      },
+      "condition": {
+        "variable": "$host",
+        "operator": "equal",
+        "value": "portal.example.test",
+        "value_redacted": false
+      }
+    },
+    {
+      "id": "n000012",
+      "kind": "redirect",
+      "label": "301 → https://$host$request_uri",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 17
+      },
+      "attributes": {
+        "destination_resolution": "dynamic",
+        "routing": "unresolved",
+        "status": "301",
+        "target_expression": "https://$host$request_uri"
+      }
+    },
+    {
+      "id": "n000013",
+      "kind": "response",
+      "label": "return 404",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 18
+      },
+      "attributes": {
+        "response": "body omitted",
+        "status": "404"
+      }
+    },
+    {
+      "id": "n000014",
+      "kind": "server",
+      "label": "portal.example.test · HTTPS :443",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 20
+      },
+      "attributes": {
+        "configured_root": "/srv/example-default",
+        "listeners": "HTTPS :443",
+        "root_origin": "inherited",
+        "root_source": "fixtures/nginx/multi-vhost.conf:5",
+        "server_names": "portal.example.test, www.portal.example.test",
+        "state": "configured",
+        "virtual_host": "portal.example.test"
+      }
+    },
+    {
+      "id": "n000015",
+      "kind": "listener",
+      "label": "443",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 21
+      },
+      "attributes": {
+        "address": "*",
+        "parameters": "ssl",
+        "port": "443",
+        "protocol": "https"
+      }
+    },
+    {
+      "id": "n000016",
+      "kind": "listener",
+      "label": "[::]:443",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 22
+      },
+      "attributes": {
+        "address": "[::]",
+        "parameters": "ssl",
+        "port": "443",
+        "protocol": "https"
+      }
+    },
+    {
+      "id": "n000017",
+      "kind": "domain",
+      "label": "portal.example.test",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 23
+      },
+      "attributes": {
+        "match": "exact"
+      }
+    },
+    {
+      "id": "n000018",
+      "kind": "domain",
+      "label": "www.portal.example.test",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 23
+      },
+      "attributes": {
+        "match": "exact"
+      }
+    },
+    {
+      "id": "n000019",
+      "kind": "static_root",
+      "label": "/srv/example-default",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 5
+      },
+      "attributes": {
+        "directive": "root"
+      }
+    },
+    {
+      "id": "n000020",
+      "kind": "location",
+      "label": "location /",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 24
+      },
+      "attributes": {
+        "configured_root": "/srv/example-default",
+        "match": "prefix",
+        "pattern": "/",
+        "root_origin": "inherited",
+        "root_source": "fixtures/nginx/multi-vhost.conf:5"
+      }
+    },
+    {
+      "id": "n000021",
+      "kind": "location",
+      "label": "location /assets/",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 25
+      },
+      "attributes": {
+        "match": "prefix",
+        "pattern": "/assets/"
+      }
+    },
+    {
+      "id": "n000022",
+      "kind": "static_root",
+      "label": "/srv/example-assets/",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 25
+      },
+      "attributes": {
+        "directive": "alias"
+      }
+    },
+    {
+      "id": "n000023",
+      "kind": "location",
+      "label": "location = /health",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 26
+      },
+      "attributes": {
+        "configured_root": "/srv/example-default",
+        "match": "exact",
+        "pattern": "/health",
+        "root_origin": "inherited",
+        "root_source": "fixtures/nginx/multi-vhost.conf:5"
+      }
+    },
+    {
+      "id": "n000024",
+      "kind": "response",
+      "label": "return 204",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 26
+      },
+      "attributes": {
+        "response": "body omitted",
+        "status": "204"
+      }
+    },
+    {
+      "id": "n000025",
+      "kind": "location",
+      "label": "location /api/",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 27
+      },
+      "attributes": {
+        "configured_root": "/srv/example-default",
+        "match": "prefix",
+        "pattern": "/api/",
+        "root_origin": "inherited",
+        "root_source": "fixtures/nginx/multi-vhost.conf:5"
+      }
+    },
+    {
+      "id": "n000026",
+      "kind": "server",
+      "label": "api.example.test · HTTP :80",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 29
+      },
+      "attributes": {
+        "configured_root": "/srv/example-default",
+        "listeners": "HTTP :80",
+        "root_origin": "inherited",
+        "root_source": "fixtures/nginx/multi-vhost.conf:5",
+        "routing": "conditional",
+        "server_names": "api.example.test",
+        "state": "configured",
+        "virtual_host": "api.example.test"
+      }
+    },
+    {
+      "id": "n000027",
+      "kind": "listener",
+      "label": "80",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 30
+      },
+      "attributes": {
+        "address": "*",
+        "parameters": "",
+        "port": "80",
+        "protocol": "http"
+      }
+    },
+    {
+      "id": "n000028",
+      "kind": "domain",
+      "label": "api.example.test",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 31
+      },
+      "attributes": {
+        "match": "exact"
+      }
+    },
+    {
+      "id": "n000029",
+      "kind": "condition",
+      "label": "$host = \"api.example.test\"",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 32
+      },
+      "attributes": {
+        "phase": "server_rewrite"
+      },
+      "condition": {
+        "variable": "$host",
+        "operator": "equal",
+        "value": "api.example.test",
+        "value_redacted": false
+      }
+    },
+    {
+      "id": "n000030",
+      "kind": "redirect",
+      "label": "308 → https://$host$request_uri",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 32
+      },
+      "attributes": {
+        "destination_resolution": "dynamic",
+        "routing": "unresolved",
+        "status": "308",
+        "target_expression": "https://$host$request_uri"
+      }
+    },
+    {
+      "id": "n000031",
+      "kind": "response",
+      "label": "return 404",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 33
+      },
+      "attributes": {
+        "response": "body omitted",
+        "status": "404"
+      }
+    },
+    {
+      "id": "n000032",
+      "kind": "server",
+      "label": "api.example.test · HTTPS :443",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 35
+      },
+      "attributes": {
+        "configured_root": "/srv/example-default",
+        "listeners": "HTTPS :443",
+        "root_origin": "inherited",
+        "root_source": "fixtures/nginx/multi-vhost.conf:5",
+        "server_names": "api.example.test",
+        "state": "configured",
+        "virtual_host": "api.example.test"
+      }
+    },
+    {
+      "id": "n000033",
+      "kind": "listener",
+      "label": "443",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 36
+      },
+      "attributes": {
+        "address": "*",
+        "parameters": "ssl",
+        "port": "443",
+        "protocol": "https"
+      }
+    },
+    {
+      "id": "n000034",
+      "kind": "domain",
+      "label": "api.example.test",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 37
+      },
+      "attributes": {
+        "match": "exact"
+      }
+    },
+    {
+      "id": "n000035",
+      "kind": "static_root",
+      "label": "/srv/example-default",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 5
+      },
+      "attributes": {
+        "directive": "root"
+      }
+    },
+    {
+      "id": "n000036",
+      "kind": "location",
+      "label": "location /",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 38
+      },
+      "attributes": {
+        "configured_root": "/srv/example-default",
+        "match": "prefix",
+        "pattern": "/",
+        "root_origin": "inherited",
+        "root_source": "fixtures/nginx/multi-vhost.conf:5"
+      }
+    },
+    {
+      "id": "n000037",
+      "kind": "location",
+      "label": "location /docs/",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 39
+      },
+      "attributes": {
+        "configured_root": "/srv/example-docs",
+        "match": "prefix",
+        "pattern": "/docs/",
+        "root_origin": "local",
+        "root_source": "fixtures/nginx/multi-vhost.conf:39"
+      }
+    },
+    {
+      "id": "n000038",
+      "kind": "static_root",
+      "label": "/srv/example-docs",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 39
+      },
+      "attributes": {
+        "directive": "root"
+      }
+    },
+    {
+      "id": "n000039",
+      "kind": "location",
+      "label": "location = /status",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 40
+      },
+      "attributes": {
+        "configured_root": "/srv/example-default",
+        "match": "exact",
+        "pattern": "/status",
+        "root_origin": "inherited",
+        "root_source": "fixtures/nginx/multi-vhost.conf:5"
+      }
+    },
+    {
+      "id": "n000040",
+      "kind": "response",
+      "label": "return 200",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 40
+      },
+      "attributes": {
+        "response": "body omitted",
+        "status": "200"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "n000001",
+      "to": "n000002",
+      "kind": "backed_by",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 7
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000001",
+      "to": "n000003",
+      "kind": "backed_by",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 8
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000004",
+      "to": "n000005",
+      "kind": "backed_by",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 11
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000004",
+      "to": "n000006",
+      "kind": "backed_by",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 12
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000007",
+      "to": "n000008",
+      "kind": "listens_on",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 15
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000009",
+      "to": "n000007",
+      "kind": "routes_to",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 16
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000010",
+      "to": "n000007",
+      "kind": "routes_to",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 16
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000007",
+      "to": "n000011",
+      "kind": "evaluates",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 17
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000011",
+      "to": "n000012",
+      "kind": "when_true",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 17
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000011",
+      "to": "n000013",
+      "kind": "when_false",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 17
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000014",
+      "to": "n000015",
+      "kind": "listens_on",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 21
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000014",
+      "to": "n000016",
+      "kind": "listens_on",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 22
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000017",
+      "to": "n000014",
+      "kind": "routes_to",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 23
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000018",
+      "to": "n000014",
+      "kind": "routes_to",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 23
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000014",
+      "to": "n000019",
+      "kind": "backed_by",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 5
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000014",
+      "to": "n000020",
+      "kind": "contains",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 24
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000020",
+      "to": "n000001",
+      "kind": "proxies_to",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 24
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000014",
+      "to": "n000021",
+      "kind": "contains",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 25
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000021",
+      "to": "n000022",
+      "kind": "backed_by",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 25
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000014",
+      "to": "n000023",
+      "kind": "contains",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 26
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000023",
+      "to": "n000024",
+      "kind": "responds_with",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 26
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000014",
+      "to": "n000025",
+      "kind": "contains",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 27
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000025",
+      "to": "n000004",
+      "kind": "proxies_to",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 27
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000026",
+      "to": "n000027",
+      "kind": "listens_on",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 30
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000028",
+      "to": "n000026",
+      "kind": "routes_to",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 31
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000026",
+      "to": "n000029",
+      "kind": "evaluates",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 32
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000029",
+      "to": "n000030",
+      "kind": "when_true",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 32
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000029",
+      "to": "n000031",
+      "kind": "when_false",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 32
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000032",
+      "to": "n000033",
+      "kind": "listens_on",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 36
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000034",
+      "to": "n000032",
+      "kind": "routes_to",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 37
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000032",
+      "to": "n000035",
+      "kind": "backed_by",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 5
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000032",
+      "to": "n000036",
+      "kind": "contains",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 38
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000036",
+      "to": "n000004",
+      "kind": "proxies_to",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 38
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000032",
+      "to": "n000037",
+      "kind": "contains",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 39
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000037",
+      "to": "n000038",
+      "kind": "backed_by",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 39
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000032",
+      "to": "n000039",
+      "kind": "contains",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 40
+      },
+      "evidence": "configured"
+    },
+    {
+      "from": "n000039",
+      "to": "n000040",
+      "kind": "responds_with",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 40
+      },
+      "evidence": "configured"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "include.empty",
+      "message": "optional include glob matched no files; check the pattern if configuration was expected",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 2
+      },
+      "severity": "info"
+    },
+    {
+      "code": "include.empty",
+      "message": "optional include glob matched no files; check the pattern if configuration was expected",
+      "source": {
+        "path": "fixtures/nginx/multi-vhost.conf",
+        "line": 3
+      },
+      "severity": "info"
+    }
+  ]
+}

@@ -20,6 +20,7 @@ import { verifyArtifacts } from "../scripts/artifact-policy.mjs";
 // Test actual built assets in disposable copies. Never modify dist or baselines.
 const built = resolve("dist");
 const originalManifest = JSON.parse(await readFile("assets.json", "utf8"));
+const demos = JSON.parse(await readFile("src/data/demos.json", "utf8"));
 const generated = await readdir(join(built, "_astro"));
 const css = "_astro/" + generated.find((path) => path.endsWith(".css"));
 const font = "_astro/" + generated.find((path) => path.endsWith(".woff2"));
@@ -30,13 +31,23 @@ async function fixture(t) {
     t.after(() => rm(temporary, { recursive: true, force: true }));
     const root = join(temporary, "dist");
     await cp(built, root, { recursive: true });
-    return { root, manifest: structuredClone(originalManifest), temporary };
+    return {
+        root,
+        manifest: structuredClone(originalManifest),
+        demos,
+        temporary,
+    };
 }
 
 test("accepts the complete real production inventory", async () => {
     assert.ok(
-        (await verifyArtifacts({ root: built, manifest: originalManifest }))
-            .length > 20,
+        (
+            await verifyArtifacts({
+                root: built,
+                manifest: originalManifest,
+                demos,
+            })
+        ).length > 20,
     );
 });
 

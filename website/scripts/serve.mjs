@@ -12,6 +12,9 @@ const types = {
     ".woff2": "font/woff2",
     ".xml": "application/xml",
     ".txt": "text/plain; charset=utf-8",
+    ".json": "application/json",
+    ".svg": "image/svg+xml",
+    ".dot": "text/plain; charset=utf-8",
 };
 const server = createServer(async (req, res) => {
     try {

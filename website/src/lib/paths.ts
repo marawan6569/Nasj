@@ -8,6 +8,8 @@ export function asset(path: string): string {
     return basePath + path.replace(/^\/+/, "");
 }
 export const home = (locale: Locale) => asset(locale === "ar" ? "ar/" : "");
+export const demo = (locale: Locale) =>
+    asset(locale === "ar" ? "ar/demo/" : "demo/");
 export const repository = "https://github.com/marawan6569/Nasj";
 export const documentation = (locale: Locale) =>
     `${repository}/blob/main/${locale === "ar" ? "README.ar.md" : "README.md"}`;
