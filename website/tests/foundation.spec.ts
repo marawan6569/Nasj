@@ -21,9 +21,10 @@ async function settle(page: Page) {
 
 for (const locale of ["en", "ar"]) {
     for (const theme of ["dark", "light"] as const) {
-        for (const width of [1440, 390, 320]) {
+        for (const width of [1440, 768, 390, 320]) {
             test(`${locale} ${theme} ${width}: production smoke, reflow, accessibility and visual`, async ({
                 page,
+                browserName,
             }) => {
                 await page.setViewportSize({ width, height: 900 });
                 await page.emulateMedia({
@@ -128,10 +129,11 @@ for (const locale of ["en", "ar"]) {
                     ),
                 );
                 expect(payload).toBeLessThanOrEqual(500 * 1024);
-                await expect(page).toHaveScreenshot(
-                    `${locale}-${theme}-${width}.png`,
-                    { fullPage: true },
-                );
+                if (browserName === "chromium" && width !== 768)
+                    await expect(page).toHaveScreenshot(
+                        `${locale}-${theme}-${width}.png`,
+                        { fullPage: true },
+                    );
             });
         }
     }

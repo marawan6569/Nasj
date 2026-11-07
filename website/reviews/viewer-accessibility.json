@@ -1,0 +1,50 @@
+[
+    {
+        "surface": "direct released multi-vhost viewer",
+        "theme": "dark",
+        "viewport": "390x844",
+        "browser": "156.0.8078.4",
+        "violations": [
+            {
+                "id": "nested-interactive",
+                "impact": "serious",
+                "nodes": [
+                    {
+                        "target": ["#topology-graph"],
+                        "summary": "Fix any of the following:\n  Element has focusable descendants. Move them outside of the element, or remove them."
+                    }
+                ]
+            }
+        ],
+        "incomplete": ["aria-prohibited-attr", "color-contrast"]
+    },
+    {
+        "surface": "direct released multi-vhost viewer",
+        "theme": "light",
+        "viewport": "390x844",
+        "browser": "156.0.8078.4",
+        "violations": [
+            {
+                "id": "color-contrast",
+                "impact": "serious",
+                "nodes": [
+                    {
+                        "target": ["header > .badge"],
+                        "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.39 (foreground color: #007d73, background color: #e1f4ef, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+                    }
+                ]
+            },
+            {
+                "id": "nested-interactive",
+                "impact": "serious",
+                "nodes": [
+                    {
+                        "target": ["#topology-graph"],
+                        "summary": "Fix any of the following:\n  Element has focusable descendants. Move them outside of the element, or remove them."
+                    }
+                ]
+            }
+        ],
+        "incomplete": ["aria-prohibited-attr", "color-contrast"]
+    }
+]

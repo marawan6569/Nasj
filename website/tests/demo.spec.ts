@@ -108,7 +108,7 @@ async function tasks(surface: Page | Frame, id: string) {
 
 for (const locale of ["en", "ar"])
     for (const theme of ["dark", "light"] as const)
-        for (const width of [1440, 390, 320]) {
+        for (const width of [1440, 768, 390, 320]) {
             test(`W2 wrapper ${locale} ${theme} ${width}: reflow, evidence and accessibility`, async ({
                 page,
             }, info) => {
