@@ -24,7 +24,10 @@
         "test:update": "playwright test --update-snapshots",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "verify:dependencies": "node scripts/verify-dependencies.mjs"
+        "verify:dependencies": "node scripts/verify-dependencies.mjs",
+        "test:content": "node --test tests/content.test.mjs",
+        "verify:release": "node scripts/verify-release.mjs",
+        "test:visual": "playwright test --config playwright.visual.config.ts --update-snapshots=none"
     },
     "dependencies": {
         "@tailwindcss/vite": "4.3.3",

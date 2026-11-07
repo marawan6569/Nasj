@@ -15,7 +15,7 @@ const files = await verifyArtifacts({ root, manifest, demos });
 const pages = files.filter(
     (f) => f.endsWith(".html") && !f.startsWith(root + "/demos/"),
 );
-assert.equal(pages.length, 5, "Only localized home/demo routes and a 404");
+assert.equal(pages.length, 15, "Seven localized routes and a 404");
 for (const scenario of demos.scenarios) {
     const reports = {};
     for (const output of scenario.outputs) {
@@ -123,17 +123,7 @@ for (const file of pages) {
         });
     }
     const current =
-        origin +
-        base +
-        (file.endsWith("/ar/demo/index.html")
-            ? "ar/demo/"
-            : demoPage
-              ? "demo/"
-              : file.endsWith("/ar/index.html")
-                ? "ar/"
-                : file.endsWith("/404.html")
-                  ? "404.html"
-                  : "");
+        origin + base + file.slice(root.length + 1).replace(/index\.html$/, "");
     const urls = [];
     $("[src], [href], [srcset]").each((_, e) => {
         for (const attr of ["src", "href", "srcset"]) {

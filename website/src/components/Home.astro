@@ -1,6 +1,6 @@
 ---
 import { translator } from "../lib/copy";
-import type { Locale } from "../lib/paths";
+import { pagePath, type Locale } from "../lib/paths";
 import SourceCard from "./SourceCard.astro";
 import ReportPreview from "./ReportPreview.astro";
 interface Props {
@@ -39,7 +39,7 @@ const t = translator(locale);
                 <Fragment set:html={t("Preview report")} />{" "}
                 <span class="arrow">↗</span>
             </a>
-            <a class="button" href="#install">
+            <a class="button" href={pagePath(locale, "install")}>
                 <svg aria-hidden="true" class="icon" viewBox="0 0 24 24">
                     <path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4" />
                 </svg>
@@ -274,10 +274,7 @@ const t = translator(locale);
         </p>
     </div>
     <div class="install-actions">
-        <a
-            class="button primary"
-            href="https://github.com/marawan6569/Nasj/releases/tag/v0.1.0"
-        >
+        <a class="button primary" href={pagePath(locale, "install")}>
             <Fragment set:html={t("Install NASJ")} />{" "}
             <span class="arrow">↗</span>
         </a>

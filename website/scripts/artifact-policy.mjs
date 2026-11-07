@@ -10,6 +10,9 @@ const generatedDocuments = new Set([
     "ar/index.html",
     "demo/index.html",
     "ar/demo/index.html",
+    ...["install", "docs", "compatibility", "roadmap", "licenses"].flatMap(
+        (slug) => [`${slug}/index.html`, `ar/${slug}/index.html`],
+    ),
     "404.html",
     "sitemap.xml",
 ]);

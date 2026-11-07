@@ -2,6 +2,13 @@ import { defineConfig } from "@playwright/test";
 const run = process.env.WEBSITE_TEST_RUN || "project";
 if (!/^[a-z][a-z0-9-]*$/.test(run)) throw new Error("Invalid test run label");
 export default defineConfig({
+    projects: (process.env.WEBSITE_ALL_BROWSERS === "1"
+        ? ["chromium", "firefox", "webkit"]
+        : ["chromium"]
+    ).map((name) => ({
+        name,
+        use: { browserName: name as "chromium" | "firefox" | "webkit" },
+    })),
     testDir: "./tests",
     testMatch: "**/*.spec.ts",
     outputDir: `./test-results/${run}`,

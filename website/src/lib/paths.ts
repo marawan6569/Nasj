@@ -13,3 +13,14 @@ export const demo = (locale: Locale) =>
 export const repository = "https://github.com/marawan6569/Nasj";
 export const documentation = (locale: Locale) =>
     `${repository}/blob/main/${locale === "ar" ? "README.ar.md" : "README.md"}`;
+
+export const contentRoutes = [
+    "install",
+    "docs",
+    "compatibility",
+    "roadmap",
+    "licenses",
+] as const;
+export type ContentRoute = (typeof contentRoutes)[number];
+export const pagePath = (locale: Locale, slug = "") =>
+    home(locale) + (slug ? slug + "/" : "");
