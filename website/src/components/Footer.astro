@@ -1,6 +1,6 @@
 ---
 import Brand from "./Brand.astro";
-import { documentation, repository, type Locale } from "../lib/paths";
+import { pagePath, repository, type Locale } from "../lib/paths";
 interface Props {
     locale: Locale;
 }
@@ -17,13 +17,15 @@ const ar = locale === "ar";
                     ? "انسج بنيتك التحتية في صورة واضحة."
                     : "Weave your infrastructure into clarity."}
                 <br />
-                {ar
-                    ? "مفتوح المصدر. بترخيص MIT."
-                    : "Open source. Licensed under MIT."}
+                <a href={pagePath(locale, "licenses")}>
+                    {ar
+                        ? "مفتوح المصدر. بترخيص MIT."
+                        : "Open source. Licensed under MIT."}
+                </a>
             </p>
         </div>
         <div class="footer-links">
-            <a href={documentation(locale)}>
+            <a href={pagePath(locale, "docs")}>
                 {ar ? "التوثيق" : "Documentation"}
             </a>
             <a href={`${repository}/blob/main/CONTRIBUTING.md`}>
