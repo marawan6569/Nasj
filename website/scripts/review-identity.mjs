@@ -10,6 +10,7 @@ const excluded = new Set([
     ".astro",
     "dist",
     "reviews",
+    "artifact.tar",
     "test-results",
     "playwright-report",
 ]);
@@ -46,6 +47,9 @@ for (const path of [
     ".editorconfig",
     "LICENSE",
     ".github/workflows/website.yml",
+    ".github/workflows/website-audit.yml",
+    ".github/workflows/website-deploy.yml",
+    "docs/BINARY_VALIDATION_v0.1.0.md",
     "fixtures/nginx/multi-vhost.conf",
     "docs/website/WEBSITE_PLAN.md",
 ])
