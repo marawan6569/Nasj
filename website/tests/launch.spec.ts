@@ -7,6 +7,7 @@ for (const locale of ["en", "ar"])
         for (const width of [320, 390, 768, 1440]) {
             test(`W4 content ${locale} ${theme} ${width}: all routes, accessibility, bidi and reflow`, async ({
                 page,
+                browserName,
             }, info) => {
                 test.setTimeout(90000);
                 await page.setViewportSize({ width, height: 900 });
