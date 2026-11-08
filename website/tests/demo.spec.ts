@@ -230,6 +230,7 @@ for (const id of ["multi-vhost", "unresolved"]) {
             reportTheme!,
         );
         await expect(frame!.locator("html")).toHaveAttribute("lang", "en");
+        const pageCount = page.context().pages().length;
         const isolation = await frame!.evaluate(() => {
             let parentDenied = false;
             let storageDenied = false;
@@ -243,11 +244,20 @@ for (const id of ["multi-vhost", "unresolved"]) {
             } catch (e) {
                 storageDenied = (e as Error).name === "SecurityError";
             }
+            let popupDenied = false;
+            try {
+                popupDenied = window.open("about:blank") === null;
+            } catch (error) {
+                // Firefox throws InvalidAccessError for the same sandbox denial.
+                popupDenied =
+                    error instanceof DOMException &&
+                    error.name === "InvalidAccessError";
+            }
             return {
                 parentDenied,
                 storageDenied,
                 referrer: document.referrer,
-                popupDenied: window.open("about:blank") === null,
+                popupDenied,
             };
         });
         expect(isolation).toEqual({
@@ -256,6 +266,7 @@ for (const id of ["multi-vhost", "unresolved"]) {
             referrer: "",
             popupDenied: true,
         });
+        expect(page.context().pages()).toHaveLength(pageCount);
         // Move focus out through the browser's Tab sequence, with no keyboard trap.
         await frame!.locator("#theme").focus();
         for (
@@ -318,7 +329,17 @@ for (const id of ["multi-vhost", "unresolved"]) {
             file.on("request", (r) => requests.push(r.url()));
             await file.goto(pathToFileURL(path).href);
             await tasks(file, id);
-            expect(requests).toEqual([pathToFileURL(path).href]);
+            // Firefox does not emit request events for the initial file navigation.
+            // Assert the exact loaded URL, no other request, and no secondary resource.
+            expect(file.url()).toBe(pathToFileURL(path).href);
+            expect(
+                requests.filter((url) => url !== pathToFileURL(path).href),
+            ).toEqual([]);
+            expect(
+                await file.evaluate(
+                    () => performance.getEntriesByType("resource").length,
+                ),
+            ).toBe(0);
             await assertCsp(file);
         } finally {
             await offline.close();
