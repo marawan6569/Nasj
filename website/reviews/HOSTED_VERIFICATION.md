@@ -51,3 +51,12 @@ avoid it. Optional content captures now use Chromium, consistent with the existi
 visual-comparison project. All Firefox/WebKit functional, accessibility, network
 and zero-console-error assertions remain enabled and unchanged. No CSP error
 filter or permission relaxation was introduced.
+
+Run 42431392416 passed all 246 project and 186 cases at each additional base,
+including Firefox/WebKit isolation and zero normal-use CSP errors. The visual
+step exposed configuration merging: `defineConfig(common, overrides)` concatenated
+project arrays, comparing Firefox/WebKit against Chromium-only baselines. All 24
+Chromium comparisons passed; 48 unintended cross-engine comparisons failed. The
+visual config now spreads the common config before replacing `projects`, retaining
+its intended single Chromium project. The full functional matrix remains three
+engines. No baselines or screenshot tolerances changed.
