@@ -78,3 +78,12 @@ block` with high-priority preload: text has a short font-loading block period
 instead of visibly replacing fallback glyphs. Final typography, no-JS operation
 and all budgets/thresholds remain unchanged. The final hosted measurement is
 required to establish the result.
+
+Run 42433392646 reduced Arabic CLS to 0.139698, still above budget. A delayed-font
+reproduction identifies the remaining mechanism: the system fallback adds a lead
+line (96px instead of 64px) and wraps evidence labels (49px instead of 22px).
+A metric-adjusted local DejaVu Sans fallback at 94% keeps those blocks at exactly
+their final heights while the bundled font loads. The final font still takes
+precedence; this does not change final typography or screenshots. An explicit
+font-delay regression now compares pre/post-load geometry, in addition to the
+unchanged full performance budget tests. No local fallback font is redistributed.

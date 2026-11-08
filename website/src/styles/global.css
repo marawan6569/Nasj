@@ -970,7 +970,7 @@ html[data-theme="light"] {
     color: #587786;
 }
 html[lang="ar"] body {
-    font-family: "Noto Sans Arabic", Inter, sans-serif;
+    font-family: "Noto Sans Arabic", "NASJ Arabic Fallback", Inter, sans-serif;
     line-height: 1.85;
 }
 html[lang="ar"] h1 {
@@ -2286,4 +2286,12 @@ html[data-theme="light"] .ln {
     html:not([data-theme]) .ln {
         color: #526c7c;
     }
+}
+
+/* Match the bundled Arabic face closely while it loads. Avoid an extra lead
+   line and wrapped evidence labels in the system-font fallback. */
+@font-face {
+    font-family: "NASJ Arabic Fallback";
+    src: local("DejaVu Sans");
+    size-adjust: 94%;
 }

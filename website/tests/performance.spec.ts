@@ -141,3 +141,32 @@ test("W4 production performance: three sequential mobile lab measurements", asyn
         }
     }
 });
+
+test("W4 delayed Arabic fonts preserve lead and evidence-label geometry", async ({
+    page,
+}) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    let releaseFonts!: () => void;
+    const gate = new Promise<void>((resolve) => {
+        releaseFonts = resolve;
+    });
+    await page.route("**/*.woff2", async (route) => {
+        await gate;
+        await route.continue();
+    });
+    try {
+        await page.goto(base + "ar/", { waitUntil: "domcontentloaded" });
+        const geometry = () =>
+            page
+                .locator(".hero .lead, .hero-note")
+                .evaluateAll((elements) =>
+                    elements.map((e) => e.getBoundingClientRect().height),
+                );
+        const before = await geometry();
+        releaseFonts();
+        await page.evaluate(() => document.fonts.ready);
+        expect(await geometry()).toEqual(before);
+    } finally {
+        releaseFonts();
+    }
+});
