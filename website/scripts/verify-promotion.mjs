@@ -34,13 +34,15 @@ async function get(path) {
     );
     return response.json();
 }
-const [run, artifact, main, environment, pages] = await Promise.all([
-    get(`actions/runs/${runId}`),
-    get(`actions/artifacts/${artifactId}`),
-    get("git/ref/heads/main"),
-    get("environments/github-pages"),
-    get("pages"),
-]);
+const [run, artifact, main, environment, environmentBranchPolicies, pages] =
+    await Promise.all([
+        get(`actions/runs/${runId}`),
+        get(`actions/artifacts/${artifactId}`),
+        get("git/ref/heads/main"),
+        get("environments/github-pages"),
+        get("environments/github-pages/deployment-branch-policies"),
+        get("pages"),
+    ]);
 validatePromotion({
     repository,
     ref,
@@ -53,8 +55,9 @@ validatePromotion({
     artifact,
     main: main.object.sha,
     environment,
+    environmentBranchPolicies,
     pages,
 });
 console.log(
-    "Exact main candidate, successful trusted workflow, artifact ownership, freshness and existing protected environment verified.",
+    "Exact main candidate, successful trusted workflow, artifact ownership, freshness and existing solo-maintainer main-only environment verified; no independent second-person review.",
 );

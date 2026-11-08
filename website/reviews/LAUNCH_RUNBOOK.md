@@ -1,6 +1,8 @@
 # Exact-artifact launch and rollback
 
-This sprint authorizes preparation and PR verification only. Do not execute the
+The solo maintainer has authorized policy correction, integration/merge and main
+candidate verification. Public deployment requires a separate explicit authorization
+after that verification. Do not execute the
 publication steps until the maintainer separately authorizes launch. No workflow
 in this PR automatically enables Pages, creates environment protection, merges
 code, changes release assets or deploys from PRs.
@@ -30,9 +32,13 @@ code, changes release assets or deploys from PRs.
 
 5. Only after explicit authorization, the maintainer enables GitHub Pages with
    **GitHub Actions** as source and configures an existing `github-pages`
-   environment. Require reviewers, prevent self-review and disable administrator
-   bypass. Restrict deployment branches to `main`. Protect main through normal
-   repository governance. Do not add a long-lived token.
+   environment. Set Required reviewers OFF and Prevent self-review OFF; no second
+   GitHub account is required. Choose Selected branches and tags, with exactly
+   one policy: type Branch, name `main` (no wildcard, tags or additional branches).
+   The API must report `deployment_branch_policy` as `protected_branches: false`,
+   `custom_branch_policies: true`, and a single `main` branch policy. Missing or
+   broader policies fail preflight. Do not add a long-lived token.
+   Solo-maintainer approval provides no independent second-person review.
 6. Set repository variable `WEBSITE_LAUNCH_ENABLED=true` only for the approved
    launch window. The default absent/false state disables the promotion job.
 7. Dispatch **Website approved artifact promotion** from `main` with:
@@ -43,11 +49,12 @@ code, changes release assets or deploys from PRs.
     - `approval`: `publish website <SHA> from run <ID>`.
 8. Read-only preflight rejects foreign repositories, PR refs/events/artifacts,
    non-main source, wrong/failed/incomplete runs, moved main, stale audits,
-   missing environment protection, disabled Pages and mismatched archive bytes.
+   missing/invalid main-only environment policy, reviewer requirements, disabled Pages and mismatched archive bytes.
    It downloads the named artifact, checks the exact tar hash and transfers that
    same tar into the deployment run. There is **no rebuild after approval**.
-9. An authorized environment reviewer approves the deployment job. Main is checked
-   again after approval. Only that job has `pages: write` / `id-token: write`.
+9. The sole maintainer's separately authorized manual dispatch and exact approval
+   phrase authorize this specific publication; there is no environment reviewer
+   approval step. Main is checked again immediately before deployment. Only that job has `pages: write` / `id-token: write`.
    Deployment uses the transferred `github-pages` archive. Record deployment URL,
    ID, SHA, candidate run and tar hash. Set the launch variable back to `false`.
 
@@ -72,14 +79,16 @@ code, changes release assets or deploys from PRs.
 - Before first deployment: leave the launch variable false; nothing is public.
 - After deployment: disable further dispatch with the variable. Preserve failed
   run/deployment IDs and hashes. For urgent sensitive-data exposure, the maintainer
-  may separately authorize disabling Pages while recovery is prepared.
+  may separately authorize disabling Pages while recovery is prepared. Recovery
+  remains under the same solo-maintainer policy; do not add a second-account gate.
 - Create a focused restoration branch from current main that restores website
   source and relevant verification workflow files from the last accepted source
   commit. Do not move tags, force-push main, replace product releases or copy an
   unreviewed tar over the deployed site.
 - Open and review the restoration PR. Run the complete checks, resolve failures,
   and let the maintainer merge. Validate the new exact main SHA, retain its tested
-  artifact, obtain new SHA/run/hash approval and follow steps 5–12. A restoration
+  artifact, obtain separate explicit publication authorization and new SHA/run/hash approval
+  from the sole maintainer, and follow steps 5–12. A restoration
   is a new approved deployment, even when bytes match the previous site.
 - For first-launch rollback without a previously accepted site, separately
   authorize unpublishing Pages or restore the approved pre-launch website source,
@@ -89,3 +98,15 @@ A live deployment/rollback rehearsal cannot be claimed in this sprint. The polic
 has positive/negative tests; hosted workflow syntax and candidate production are
 validated. The real protected environment and Pages service are intentionally
 unconfigured here. Their absence will make promotion fail closed.
+
+## Integration risk disposition and publication boundary
+
+The sole maintainer explicitly accepted LC-01 through LC-08 for the initial launch
+on 2026-11-08. Missing manual checks remain UNVERIFIED; this is not viewer WCAG
+conformance evidence. Follow-up ownership/dates remain in LAUNCH_RISKS.md.
+Integration approval does not authorize setting WEBSITE_LAUNCH_ENABLED, enabling
+Pages or dispatching publication. Keep the variable absent/false while preparing
+and verifying the main candidate. Its source SHA, run, artifact ID, ZIP digest and
+inner tar digest must be supplied for the next explicit publication authorization.
+Do not bypass a pending environment approval; correct configuration only through
+the authorized repository/environment procedure before any future dispatch.

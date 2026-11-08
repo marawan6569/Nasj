@@ -30,18 +30,19 @@ const valid = () => ({
     },
     environment: {
         name: "github-pages",
-        can_admins_bypass: false,
-        protection_rules: [
-            {
-                type: "required_reviewers",
-                prevent_self_review: true,
-                reviewers: [{ type: "User" }],
-            },
-        ],
+        protection_rules: [],
+        deployment_branch_policy: {
+            protected_branches: false,
+            custom_branch_policies: true,
+        },
+    },
+    environmentBranchPolicies: {
+        total_count: 1,
+        branch_policies: [{ id: 1, name: "main", type: "branch" }],
     },
     pages: { build_type: "workflow" },
 });
-test("explicitly approved fresh main artifact with protected existing Pages passes", () =>
+test("explicitly approved fresh main artifact with solo-maintainer main-only Pages passes", () =>
     validatePromotion(valid()));
 for (const [name, mutate] of Object.entries({
     fork: (x) => (x.repository = "other/Nasj"),
@@ -60,10 +61,44 @@ for (const [name, mutate] of Object.entries({
     "expired artifact": (x) => (x.artifact.expired = true),
     "foreign run": (x) => (x.artifact.workflow_run.id = 2),
     "stale audit": (x) => (x.run.updated_at = "2020-01-01T00:00:00Z"),
-    "missing reviewers": (x) => (x.environment.protection_rules = []),
-    "self approval": (x) =>
-        (x.environment.protection_rules[0].prevent_self_review = false),
-    "admin bypass": (x) => (x.environment.can_admins_bypass = true),
+    "missing environment": (x) => (x.environment = {}),
+    "missing environment rules": (x) => delete x.environment.protection_rules,
+    "required reviewers": (x) =>
+        x.environment.protection_rules.push({
+            type: "required_reviewers",
+            reviewers: [{ type: "User" }],
+            prevent_self_review: false,
+        }),
+    "prevent self-review": (x) =>
+        x.environment.protection_rules.push({
+            type: "required_reviewers",
+            prevent_self_review: true,
+        }),
+    "missing branch selector": (x) =>
+        delete x.environment.deployment_branch_policy,
+    "protected branches selector": (x) =>
+        (x.environment.deployment_branch_policy = {
+            protected_branches: true,
+            custom_branch_policies: false,
+        }),
+    "missing branch policies": (x) => (x.environmentBranchPolicies = {}),
+    "no branch policy": (x) =>
+        (x.environmentBranchPolicies = { total_count: 0, branch_policies: [] }),
+    "wildcard branches": (x) =>
+        (x.environmentBranchPolicies.branch_policies[0].name = "*"),
+    "non-main branch": (x) =>
+        (x.environmentBranchPolicies.branch_policies[0].name = "release"),
+    "main tag": (x) =>
+        (x.environmentBranchPolicies.branch_policies[0].type = "tag"),
+    "additional branch": (x) => {
+        x.environmentBranchPolicies.total_count = 2;
+        x.environmentBranchPolicies.branch_policies.push({
+            name: "preview",
+            type: "branch",
+        });
+    },
+    "additional hidden page": (x) =>
+        (x.environmentBranchPolicies.total_count = 101),
     "Pages disabled": (x) => (x.pages = {}),
 }))
     test(`reject ${name}`, () => {

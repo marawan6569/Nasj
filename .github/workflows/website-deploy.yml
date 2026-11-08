@@ -78,13 +78,13 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - name: Recheck main after environment approval
+      - name: Recheck main immediately before deployment
         env:
           GITHUB_TOKEN: ${{ github.token }}
           APPROVED_SHA: ${{ inputs.approved_sha }}
         run: |
           current=$(curl --fail --silent --show-error -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/marawan6569/Nasj/git/ref/heads/main | jq -r '.object.sha')
           test "$current" = "$APPROVED_SHA"
-      - name: Deploy only the verified archive after environment approval
+      - name: Deploy only the verified archive after explicit maintainer dispatch
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # reviewed main 2026-11-07, Node 24

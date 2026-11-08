@@ -11,6 +11,7 @@ export function validatePromotion({
     artifact,
     main,
     environment,
+    environmentBranchPolicies,
     pages,
 }) {
     assert.equal(
@@ -45,22 +46,34 @@ export function validatePromotion({
         "Candidate online audit is older than 24 hours",
     );
     assert.equal(environment.name, "github-pages");
-    const reviewers = environment.protection_rules.find(
-        (r) => r.type === "required_reviewers",
+    assert.ok(
+        Array.isArray(environment.protection_rules),
+        "Environment rules missing",
     );
     assert.ok(
-        reviewers?.reviewers?.length,
-        "Pre-existing environment reviewers required",
+        !environment.protection_rules.some(
+            (rule) =>
+                rule.type === "required_reviewers" ||
+                rule.prevent_self_review === true,
+        ),
+        "Solo-maintainer environment must not require reviewer approval or prevent self-review",
+    );
+    assert.deepEqual(
+        environment.deployment_branch_policy,
+        { protected_branches: false, custom_branch_policies: true },
+        "Explicit main-only branch policy required",
     );
     assert.equal(
-        reviewers.prevent_self_review,
-        true,
-        "Prevent self-review must be enabled",
+        environmentBranchPolicies.total_count,
+        1,
+        "Exactly one deployment branch policy required",
     );
+    assert.equal(environmentBranchPolicies.branch_policies.length, 1);
+    assert.equal(environmentBranchPolicies.branch_policies[0].name, "main");
     assert.equal(
-        environment.can_admins_bypass,
-        false,
-        "Environment bypass must be disabled",
+        environmentBranchPolicies.branch_policies[0].type,
+        "branch",
+        "Tag policies cannot deploy",
     );
     assert.equal(
         pages.build_type,
