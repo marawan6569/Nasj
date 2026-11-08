@@ -91,3 +91,19 @@ unchanged full performance budget tests. No local fallback font is redistributed
 The adjusted fallback is restricted to the Arabic ranges of the bundled face.
 Latin characters continue to use the original Inter fallback after the Arabic
 font loads; a local face must not change final mixed-script typography.
+
+The first delayed-font cross-engine regression sampled Firefox/WebKit before
+the local fallback face had resolved. It now explicitly awaits and asserts that
+local face while keeping every downloaded font blocked, then compares geometry
+before and after releasing those downloads. The cold-load lab test remains
+unmodified and independently measures actual page-load CLS.
+The local face alone does not end the first font's invisible block period in
+Firefox/WebKit. The geometry regression therefore waits 3.5 seconds with all
+remote fonts held, exceeding that short block period, before measuring the painted
+adjusted fallback. It still requires identical geometry after remote font release.
+The cold navigation/CLS test does not use that wait and retains every budget.
+The final local fallback size adjustment is 88%: WebKit's painted fallback still
+wrapped the lead at 94%. The 88% Arabic-only face passes the delayed-font geometry
+regression in WebKit and retains final Inter/Noto typography after loading. The
+regression deliberately waits for actual fallback painting, then still asserts
+exact pre/post-load block heights. No cold-load performance measurement is delayed.

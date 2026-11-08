@@ -162,6 +162,21 @@ test("W4 delayed Arabic fonts preserve lead and evidence-label geometry", async 
                 .evaluateAll((elements) =>
                     elements.map((e) => e.getBoundingClientRect().height),
                 );
+        // Local font resolution is asynchronous in Firefox/WebKit. This test
+        // measures the adjusted fallback while only downloaded fonts are blocked.
+        const localFaces = await page.evaluate(
+            async () =>
+                (
+                    await document.fonts.load(
+                        '16px "NASJ Arabic Fallback"',
+                        "القراءة",
+                    )
+                ).length,
+        );
+        expect(localFaces).toBeGreaterThan(0);
+        // Exercise the painted fallback after font-display:block's short block
+        // period, rather than engine-specific invisible last-resort metrics.
+        await page.waitForTimeout(3500);
         const before = await geometry();
         releaseFonts();
         await page.evaluate(() => document.fonts.ready);

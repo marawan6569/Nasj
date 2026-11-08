@@ -2293,7 +2293,7 @@ html[data-theme="light"] .ln {
 @font-face {
     font-family: "NASJ Arabic Fallback";
     src: local("DejaVu Sans");
-    size-adjust: 94%;
+    size-adjust: 88%;
     unicode-range:
         U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+FB50-FDFF,
         U+FE70-FEFF;
