@@ -41,3 +41,13 @@ Final rerun evidence is added after completion. A failed run is never a launch p
 Local reproduction with Playwright 1.65.0 / WebKit revision 2388 produces zero
 CSP violations on the same page and policy. This confirms the engine update fixes
 the native-control regression without changing the website's CSP or controls.
+
+The second hosted run 42430827690 cleared normal WebKit navigation and Firefox
+failures. Eight WebKit content cases still encountered automation-generated CSP
+errors only when capturing screenshots. Local reproduction and Playwright's
+`inPagePrepareForScreenshots` source confirm WebKit screenshot synchronization
+unconditionally appends a `body {}` style element. Even `caret: initial` does not
+avoid it. Optional content captures now use Chromium, consistent with the existing
+visual-comparison project. All Firefox/WebKit functional, accessibility, network
+and zero-console-error assertions remain enabled and unchanged. No CSP error
+filter or permission relaxation was introduced.

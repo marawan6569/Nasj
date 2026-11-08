@@ -53,7 +53,11 @@ for (const locale of ["en", "ar"])
                             targets: v.nodes.map((n) => n.target),
                         })),
                     ).toEqual([]);
-                    if (theme !== "system" && [390, 1440].includes(width))
+                    if (
+                        browserName === "chromium" &&
+                        theme !== "system" &&
+                        [390, 1440].includes(width)
+                    )
                         await page.screenshot({
                             path: info.outputPath(
                                 `${slug}-${locale}-${theme}-${width}.png`,
