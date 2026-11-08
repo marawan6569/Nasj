@@ -87,3 +87,7 @@ their final heights while the bundled font loads. The final font still takes
 precedence; this does not change final typography or screenshots. An explicit
 font-delay regression now compares pre/post-load geometry, in addition to the
 unchanged full performance budget tests. No local fallback font is redistributed.
+
+The adjusted fallback is restricted to the Arabic ranges of the bundled face.
+Latin characters continue to use the original Inter fallback after the Arabic
+font loads; a local face must not change final mixed-script typography.
