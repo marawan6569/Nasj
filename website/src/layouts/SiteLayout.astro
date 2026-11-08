@@ -2,6 +2,7 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { asset, pagePath, type Locale } from "../lib/paths";
+import monoFont from "../assets/dejavu-sans-mono.woff2?url";
 import interFont from "../assets/inter.woff2?url";
 import arabicFont from "../assets/noto-sans-arabic.woff2?url";
 import themeSource from "../scripts/theme.ts?raw";
@@ -47,13 +48,16 @@ const theme = (
 <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
     <head>
         <meta charset="utf-8" />
-        <link
-            rel="preload"
-            as="font"
-            type="font/woff2"
-            href={locale === "ar" ? arabicFont : interFont}
-            crossorigin="anonymous"
-        />
+        {[interFont, arabicFont, monoFont].map((href) => (
+            <link
+                rel="preload"
+                as="font"
+                type="font/woff2"
+                href={href}
+                crossorigin="anonymous"
+                fetchpriority="high"
+            />
+        ))}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script is:inline set:html={theme} />
         <title>{title}</title>

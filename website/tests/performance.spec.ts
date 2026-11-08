@@ -33,7 +33,7 @@ test("W4 production performance: three sequential mobile lab measurements", asyn
                 });
                 await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
                 await page.addInitScript(() => {
-                    const metrics = { lcp: 0, cls: 0 };
+                    const metrics = { lcp: 0, cls: 0, shifts: [] as unknown[] };
                     (window as unknown as { lab: typeof metrics }).lab =
                         metrics;
                     new PerformanceObserver((list) => {
@@ -48,8 +48,26 @@ test("W4 production performance: three sequential mobile lab measurements", asyn
                             value: number;
                             hadRecentInput: boolean;
                         })[])
-                            if (!entry.hadRecentInput)
+                            if (!entry.hadRecentInput) {
                                 metrics.cls += entry.value;
+                                metrics.shifts.push({
+                                    value: entry.value,
+                                    sources: (
+                                        entry as unknown as {
+                                            sources?: {
+                                                node?: Element;
+                                                previousRect: DOMRectReadOnly;
+                                                currentRect: DOMRectReadOnly;
+                                            }[];
+                                        }
+                                    ).sources?.map((source) => ({
+                                        tag: source.node?.tagName,
+                                        className: source.node?.className,
+                                        before: source.previousRect,
+                                        after: source.currentRect,
+                                    })),
+                                });
+                            }
                     }).observe({ type: "layout-shift", buffered: true });
                 });
                 await page.goto(base + (locale === "ar" ? "ar/" : ""));

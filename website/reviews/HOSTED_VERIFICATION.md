@@ -60,3 +60,13 @@ Chromium comparisons passed; 48 unintended cross-engine comparisons failed. The
 visual config now spreads the common config before replacing `projects`, retaining
 its intended single Chromium project. The full functional matrix remains three
 engines. No baselines or screenshot tolerances changed.
+
+Run 42432206552 passed all 618 functional cases and 24 intended visual comparisons,
+but its three Arabic mobile lab runs measured CLS 0.225985 (English 0.000639).
+LCP, transfer and interaction budgets passed. The failed performance trace/report
+is retained in project evidence artifact 13598107829. Font scheduling now preloads
+all three already-bundled fonts with high priority because both locales use mixed
+Arabic, Latin and technical text. Final typography is unchanged. Performance
+evidence additionally records individual shift sources, and performance now runs
+before the long matrix so a budget defect is visible earlier. Thresholds remain
+unchanged; the final full run must pass.

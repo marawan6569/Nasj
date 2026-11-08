@@ -148,6 +148,11 @@ jobs:
       - run: npm ci --no-audit
       - run: npm run build && npm run verify && npm run test:content
       - run: npx playwright install --with-deps chromium firefox webkit
+      - name: Sequential fixed-profile performance measurements
+        if: matrix.label == 'project'
+        env:
+          WEBSITE_TEST_RUN: candidate-performance
+        run: npm test -- --project chromium --grep 'production performance' --workers=1
       - name: Complete browser matrix, preserving existing baselines
         if: matrix.label == 'project'
         run: npm test -- --grep-invert 'production performance' --update-snapshots=none
@@ -159,11 +164,6 @@ jobs:
         env:
           WEBSITE_TEST_RUN: candidate-visual
         run: npm run test:visual
-      - name: Sequential fixed-profile performance measurements
-        if: matrix.label == 'project'
-        env:
-          WEBSITE_TEST_RUN: candidate-performance
-        run: npm test -- --project chromium --grep 'production performance' --workers=1
       - name: Fresh published release verification
         if: ${{ !cancelled() && matrix.label == 'project' }}
         env:
