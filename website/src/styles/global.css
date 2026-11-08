@@ -3,13 +3,13 @@
     font-family: Inter;
     src: url("../assets/inter.woff2") format("woff2");
     font-weight: 100 900;
-    font-display: swap;
+    font-display: block;
 }
 @font-face {
     font-family: "Noto Sans Arabic";
     src: url("../assets/noto-sans-arabic.woff2") format("woff2");
     font-weight: 100 900;
-    font-display: swap;
+    font-display: block;
 }
 
 :root {
@@ -2259,7 +2259,7 @@ a:hover {
     font-family: "NASJ Mono";
     src: url("../assets/dejavu-sans-mono.woff2") format("woff2");
     font-weight: 400;
-    font-display: swap;
+    font-display: block;
 }
 :root {
     --mono: "NASJ Mono", monospace;

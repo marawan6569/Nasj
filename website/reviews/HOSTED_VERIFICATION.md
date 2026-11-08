@@ -70,3 +70,11 @@ Arabic, Latin and technical text. Final typography is unchanged. Performance
 evidence additionally records individual shift sources, and performance now runs
 before the long matrix so a budget defect is visible earlier. Thresholds remain
 unchanged; the final full run must pass.
+
+Run 42433092665 showed that font priority alone was insufficient: Arabic CLS
+remained 0.223638. New shift attribution identifies painted fallback glyphs and
+the source card moving when fonts swap. The bundled fonts now use `font-display:
+block` with high-priority preload: text has a short font-loading block period
+instead of visibly replacing fallback glyphs. Final typography, no-JS operation
+and all budgets/thresholds remain unchanged. The final hosted measurement is
+required to establish the result.
