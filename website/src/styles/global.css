@@ -3,13 +3,13 @@
     font-family: Inter;
     src: url("../assets/inter.woff2") format("woff2");
     font-weight: 100 900;
-    font-display: swap;
+    font-display: block;
 }
 @font-face {
     font-family: "Noto Sans Arabic";
     src: url("../assets/noto-sans-arabic.woff2") format("woff2");
     font-weight: 100 900;
-    font-display: swap;
+    font-display: block;
 }
 
 :root {
@@ -970,7 +970,7 @@ html[data-theme="light"] {
     color: #587786;
 }
 html[lang="ar"] body {
-    font-family: "Noto Sans Arabic", Inter, sans-serif;
+    font-family: "Noto Sans Arabic", "NASJ Arabic Fallback", Inter, sans-serif;
     line-height: 1.85;
 }
 html[lang="ar"] h1 {
@@ -2259,7 +2259,7 @@ a:hover {
     font-family: "NASJ Mono";
     src: url("../assets/dejavu-sans-mono.woff2") format("woff2");
     font-weight: 400;
-    font-display: swap;
+    font-display: block;
 }
 :root {
     --mono: "NASJ Mono", monospace;
@@ -2286,4 +2286,15 @@ html[data-theme="light"] .ln {
     html:not([data-theme]) .ln {
         color: #526c7c;
     }
+}
+
+/* Match the bundled Arabic face closely while it loads. Avoid an extra lead
+   line and wrapped evidence labels in the system-font fallback. */
+@font-face {
+    font-family: "NASJ Arabic Fallback";
+    src: local("DejaVu Sans");
+    size-adjust: 88%;
+    unicode-range:
+        U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+FB50-FDFF,
+        U+FE70-FEFF;
 }

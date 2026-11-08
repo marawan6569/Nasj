@@ -1,0 +1,226 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import {
+    pagePath,
+    repository,
+    asset,
+    contentRoutes,
+    type Locale,
+    type ContentRoute,
+} from "../lib/paths";
+import en from "../content/en/pages.json";
+import ar from "../content/ar/pages.json";
+import { installCommands, release } from "../lib/install.mjs";
+import "../styles/content.css";
+interface Props {
+    locale: Locale;
+    slug: ContentRoute;
+}
+const { locale, slug } = Astro.props;
+const isAr = locale === "ar";
+const copy = isAr ? ar : en;
+const page = copy[slug];
+const distributions = release.assets.filter(
+    (a) => a.manifest && !a.name.startsWith("build-"),
+);
+const evidence = {
+    install: "DISTRIBUTION.md",
+    docs: "ANALYSIS.md",
+    compatibility: "BINARY_VALIDATION_v0.1.0.md",
+    roadmap: "ROADMAP.md",
+    licenses: "DEPENDENCY_LICENSES.md",
+};
+// Split technical tokens into semantic bidi isolation without inserting HTML.
+const technical =
+    /(\$HOME[^\s،؛.]*|--[a-z-]+|[A-Za-z0-9][A-Za-z0-9_./()>= -]*[A-Za-z0-9_./()]|[A-Za-z0-9])/g;
+const parts = (text: string) => text.split(technical).filter(Boolean);
+---
+
+<SiteLayout
+    locale={locale}
+    slug={slug}
+    title={`${page.title} — NASJ`}
+    description={page.description}
+>
+    <article class="content-page">
+        <p class="section-eyebrow">
+            <bdi dir="ltr">NASJ v{release.version}</bdi>
+        </p>
+        <h1>{page.title}</h1>
+        <p class="content-lead">{page.description}</p>
+        <nav
+            class="content-nav"
+            aria-label={isAr ? "دليل المنتج" : "Product guide"}
+        >
+            {contentRoutes.map((route) => (
+                <a
+                    href={pagePath(locale, route)}
+                    aria-current={route === slug ? "page" : undefined}
+                >
+                    {copy[route].title}
+                </a>
+            ))}
+        </nav>
+        {page.sections.map((section) => (
+            <section id={section.id}>
+                <h2>{section.title}</h2>
+                {section.paragraphs.map((p) => (
+                    <p>
+                        {parts(p).map((part) =>
+                            /^[A-Za-z0-9$-]/.test(part) ? (
+                                <bdi dir="ltr">{part}</bdi>
+                            ) : (
+                                part
+                            ),
+                        )}
+                    </p>
+                ))}
+                {"code" in section && <pre
+                    tabindex="0"
+                    dir="ltr"
+                    aria-label={isAr ? "أمر للاستخدام" : "Usage command"}
+                ><code>{section.code}</code></pre>}
+            </section>
+        ))}
+        {slug === "install" && (
+            <section id="downloads">
+                <h2>
+                    {isAr
+                        ? "التنزيلات والأوامر المتحقق منها"
+                        : "Downloads and verified commands"}
+                </h2>
+                <p>
+                    {isAr
+                        ? "اختَر ملفاً واحداً يناسب نظامك. تتطلب أوامر حزم Debian صلاحيات المسؤول؛ أوامر الأرشيف مخصصة لحسابك."
+                        : "Choose one file for your system. Debian package commands require administrator permission; archive commands install for your user."}
+                </p>
+                {distributions.map((item) => (
+                    <section
+                        class="download-card"
+                        data-distribution={item.name}
+                    >
+                        <h3>
+                            <bdi dir="ltr">{item.name}</bdi>
+                        </h3>
+                        <div class="content-actions">
+                            <a href={release.url + item.name}>
+                                {isAr ? "تنزيل الملف" : "Download file"}
+                            </a>
+                            <a href={release.url + item.manifest}>
+                                <bdi dir="ltr">{item.manifest}</bdi>
+                            </a>
+                        </div>
+                        <p class="checksum">
+                            <bdi dir="ltr">SHA-256: {item.sha256}</bdi>
+                        </p>
+                        <pre
+                            tabindex="0"
+                            dir="ltr"
+                            aria-label={
+                                isAr
+                                    ? "أوامر التنزيل والتحقق والتثبيت"
+                                    : "Download, verify and install commands"
+                            }
+                        ><code>{installCommands(item.name)}</code></pre>
+                    </section>
+                ))}
+                <p>
+                    {isAr ? "هوية مصدر الإصدار:" : "Release source identity:"}{" "}
+                    <bdi dir="ltr">{release.commit}</bdi>
+                </p>
+                <p>
+                    <a href={`${repository}/releases/tag/${release.tag}`}>
+                        {isAr
+                            ? "الإصدار المنشور وبيانات البناء"
+                            : "Published release and build provenance"}
+                    </a>
+                </p>
+            </section>
+        )}
+        {slug === "licenses" && (
+            <section>
+                <h2>
+                    {isAr
+                        ? "نصوص التراخيص والإشعارات"
+                        : "License texts and notices"}
+                </h2>
+                <ul>
+                    {[
+                        "NASJ-LICENSE.txt",
+                        "OFL-Inter.txt",
+                        "OFL-NotoSansArabic.txt",
+                        "DejaVu-LICENSE.txt",
+                        "Tailwind-LICENSE.txt",
+                    ].map((name) => (
+                        <li>
+                            <a href={asset(`licenses/${name}`)}>
+                                <bdi dir="ltr">{name}</bdi>
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+                <p>
+                    <a
+                        href={`${repository}/blob/${release.commit}/THIRD_PARTY_NOTICES.md`}
+                    >
+                        {isAr
+                            ? "إشعارات مصدر المنتج"
+                            : "Product source notices"}
+                    </a>
+                </p>
+                <p>
+                    <a href={`${repository}/blob/main/assets/logos/README.md`}>
+                        {isAr
+                            ? "مصدر الهوية الرسمية وسجلها"
+                            : "Official artwork provenance and manifest"}
+                    </a>
+                </p>
+            </section>
+        )}
+        <section class="content-evidence">
+            <h2>
+                {isAr ? "المراجع والخطوة التالية" : "Evidence and next steps"}
+            </h2>
+            <p>
+                <a href={`${repository}/blob/main/docs/${evidence[slug]}`}>
+                    {isAr
+                        ? "التوثيق المرجعي في المستودع (بالإنجليزية)"
+                        : "Repository reference documentation (English)"}
+                </a>
+            </p>
+            {slug === "compatibility" && (
+                <p>
+                    <a href={`${repository}/blob/main/docs/ANALYSIS.md`}>
+                        {isAr
+                            ? "عقد التحليل الثابت"
+                            : "Static analysis contract"}
+                    </a>{" "}
+                    ·{" "}
+                    <a
+                        href={`${repository}/blob/main/website/reviews/LAUNCH_READINESS.md`}
+                    >
+                        {isAr
+                            ? "نتائج قبول مرشح الإطلاق وحدود التحقق"
+                            : "Launch-candidate acceptance results and verification limits"}
+                    </a>
+                </p>
+            )}
+            <p>
+                <a
+                    href={pagePath(
+                        locale,
+                        slug === "install" ? "docs" : "demo",
+                    )}
+                >
+                    {isAr
+                        ? slug === "install"
+                            ? "ابدأ أول خريطة"
+                            : "استكشف العرض والأدلة"
+                        : slug === "install"
+                          ? "Create your first map"
+                          : "Explore the demo and evidence"}
+                </a>
+            </p>
+        </section>
+    </article>
+</SiteLayout>

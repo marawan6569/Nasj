@@ -24,7 +24,10 @@
         "test:update": "playwright test --update-snapshots",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "verify:dependencies": "node scripts/verify-dependencies.mjs"
+        "verify:dependencies": "node scripts/verify-dependencies.mjs",
+        "test:content": "node --test tests/content.test.mjs",
+        "verify:release": "node scripts/verify-release.mjs",
+        "test:visual": "playwright test --config playwright.visual.config.ts --update-snapshots=none"
     },
     "dependencies": {
         "@tailwindcss/vite": "4.3.3",
@@ -34,7 +37,7 @@
     "devDependencies": {
         "@astrojs/check": "0.9.12",
         "@axe-core/playwright": "4.14.0",
-        "@playwright/test": "1.64.1",
+        "@playwright/test": "1.65.0",
         "@types/node": "24.19.2",
         "cheerio": "1.2.0",
         "esbuild": "0.28.2",

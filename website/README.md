@@ -179,3 +179,25 @@ Use `npm audit --audit-level=high` explicitly for an online dependency audit.
 See [W2 review](reviews/W2.md) for current results and limitations, and
 [W1 review](reviews/W1.md) for historical W0 adaptations. Nothing here enables
 GitHub Pages.
+
+## Launch-candidate verification and promotion
+
+The W3/W4/W5 implementation extends the existing Astro site without changing the
+released viewer. See [readiness](reviews/LAUNCH_READINESS.md),
+[risk dispositions](reviews/LAUNCH_RISKS.md) and the
+[exact-artifact launch/rollback runbook](reviews/LAUNCH_RUNBOOK.md).
+
+`npm run test:content` checks reviewed release pins, bilingual/metadata parity
+and failure-stopping installation commands. `npm run verify:release` performs a
+fresh online read-only audit; ordinary builds never contact release APIs.
+`WEBSITE_ALL_BROWSERS=1 npm test -- --update-snapshots=none` expands functional
+coverage to Chromium, Firefox and WebKit. `npm run test:visual` compares the new
+launch compositions; the original twelve baselines remain in the foundation suite.
+The optional capture helper creates new baseline files exclusively and refuses
+replacement; baseline changes always require deliberate review.
+
+CI preserves success/failure browser evidence per base for 30 days. The weekly
+online audit reports release drift and dependency advisories without changing
+manifests. Promotion is manual, canonical-main-only, requires an existing protected
+environment and a separate enable variable, and reuses the exact tested archive.
+The workflow never enables Pages and has no PR deployment path.

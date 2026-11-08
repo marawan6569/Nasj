@@ -1,7 +1,10 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { asset, home, demo, type Locale } from "../lib/paths";
+import { asset, pagePath, type Locale } from "../lib/paths";
+import monoFont from "../assets/dejavu-sans-mono.woff2?url";
+import interFont from "../assets/inter.woff2?url";
+import arabicFont from "../assets/noto-sans-arabic.woff2?url";
 import themeSource from "../scripts/theme.ts?raw";
 import { transform } from "esbuild";
 import "../styles/global.css";
@@ -10,6 +13,8 @@ interface Props {
     title?: string;
     noindex?: boolean;
     demoPage?: boolean;
+    slug?: string;
+    description?: string;
 }
 const {
     locale,
@@ -18,13 +23,16 @@ const {
         : "NASJ — Weave your infrastructure into clarity",
     noindex = false,
     demoPage = false,
+    slug = demoPage ? "demo" : "",
+    description: pageDescription,
 } = Astro.props;
 const description =
-    locale === "ar"
+    pageDescription ??
+    (locale === "ar"
         ? "أداة مفتوحة المصدر لتحليل إعدادات Nginx ورسم علاقاتها، مع أدلة من الملفات والأسطر. تقارير مستقلة دون خادم."
-        : "Map Nginx configuration into an explorable topology with source-file and line-level evidence. Open-source, CLI-first, offline reports.";
+        : "Map Nginx configuration into an explorable topology with source-file and line-level evidence. Open-source, CLI-first, offline reports.");
 const origin = Astro.site!;
-const route = demoPage ? demo : home;
+const route = (language: Locale) => pagePath(language, slug);
 const canonical = new URL(route(locale), origin).href;
 Astro.csp?.insertDirective(demoPage ? "frame-src 'self'" : "frame-src 'none'");
 const theme = (
@@ -40,6 +48,16 @@ const theme = (
 <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
     <head>
         <meta charset="utf-8" />
+        {[interFont, arabicFont, monoFont].map((href) => (
+            <link
+                rel="preload"
+                as="font"
+                type="font/woff2"
+                href={href}
+                crossorigin="anonymous"
+                fetchpriority="high"
+            />
+        ))}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script is:inline set:html={theme} />
         <title>{title}</title>
@@ -97,7 +115,7 @@ const theme = (
         <a class="skip-link" href="#main">
             {locale === "ar" ? "انتقل إلى المحتوى" : "Skip to content"}
         </a>
-        <Header locale={locale} demoPage={demoPage} />
+        <Header locale={locale} slug={slug} />
         <main id="main" tabindex="-1" class="wrap">
             <slot />
         </main>

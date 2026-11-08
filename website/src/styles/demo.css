@@ -140,6 +140,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    min-height: 44px;
+    /* Keep a real 44px target even after fractional engine geometry conversion. */
+    min-width: 45px;
+    min-height: 45px;
 }

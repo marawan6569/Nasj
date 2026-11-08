@@ -1,0 +1,212 @@
+{
+    "install": {
+        "title": "Install NASJ",
+        "description": "Verified v0.1.0 Linux downloads, checksum verification and source installation.",
+        "sections": [
+            {
+                "id": "choose",
+                "title": "Choose your architecture",
+                "paragraphs": [
+                    "Run uname -m: x86_64 uses the x86_64 archive or amd64 package; aarch64 uses the aarch64 archive or arm64 package. These are GNU/Linux binaries, not static or MUSL builds.",
+                    "Both architectures were tested on Ubuntu 22.04.5 and Debian 12. Required libraries: libc6 (>= 2.34) and libgcc-s1 (>= 4.2). The lowest tested glibc is 2.35; a symbol requirement is not a compatibility test. Linux Mint and other distributions are unverified."
+                ]
+            },
+            {
+                "id": "verify",
+                "title": "Verify before installing",
+                "paragraphs": [
+                    "Use curl, sha256sum and tar on Linux. Every command block downloads into a fresh temporary directory, checks the pinned checksum manifest and the selected file, and stops on failure. Never continue after a mismatch.",
+                    "Checksums detect changed bytes; they do not prove publisher identity, signing or reproducible builds. Source and binary checksum manifests are separate. Do not substitute GitHub’s automatic source archive."
+                ]
+            },
+            {
+                "id": "after",
+                "title": "After installation",
+                "paragraphs": [
+                    "The archive instructions retain the bundled licenses under $HOME/.local/share/nasj and install the executable into $HOME/.local/bin. Add that directory to PATH if needed. Remove those NASJ files to uninstall.",
+                    "Debian packages use administrator permission only for package management. Remove with sudo apt remove nasj. Mapping never needs sudo, Nginx reloads or a Docker socket.",
+                    "Source installation needs Rust/Cargo and a native linker and may fetch dependencies. Rust 1.99.1 was validated; no older MSRV is promised. There is no crates.io package. Mapping and reports work offline after installation."
+                ]
+            }
+        ]
+    },
+    "docs": {
+        "title": "Getting started",
+        "description": "Create your first offline Nginx map and interpret source evidence and unresolved routing.",
+        "sections": [
+            {
+                "id": "first-map",
+                "title": "Create your first map",
+                "paragraphs": [
+                    "Install NASJ, then select an explicit nginx.conf that your user can read. Choose a new output filename; NASJ refuses to overwrite existing files or symlinks. The command reads configuration only and creates a report."
+                ],
+                "code": "nasj map --config ./nginx.conf --format html --output report.html"
+            },
+            {
+                "id": "includes",
+                "title": "Includes and the configuration prefix",
+                "paragraphs": [
+                    "Relative includes resolve against the root configuration directory, even inside nested files. Use --prefix to choose a different root. Declared globs are sorted; unmatched optional globs are informational. Missing literal includes and cycles fail.",
+                    "Includes must remain within the canonical prefix by default. --allow-external-includes explicitly permits declared paths outside it; review that scope first. Use a trusted snapshot for an untrusted, concurrently changing tree."
+                ],
+                "code": "nasj map --config ./snapshot/nginx.conf --prefix ./snapshot --format json --output topology.json"
+            },
+            {
+                "id": "strict",
+                "title": "Strict mode and diagnostics",
+                "paragraphs": [
+                    "--strict rejects Warning and Error diagnostics and creates no output. Info diagnostics, such as an empty optional include glob, are permitted. Input, syntax and required-include errors always abort, even without strict mode.",
+                    "Without --strict, review every warning. A variable proxy_pass remains unresolved and has no invented backend edge. Warnings describe analysis limits; they do not necessarily mean the Nginx configuration is invalid."
+                ],
+                "code": "nasj map --config ./nginx.conf --strict --format svg --output topology.svg"
+            },
+            {
+                "id": "exports",
+                "title": "Four output formats",
+                "paragraphs": [
+                    "Choose json, dot, svg or html with --format. HTML is one self-contained offline file; SVG needs no Graphviz. DOT can be used with your own Graphviz workflow. JSON schema 0.2 is experimental and distinct from product version 0.1.0."
+                ],
+                "code": "nasj map --config ./nginx.conf --format dot --output topology.dot"
+            },
+            {
+                "id": "evidence",
+                "title": "Read the evidence",
+                "paragraphs": [
+                    "Open report.html in a browser. Search a backend, choose a result, then use Inspect selection to read file-and-line evidence and relationships. Fit view and Readable scale help recover graph context.",
+                    "Configured describes declarations in files. It does not mean a service is running, reachable or runtime-confirmed. Conditions remain symbolic; NASJ does not simulate requests or evaluate variables.",
+                    "The website demo includes a localized semantic relationship list and source excerpts as an alternative to the English viewer. Its theme control is independent of the website."
+                ]
+            },
+            {
+                "id": "troubleshooting",
+                "title": "Troubleshooting and safe sharing",
+                "paragraphs": [
+                    "Permission or missing-include errors: check readable files and the prefix without elevating privileges. Existing-output errors: choose a new output path. Unsupported routing: inspect diagnostics and original source, rather than treating omitted edges as proof that no route exists.",
+                    "Input limits are 4 MiB per file, 16 MiB total reads, 1,024 file expansions, 32 include levels, 64 syntax levels and 200,000 tokens per file. Exceeding a limit aborts without a partial report.",
+                    "Reports intentionally contain hostnames and paths. Review before sharing: redaction is not a general secret detector. NASJ does not replace nginx -t and never runs it."
+                ]
+            }
+        ]
+    },
+    "compatibility": {
+        "title": "Compatibility and limits",
+        "description": "Tested Linux platforms, partial Nginx semantics, unsupported handlers and report accessibility limits.",
+        "sections": [
+            {
+                "id": "supported",
+                "title": "Supported · static configuration analysis",
+                "paragraphs": [
+                    "Linux x86_64 and ARM64 archives and Debian packages were validated natively on Ubuntu 22.04.5 and Debian 12. Source builds with Rust 1.99.1 passed on both architectures. Other operating systems, CPUs, Linux Mint and MUSL are unverified.",
+                    "Read-only UTF-8 configuration analysis supports declared includes, HTTP servers, listeners, locations, named upstreams, configured HTTP(S) proxy targets, root/alias metadata and JSON/DOT/SVG/offline HTML exports."
+                ]
+            },
+            {
+                "id": "partial",
+                "title": "Partial · conservative semantics",
+                "paragraphs": [
+                    "Simple server-level conditional returns are symbolic, ordered branches. Root inheritance is represented, but alias inheritance is unresolved. Duplicate upstream names, conflicting routing directives and unsupported contexts omit effective destination edges and emit diagnostics.",
+                    "Location forms are represented, but request matching and precedence are not simulated. Static configured edges describe intent, never runtime reachability."
+                ]
+            },
+            {
+                "id": "unsupported",
+                "title": "Unsupported · no invented destinations",
+                "paragraphs": [
+                    "Variable proxy_pass, arbitrary variable evaluation, general rewrite programs, try_files, error_page, mirror and unsupported conditional contexts remain unresolved. FastCGI, uWSGI, SCGI and gRPC handlers are unsupported; stream/mail are not traversed as HTTP routes. Embedded-language blocks fail syntax parsing.",
+                    "No DNS lookups, process/container discovery, socket probes, Nginx configuration validation or local web server are implemented. No automatic privilege escalation or Docker access occurs."
+                ]
+            },
+            {
+                "id": "browsers",
+                "title": "Website and report browsers",
+                "paragraphs": [
+                    "The launch candidate has automated Chromium, Firefox and WebKit coverage; exact versions, results and unresolved failures are in the launch review. Automation does not establish physical Safari/iOS/Android or screen-reader compatibility. Those manual tasks remain unverified.",
+                    "The released report viewer is English-only. Use the localized semantic summary and source excerpts when graph navigation or the embedded viewport is difficult. Search, Inspect selection, Fit view, internal scrolling and standalone viewing offer additional routes to evidence.",
+                    "Direct reports leave the iframe sandbox and share the website origin. They retain their pinned release CSP and open without an opener. Downloaded HTML works independently of neighboring assets; opening local HTML on mobile is device-dependent and unverified."
+                ]
+            },
+            {
+                "id": "privacy",
+                "title": "Privacy and sharing",
+                "paragraphs": [
+                    "The site has no uploads, telemetry, visitor API calls or remote fonts. Demo inputs use synthetic .test hostnames and local addresses. Your own reports still contain source paths and hostnames; review before sharing. Pattern checks and redaction cannot guarantee removal of every secret."
+                ]
+            }
+        ]
+    },
+    "roadmap": {
+        "title": "Roadmap and feature status",
+        "description": "What ships in NASJ v0.1.0, what remains experimental, and what is planned.",
+        "sections": [
+            {
+                "id": "shipped",
+                "title": "Shipped · v0.1.0",
+                "paragraphs": [
+                    "Read-only static Nginx HTTP topology, declared includes, configured relationships with file-and-line provenance, unresolved-routing diagnostics, and JSON/DOT/SVG/offline HTML exports. Linux x86_64 and ARM64 archives and Debian packages are published."
+                ]
+            },
+            {
+                "id": "experimental",
+                "title": "Experimental · JSON schema 0.2",
+                "paragraphs": [
+                    "The machine-readable schema is experimental. Schema 0.2 is not a NASJ 0.2 release and does not imply discovery support. Downstream consumers should pin and review schema changes."
+                ]
+            },
+            {
+                "id": "planned-discovery",
+                "title": "Planned · v0.2 discovery",
+                "paragraphs": [
+                    "Optional correlation with explicitly supplied Docker port snapshots, systemd observations and local listener/process evidence is proposed. It is absent from v0.1.0. Ordinary mapping will remain read-only and separate from optional discovery."
+                ]
+            },
+            {
+                "id": "planned-server",
+                "title": "Planned · v0.3 local dashboard",
+                "paragraphs": [
+                    "An optional localhost dashboard reusing the same analysis/export APIs is proposed. No server or dashboard command ships in v0.1.0. Security and filesystem boundaries require design before implementation."
+                ]
+            },
+            {
+                "id": "later",
+                "title": "Post-launch possibilities",
+                "paragraphs": [
+                    "More examples, viewer localization, website search and other nonessential improvements are future work without a delivery commitment. Follow repository issues or contribute; planned features are not installation prerequisites."
+                ]
+            }
+        ]
+    },
+    "licenses": {
+        "title": "Licenses and attribution",
+        "description": "NASJ MIT license, bundled font notices, website dependencies and official branding provenance.",
+        "sections": [
+            {
+                "id": "project",
+                "title": "NASJ and redistribution",
+                "paragraphs": [
+                    "NASJ is released under the MIT license. Preserve its copyright and license text when redistributing. Binary archives and Debian packages include reviewed third-party notices, including the full Unicode-3.0 notice. Retain the bundled notices with copies."
+                ]
+            },
+            {
+                "id": "website",
+                "title": "Website and fonts",
+                "paragraphs": [
+                    "The site bundles Inter and Noto Sans Arabic under the SIL Open Font License, and DejaVu Sans Mono under its included license. Tailwind’s MIT notice is included. Astro and development tools are build dependencies; their node_modules are not published. The locked dependency license inventory is checked during verification."
+                ]
+            },
+            {
+                "id": "branding",
+                "title": "Official branding",
+                "paragraphs": [
+                    "NASJ artwork is copied from the approved repository branding manifest, without recoloring or redrawing. Public assets are hash-pinned and local. NASJ is independent of F5 and NGINX; their names identify the configuration ecosystem, not endorsement."
+                ]
+            },
+            {
+                "id": "reports",
+                "title": "Reports and source material",
+                "paragraphs": [
+                    "Both demo reports are generated by the verified v0.1.0 executable from synthetic fixtures. The released English viewer, its CSP and its embedded branding are preserved. Source excerpts and file-line relationships describe synthetic configuration, not observed infrastructure."
+                ]
+            }
+        ]
+    }
+}

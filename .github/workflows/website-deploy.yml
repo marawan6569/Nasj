@@ -1,0 +1,90 @@
+name: Website approved artifact promotion
+on:
+  workflow_dispatch:
+    inputs:
+      approved_sha:
+        description: Exact approved main SHA (40 hex characters)
+        required: true
+      candidate_run:
+        description: Successful main Website verification run ID, less than 24 hours old
+        required: true
+      artifact_id:
+        description: Reviewed website-pages artifact ID from that run
+        required: true
+      archive_sha256:
+        description: Reviewed artifact.tar SHA-256 from candidate evidence
+        required: true
+      approval:
+        description: 'publish website <SHA> from run <ID>'
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: website-production
+  cancel-in-progress: false
+jobs:
+  preflight:
+    if: github.repository == 'marawan6569/Nasj' && github.ref == 'refs/heads/main' && vars.WEBSITE_LAUNCH_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+      pages: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: website/.nvmrc
+      - name: Fail closed on unauthorized or stale candidates and missing protection
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          APPROVED_SHA: ${{ inputs.approved_sha }}
+          CANDIDATE_RUN: ${{ inputs.candidate_run }}
+          CANDIDATE_ARTIFACT: ${{ inputs.artifact_id }}
+          ARCHIVE_SHA256: ${{ inputs.archive_sha256 }}
+          APPROVAL: ${{ inputs.approval }}
+          LAUNCH_ENABLED: ${{ vars.WEBSITE_LAUNCH_ENABLED }}
+        run: node website/scripts/verify-promotion.mjs
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # reviewed main 2026-11-07, Node 24
+        with:
+          artifact-ids: ${{ inputs.artifact_id }}
+          run-id: ${{ inputs.candidate_run }}
+          github-token: ${{ github.token }}
+          path: promotion
+      - name: Verify exact reviewed archive without rebuilding or extracting
+        env:
+          ARCHIVE_SHA256: ${{ inputs.archive_sha256 }}
+        run: |
+          test "$(find promotion -type f | wc -l)" -eq 1
+          test -f promotion/artifact.tar
+          printf '%s  %s\n' "$ARCHIVE_SHA256" promotion/artifact.tar | sha256sum --check --strict -
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: github-pages
+          path: promotion/artifact.tar
+          if-no-files-found: error
+          retention-days: 1
+  deploy:
+    needs: preflight
+    if: github.repository == 'marawan6569/Nasj' && github.ref == 'refs/heads/main' && vars.WEBSITE_LAUNCH_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Recheck main immediately before deployment
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          APPROVED_SHA: ${{ inputs.approved_sha }}
+        run: |
+          current=$(curl --fail --silent --show-error -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/marawan6569/Nasj/git/ref/heads/main | jq -r '.object.sha')
+          test "$current" = "$APPROVED_SHA"
+      - name: Deploy only the verified archive after explicit maintainer dispatch
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # reviewed main 2026-11-07, Node 24

@@ -1,0 +1,69 @@
+{
+    "version": "0.1.0",
+    "tag": "v0.1.0",
+    "commit": "b60cb2e045fc9476034bffba7967b8674825fa18",
+    "tagObject": "70e4e2c54d7b05ef2aa6fc505eca599dc4373efc",
+    "releaseId": 425004090,
+    "url": "https://github.com/marawan6569/Nasj/releases/download/v0.1.0/",
+    "evidence": ["docs/DISTRIBUTION.md", "docs/BINARY_VALIDATION_v0.1.0.md"],
+    "testedPlatforms": [
+        "Ubuntu 22.04.5 / x86_64",
+        "Ubuntu 22.04.5 / aarch64",
+        "Debian 12 / x86_64",
+        "Debian 12 / aarch64"
+    ],
+    "assets": [
+        {
+            "name": "nasj-v0.1.0-linux-x86_64.tar.gz",
+            "bytes": 702105,
+            "sha256": "3ec95fbd277382902f2adb91e37205e33c8e20f10053b1cc0cd14cec97ad6c02",
+            "manifest": "SHA256SUMS-binaries"
+        },
+        {
+            "name": "nasj_0.1.0_amd64.deb",
+            "bytes": 539360,
+            "sha256": "c279d07f94d0de24f16b6514daa7b9b414d7b0a5b90121c19ea4bbba5cb8029c",
+            "manifest": "SHA256SUMS-binaries"
+        },
+        {
+            "name": "nasj-v0.1.0-linux-aarch64.tar.gz",
+            "bytes": 656465,
+            "sha256": "6ad1df9101a2298fc68bb9df32fac9edf978f17c27056af049814352d05141b4",
+            "manifest": "SHA256SUMS-binaries"
+        },
+        {
+            "name": "nasj_0.1.0_arm64.deb",
+            "bytes": 477572,
+            "sha256": "3182a328bc9f7de94fbb0a2b235221f2eda01da65828b781fe63436acd6af228",
+            "manifest": "SHA256SUMS-binaries"
+        },
+        {
+            "name": "build-x86_64.json",
+            "bytes": 2464,
+            "sha256": "614b27b3bc5952789cf698b7f0b6ede6725b3bcdc14fd6890ec977d4badd1460",
+            "manifest": "SHA256SUMS-binaries"
+        },
+        {
+            "name": "build-aarch64.json",
+            "bytes": 2393,
+            "sha256": "b3e5bdea2db673019d46bba621332c253a29560e4d6cd7fc44fa307c16241503",
+            "manifest": "SHA256SUMS-binaries"
+        },
+        {
+            "name": "SHA256SUMS-binaries",
+            "bytes": 540,
+            "sha256": "12591beec119bd3c2c27ad48a61c572a8d99d06030f850186a396d8be61cd0e7",
+            "manifest": null
+        },
+        {
+            "name": "nasj-v0.1.0-source.tar.gz",
+            "sha256": "bc72c99f211c7d15ec77bbe683566d63d3f42bca8a6398682ae4081da34275bc",
+            "manifest": "SHA256SUMS"
+        },
+        {
+            "name": "SHA256SUMS",
+            "sha256": "68fbf4795692c984ae5a23d18267effd4f159c2423da10b59e86374142c2e43e",
+            "manifest": null
+        }
+    ]
+}

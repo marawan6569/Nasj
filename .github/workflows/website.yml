@@ -1,27 +1,29 @@
-name: Website foundation
+name: Website verification
 
 on:
   pull_request:
     paths:
       - 'website/**'
-      - '.github/workflows/website.yml'
+      - '.github/workflows/website*.yml'
       - 'assets/logos/**'
       - 'fixtures/nginx/multi-vhost.conf'
       - 'AGENTS.md'
       - '.editorconfig'
       - 'LICENSE'
       - 'docs/website/WEBSITE_PLAN.md'
+      - 'docs/BINARY_VALIDATION_v0.1.0.md'
   push:
     branches: [main]
     paths:
       - 'website/**'
-      - '.github/workflows/website.yml'
+      - '.github/workflows/website*.yml'
       - 'assets/logos/**'
       - 'fixtures/nginx/multi-vhost.conf'
       - 'AGENTS.md'
       - '.editorconfig'
       - 'LICENSE'
       - 'docs/website/WEBSITE_PLAN.md'
+      - 'docs/BINARY_VALIDATION_v0.1.0.md'
   workflow_dispatch:
 
 permissions:
@@ -34,7 +36,7 @@ concurrency:
 jobs:
   foundation:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       NASJ_DEMO_CACHE: /tmp/nasj-website-v010
     defaults:
@@ -78,12 +80,14 @@ jobs:
           npm run verify
           npm run test:artifacts
           npm run test:demos
+          npm run test:content
+          node --test tests/promotion.test.mjs
       - id: browsers
         run: npx playwright install --with-deps chromium
       - name: Project-prefix browser tests
         env:
           WEBSITE_TEST_RUN: project
-        run: npm test -- --update-snapshots=none
+        run: npm test -- --grep-invert "W4 content|production performance" --update-snapshots=none
       - name: Verify a deeper Pages prefix
         if: ${{ !cancelled() && steps.production.outcome == 'success' && steps.browsers.outcome == 'success' }}
         env:
@@ -111,3 +115,97 @@ jobs:
             website/test-results/
             website/playwright-report/
           retention-days: 7
+
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - base: /Nasj/
+            label: project
+          - base: /
+            label: root
+          - base: /preview/Nasj/
+            label: deeper
+    env:
+      WEBSITE_BASE: ${{ matrix.base }}
+      WEBSITE_TEST_RUN: candidate-${{ matrix.label }}
+      WEBSITE_ALL_BROWSERS: '1'
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: website/.nvmrc
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci --no-audit
+      - run: npm run build && npm run verify && npm run test:content
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - name: Sequential fixed-profile performance measurements
+        if: matrix.label == 'project'
+        env:
+          WEBSITE_TEST_RUN: candidate-performance
+        run: npm test -- --project chromium --grep 'production performance' --workers=1
+      - name: Complete browser matrix, preserving existing baselines
+        if: matrix.label == 'project'
+        run: npm test -- --grep-invert 'production performance' --update-snapshots=none
+      - name: Root and deeper-base behavioral regression
+        if: matrix.label != 'project'
+        run: npm test -- --grep 'W2|W4|real 404|theme precedence|effective production CSP|no JavaScript' --grep-invert 'production performance' --update-snapshots=none
+      - name: Compare reviewed W4 launch compositions
+        if: matrix.label == 'project'
+        env:
+          WEBSITE_TEST_RUN: candidate-visual
+        run: npm run test:visual
+      - name: Fresh published release verification
+        if: ${{ !cancelled() && matrix.label == 'project' }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: npm run verify:release
+      - name: Dependency and license audit
+        if: ${{ !cancelled() && matrix.label == 'project' }}
+        run: |
+          mkdir -p test-results/audit
+          npm run verify:dependencies
+          npm audit --json > test-results/audit/npm-audit.json
+      - name: Record exact production inventory and prepare candidate archive
+        if: matrix.label == 'project'
+        run: |
+          node scripts/review-identity.mjs > test-results/candidate-identity.json
+          tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -cf artifact.tar -C dist .
+          sha256sum artifact.tar > test-results/archive-sha256.txt
+      - name: Save tested candidate bytes (never deploy from PRs)
+        if: matrix.label == 'project'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: website-pages-${{ github.sha }}
+          path: website/artifact.tar
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve all success/failure evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: website-candidate-${{ matrix.label }}-evidence
+          path: |
+            website/test-results/
+            website/playwright-report/
+          retention-days: 30
+  candidate-rust:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+      - run: cargo build --workspace

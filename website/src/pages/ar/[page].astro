@@ -1,0 +1,13 @@
+---
+import ContentPage from "../../components/ContentPage.astro";
+import { contentRoutes } from "../../lib/paths";
+export function getStaticPaths() {
+    return contentRoutes.map((slug) => ({
+        params: { page: slug },
+        props: { slug },
+    }));
+}
+const { slug } = Astro.props;
+---
+
+<ContentPage locale="ar" slug={slug} />

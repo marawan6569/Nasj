@@ -1,0 +1,39 @@
+name: Website scheduled release and dependency audit
+on:
+  schedule:
+    - cron: '23 7 * * 1'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    if: github.repository == 'marawan6569/Nasj' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: website/.nvmrc
+      - run: npm ci --no-audit
+      - name: Fresh release bytes, tag identity, checksum associations and latest drift
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: npm run verify:release
+      - name: Dependency advisory and license audit (read only)
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p test-results/audit
+          npm run verify:dependencies
+          npm audit --json > test-results/audit/npm-audit.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: website-online-audit
+          path: website/test-results/
+          retention-days: 30
